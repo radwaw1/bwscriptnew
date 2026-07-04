@@ -24,7 +24,7 @@ local playerGui = player:WaitForChild("PlayerGui")
 -- If you paste a plain "username/repo" link with no branch, it defaults to "main".
 local REPO_URL = "https://github.com/radwaw1/bwscriptnew/tree/main"
  
-local GITHUB_FOLDER = "Modules" -- the folder inside the repo that holds your modules
+local GITHUB_FOLDER = "modules" -- the folder inside the repo that holds your modules
  
 ----------------------------------------------------------------
 -- PARSE THE REPO URL

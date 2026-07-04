@@ -1,14 +1,14 @@
--- ExampleModule.lua
+-- KrystalDisabler.lua
 -- Place ModuleScripts like this inside ReplicatedStorage.Modules
 -- Every module MUST return a table with:
 --   Name (string, optional - what shows on the button, defaults to script name)
 --   Run  (function - what happens when the button is clicked)
 
-local ExampleModule = {}
+local KrystalDisabler = {}
 
-ExampleModule.Name = "Disables Anticheat using Krystal Kit (OP!)"
+KrystalDisabler.Name = "Disables Anticheat using Krystal Kit (OP!)"
 
-ExampleModule.Run = function()
+KrystalDisabler.Run = function()
 	local KnitInit, Knit
     repeat
         KnitInit, Knit = pcall(function()
@@ -43,4 +43,4 @@ ExampleModule.Run = function()
     bedwars.GlacialSkaterController:updateMomentum()
 end
 
-return ExampleModule
+return KrystalDisabler
