@@ -1,3 +1,11 @@
+-- ModuleGuiLoader_GitHub.lua
+-- Place this LocalScript in StarterPlayer > StarterPlayerScripts
+-- Requires: Game Settings > Security > Allow HTTP Requests = ON
+--
+-- Loads every .lua file found in a specific folder of a GitHub repo,
+-- using the GitHub Contents API to discover files, then fetching each
+-- one's raw source and running it with loadstring.
+ 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local HttpService = game:GetService("HttpService")
@@ -9,10 +17,40 @@ local playerGui = player:WaitForChild("PlayerGui")
 -- CONFIGURE YOUR REPO HERE
 ----------------------------------------------------------------
  
-local GITHUB_USER   = "radwaw1"
-local GITHUB_REPO   = "bwscriptnew"
-local GITHUB_BRANCH = "main"
-local GITHUB_FOLDER = "modules" -- the folder inside the repo, "" for repo root
+-- Just paste the repo URL. Accepts formats like:
+--   https://github.com/username/repo
+--   https://github.com/username/repo/tree/branch
+--   https://github.com/username/repo/tree/branch/subfolder
+-- If you paste a plain "username/repo" link with no branch, it defaults to "main".
+local REPO_URL = "https://github.com/radwaw1/bwscriptnew/tree/main"
+ 
+local GITHUB_FOLDER = "Modules" -- the folder inside the repo that holds your modules
+ 
+----------------------------------------------------------------
+-- PARSE THE REPO URL
+----------------------------------------------------------------
+ 
+local function parseRepoUrl(url)
+	-- strip trailing slash, "github.com/" prefix noise, etc.
+	local user, repo, branch = url:match("github%.com/([^/]+)/([^/]+)/tree/([^/]+)")
+ 
+	if not user then
+		user, repo = url:match("github%.com/([^/]+)/([^/]+)")
+		branch = "main"
+	end
+ 
+	if repo then
+		repo = repo:gsub("%.git$", ""):gsub("/$", "")
+	end
+ 
+	return user, repo, branch
+end
+ 
+local GITHUB_USER, GITHUB_REPO, GITHUB_BRANCH = parseRepoUrl(REPO_URL)
+ 
+if not GITHUB_USER or not GITHUB_REPO then
+	warn("[ModuleHub] Could not parse REPO_URL - check the format")
+end
  
 local CONTENTS_API_URL = string.format(
 	"https://api.github.com/repos/%s/%s/contents/%s?ref=%s",
