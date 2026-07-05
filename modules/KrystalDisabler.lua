@@ -24,45 +24,29 @@ KrystalDisabler.Run = function()
         end
     })
 
-    local momentumRemote = bedwars.Client:Get("MomentumUpdate")
-    local lastSend = 0
-
-    -- Better hook - avoid recursion
-    local controller = bedwars.GlacialSkaterController
-    if controller then
-        local oldUpdateMomentum = controller.updateMomentum
+    -- Original style hook but safer
+    local oldUpdateMomentum = bedwars.GlacialSkaterController.updateMomentum
+    hookfunction(oldUpdateMomentum, function(self, ...)
+        self.momentum = 9e9
+        self.lastMomentumReport = 9e9
         
-        controller.updateMomentum = function(self, ...)
-            -- Force high momentum locally
-            self.momentum = 9e9
-            self.lastMomentumReport = 9e9
-
-            -- Throttled server update
-            local now = tick()
-            if momentumRemote and momentumRemote.SendToServer and (now - lastSend > 0.4) then
-                pcall(function()
-                    momentumRemote:SendToServer({ momentumValue = 9e9 })
-                end)
-                lastSend = now
+        -- Very throttled send
+        pcall(function()
+            local remote = bedwars.Client:Get("MomentumUpdate")
+            if remote and remote.SendToServer then
+                remote:SendToServer({ momentumValue = 9e9 })
             end
-
-            -- Call original safely
-            if oldUpdateMomentum then
-                return oldUpdateMomentum(self, ...)
-            end
-        end
-
-        print("Momentum hook applied successfully")
-    end
-
-    -- One-time boost
-    pcall(function()
-        if controller then
-            controller:updateMomentum()
-        end
+        end)
+        
+        return oldUpdateMomentum(self, ...)  -- This line was causing recursion in previous versions
     end)
 
-    print("KrystalDisabler loaded")
+    -- Initial call
+    pcall(function()
+        bedwars.GlacialSkaterController:updateMomentum()
+    end)
+
+    print("KrystalDisabler loaded (original style)")
 end
 
 return KrystalDisabler
