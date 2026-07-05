@@ -15,7 +15,7 @@ TPAura.Run = function()
     TPAura.Enabled = not TPAura.Enabled
 
     if TPAura.Enabled then
-        print("✅ Shitaura Enabled (40 studs + TP 15 behind + Hitreg 36)")
+        print("✅ Shitaura Enabled (40 studs + TP behind + Hitreg 36)")
         
         connection = task.spawn(function()
             while TPAura.Enabled do
@@ -53,11 +53,11 @@ TPAura.Run = function()
                         local distance = (targetRoot.Position - selfPos).Magnitude
                         if distance > 40 then continue end
 
-                        -- TP 15 studs behind target
+                        -- TP 5 studs behind target
                         local behindPos = targetRoot.Position - targetRoot.CFrame.LookVector * 8
                         root.CFrame = CFrame.lookAt(behindPos, targetRoot.Position)
 
-                        -- Improved Hitreg
+                        -- Improved Hitreg (36)
                         local dir = CFrame.lookAt(selfPos, targetRoot.Position).LookVector
                         local selfValidatePos = selfPos + dir * math.max(distance - 36, 0)
 
