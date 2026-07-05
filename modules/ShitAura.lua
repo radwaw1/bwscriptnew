@@ -8,66 +8,42 @@ local SwordHit = game:GetService("ReplicatedStorage")
 
 local connection = nil
 
-Killaura.Config = {
-    { Name = "Range", Type = "Slider", Min = 5, Max = 25, Default = 20, Value = 20, Suffix = " studs" },
-    { Name = "Max Targets", Type = "Slider", Min = 1, Max = 8, Default = 4, Value = 4 },
-    { Name = "Attack Speed", Type = "Slider", Min = 10, Max = 60, Default = 20, Value = 20, Suffix = " Hz" }
-}
-
 Killaura.Run = function()
     Killaura.Enabled = not Killaura.Enabled
 
     if Killaura.Enabled then
-        print("Killaura Enabled - Always attacking")
+        print("Killaura Enabled - Testing mode")
         
         connection = game:GetService("RunService").Heartbeat:Connect(function()
             if not Killaura.Enabled then return end
 
-            local range = Killaura.Config[1].Value
-            local maxTargets = Killaura.Config[2].Value
+            local character = entitylib.character
+            if not character or not character.RootPart then return end
 
-            local swordTool = nil
-            if store and store.tools and store.tools.sword then
-                swordTool = store.tools.sword.tool
-            elseif store and store.hand and store.hand.tool then
-                swordTool = store.hand.tool
-            end
+            local selfpos = character.RootPart.Position
 
-            local targets = entitylib.AllPosition({
-                Range = range,
-                Wallcheck = false,
-                Part = "RootPart",
-                Players = true,
-                NPCs = true,
-                Limit = maxTargets,
-                Sort = "Distance"
-            })
+            -- Get nearby players
+            for _, v in ipairs(Players:GetPlayers()) do
+                if v == player then continue end
+                local targetChar = v.Character
+                if not targetChar or not targetChar:FindFirstChild("HumanoidRootPart") then continue end
 
-            if #targets == 0 then return end
+                local targetPos = targetChar.HumanoidRootPart.Position
+                local distance = (targetPos - selfpos).Magnitude
 
-            local root = entitylib.character and entitylib.character.RootPart
-            if not root then return end
+                if distance > 20 then continue end
 
-            local selfpos = root.Position
-
-            for _, target in ipairs(targets) do
-                local actualRoot = target.Character and target.Character.PrimaryPart
-                if not actualRoot then continue end
-
-                local delta = actualRoot.Position - selfpos
-                if delta.Magnitude > range then continue end
-
-                local dir = CFrame.lookAt(selfpos, actualRoot.Position).LookVector
-                local pos = selfpos + dir * math.max(delta.Magnitude - 14.4, 0)
+                local dir = CFrame.lookAt(selfpos, targetPos).LookVector
+                local pos = selfpos + dir * math.max(distance - 14.4, 0)
 
                 SwordHit:FireServer({
                     chargedAttack = { chargeRatio = 0 },
-                    entityInstance = target.Character,
+                    entityInstance = targetChar,
                     validate = {
                         selfPosition = { value = pos },
-                        targetPosition = { value = actualRoot.Position }
+                        targetPosition = { value = targetPos }
                     },
-                    weapon = swordTool
+                    weapon = player.Backpack:FindFirstChildWhichIsA("Tool") or player.Character:FindFirstChildWhichIsA("Tool")
                 })
             end
         end)
