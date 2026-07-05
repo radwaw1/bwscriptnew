@@ -15,7 +15,7 @@ TPAura.Run = function()
     TPAura.Enabled = not TPAura.Enabled
 
     if TPAura.Enabled then
-        print("✅ Shitaura Enabled (Long Range Reach)")
+        print("✅ Shitaura Enabled")
         
         connection = task.spawn(function()
             while TPAura.Enabled do
@@ -23,14 +23,8 @@ TPAura.Run = function()
                 if root then
                     local selfPos = root.Position
 
-                    -- Find weapon
-                    local weapon = nil
-                    if player.Character then
-                        weapon = player.Character:FindFirstChildWhichIsA("Tool")
-                    end
-                    if not weapon then
-                        weapon = player.Backpack:FindFirstChildWhichIsA("Tool")
-                    end
+                    local weapon = player.Character and player.Character:FindFirstChildWhichIsA("Tool") 
+                                or player.Backpack:FindFirstChildWhichIsA("Tool")
 
                     for _, plr in ipairs(Players:GetPlayers()) do
                         if plr == player then continue end
@@ -40,16 +34,15 @@ TPAura.Run = function()
                         if not targetRoot then continue end
 
                         local distance = (targetRoot.Position - selfPos).Magnitude
-                        if distance > 100 then continue end  -- Long range
+                        if distance > 40 then continue end
 
-                        -- Fake position far behind target (server thinks you're there)
-                        local fakeBehindPos = targetRoot.Position - targetRoot.CFrame.LookVector * 25
+                        local fakePos = targetRoot.Position - targetRoot.CFrame.LookVector * 12
 
                         SwordHit:FireServer({
                             chargedAttack = { chargeRatio = 0 },
                             entityInstance = targetChar,
                             validate = {
-                                selfPosition = { value = fakeBehindPos },
+                                selfPosition = { value = fakePos },
                                 targetPosition = { value = targetRoot.Position }
                             },
                             weapon = weapon
