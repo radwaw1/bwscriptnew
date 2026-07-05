@@ -3,26 +3,20 @@ local KrystalDisabler = {}
 KrystalDisabler.Name = "KrystalDisabler"
 
 KrystalDisabler.Run = function()
-    print("KrystalDisabler: Starting...")
-
     task.wait(3)
     
-    local KnitInit, Knit = pcall(function()
-        return require(game:GetService('ReplicatedStorage').rbxts_include.node_modules["@easy-games"].knit.src).KnitClient
-    end)
-
-    print("Knit loaded:", KnitInit)
-
-    if not KnitInit then
-        print("Failed to load Knit")
-        return
-    end
+    local KnitInit, Knit
+    repeat
+        KnitInit, Knit = pcall(function()
+            return require(game:GetService('ReplicatedStorage').rbxts_include.node_modules["@easy-games"].knit.src).KnitClient
+        end)
+        if KnitInit then break end
+        task.wait()
+    until KnitInit
 
     if not debug.getupvalue(Knit.Start, 1) then
         repeat task.wait() until debug.getupvalue(Knit.Start, 1)
     end
-
-    print("Knit fully initialized")
 
     local bedwars = setmetatable({
         Client = require(game:GetService('ReplicatedStorage').TS.remotes).default.Client
@@ -33,12 +27,9 @@ KrystalDisabler.Run = function()
         end
     })
 
-    print("Bedwars table created")
-
-    -- Momentum Bypass
+    -- Momentum Bypass (only this)
     local controller = bedwars.GlacialSkaterController
     if controller then
-        print("Found GlacialSkaterController")
         local oldUpdate = controller.updateMomentum
         hookfunction(oldUpdate, function(self, ...)
             self.momentum = 9e9
@@ -51,12 +42,9 @@ KrystalDisabler.Run = function()
         pcall(function()
             controller:updateMomentum()
         end)
-        print("Momentum hook applied")
-    else
-        print("GlacialSkaterController not found")
     end
 
-    print("✅ KrystalDisabler loaded successfully")
+    print("✅ KrystalDisabler loaded (Minimal & Safe)")
 end
 
 return KrystalDisabler
