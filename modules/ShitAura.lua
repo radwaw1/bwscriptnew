@@ -1,6 +1,6 @@
 local Killaura = {}
 
-Killaura.Name = "Killaura"
+Killaura.Name = "Shitaura"
 Killaura.Enabled = false
 
 local SwordHit = game:GetService("ReplicatedStorage")
