@@ -1,6 +1,6 @@
 local TPAura = {}
 
-TPAura.Name = "TPaura"
+TPAura.Name = "TPAura"
 TPAura.Enabled = false
 
 local SwordHit = game:GetService("ReplicatedStorage")
@@ -8,6 +8,7 @@ local SwordHit = game:GetService("ReplicatedStorage")
 
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
+local workspace = game:GetService("Workspace")
 
 local connection = nil
 
@@ -15,7 +16,7 @@ TPAura.Run = function()
     TPAura.Enabled = not TPAura.Enabled
 
     if TPAura.Enabled then
-        print("✅ Shitaura Enabled (40 studs + TP behind + Hitreg 36)")
+        print("✅ TPAura Enabled (Smart TP)")
         
         connection = task.spawn(function()
             while TPAura.Enabled do
@@ -23,25 +24,8 @@ TPAura.Run = function()
                 if root then
                     local selfPos = root.Position
 
-                    -- Find weapon
-                    local weapon = nil
-                    if player.Character then
-                        weapon = player.Character:FindFirstChildWhichIsA("Tool")
-                    end
-                    if not weapon then
-                        weapon = player.Backpack:FindFirstChildWhichIsA("Tool")
-                    end
-                    if not weapon then
-                        local inventory = game:GetService("ReplicatedStorage").Inventories:FindFirstChild(player.Name)
-                        if inventory then
-                            for _, item in ipairs(inventory:GetChildren()) do
-                                if item.Name:find("sword") or item.Name:find("Sword") then
-                                    weapon = item
-                                    break
-                                end
-                            end
-                        end
-                    end
+                    local weapon = player.Character and player.Character:FindFirstChildWhichIsA("Tool") 
+                                or player.Backpack:FindFirstChildWhichIsA("Tool")
 
                     for _, plr in ipairs(Players:GetPlayers()) do
                         if plr == player then continue end
@@ -53,11 +37,33 @@ TPAura.Run = function()
                         local distance = (targetRoot.Position - selfPos).Magnitude
                         if distance > 40 then continue end
 
-                        -- TP 5 studs behind target
-                        local behindPos = targetRoot.Position - targetRoot.CFrame.LookVector * 8
+                        -- Try to TP 8 studs behind
+                        local direction = targetRoot.CFrame.LookVector
+                        local behindPos = targetRoot.Position - direction * 8
+
+                        -- Check if position is blocked
+                        local rayParams = RaycastParams.new()
+                        rayParams.FilterDescendantsInstances = {player.Character}
+                        rayParams.FilterType = Enum.RaycastFilterType.Exclude
+
+                        local result = workspace:Raycast(behindPos + Vector3.new(0, 5, 0), Vector3.new(0, -10, 0), rayParams)
+
+                        if result then
+                            -- If blocked, try left or right side
+                            local leftPos = targetRoot.Position - targetRoot.CFrame.RightVector * 8
+                            local rightPos = targetRoot.Position + targetRoot.CFrame.RightVector * 8
+
+                            if not workspace:Raycast(leftPos + Vector3.new(0,5,0), Vector3.new(0,-10,0), rayParams) then
+                                behindPos = leftPos
+                            elseif not workspace:Raycast(rightPos + Vector3.new(0,5,0), Vector3.new(0,-10,0), rayParams) then
+                                behindPos = rightPos
+                            end
+                        end
+
+                        -- TP to safe position
                         root.CFrame = CFrame.lookAt(behindPos, targetRoot.Position)
 
-                        -- Improved Hitreg (36)
+                        -- Attack
                         local dir = CFrame.lookAt(selfPos, targetRoot.Position).LookVector
                         local selfValidatePos = selfPos + dir * math.max(distance - 36, 0)
 
@@ -78,7 +84,7 @@ TPAura.Run = function()
         end)
 
     else
-        print("❌ Shitaura Disabled")
+        print("❌ TPAura Disabled")
         if connection then
             connection:Disconnect()
             connection = nil
