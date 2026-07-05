@@ -4,6 +4,7 @@ Killaura.Name = "ShitAura"
 Killaura.Enabled = false
 
 local AttackRemote = { FireServer = function() end }
+local connection = nil
 
 task.spawn(function()
     if bedwars and bedwars.Client then
@@ -11,27 +12,35 @@ task.spawn(function()
     end
 end)
 
-local connection
+Killaura.Config = {
+    { Name = "Range", Type = "Slider", Min = 5, Max = 25, Default = 20, Value = 20, Suffix = " studs" },
+    { Name = "Max Targets", Type = "Slider", Min = 1, Max = 8, Default = 4, Value = 4 },
+    { Name = "Attack Speed", Type = "Slider", Min = 10, Max = 60, Default = 20, Value = 20, Suffix = " Hz" }
+}
 
 Killaura.Run = function()
     Killaura.Enabled = not Killaura.Enabled
-    
+
     if Killaura.Enabled then
-        print("Killaura Enabled (20 studs)")
+        print("Killaura Enabled")
         
         connection = game:GetService("RunService").Heartbeat:Connect(function()
             if not Killaura.Enabled then return end
-            
+
+            local range = Killaura.Config[1].Value
+            local maxTargets = Killaura.Config[2].Value
+            local rate = 1 / (Killaura.Config[3].Value / 10)
+
             local sword = store.tools.sword or store.hand
             if not sword or not sword.tool then return end
 
             local targets = entitylib.AllPosition({
-                Range = 20,
+                Range = range,
                 Wallcheck = false,
                 Part = "RootPart",
                 Players = true,
                 NPCs = true,
-                Limit = 4,
+                Limit = maxTargets,
                 Sort = "Distance"
             })
 
@@ -41,7 +50,6 @@ Killaura.Run = function()
             if not root then return end
 
             local selfpos = root.Position
-
             switchItem(sword.tool, 0)
 
             for _, target in ipairs(targets) do
@@ -49,12 +57,10 @@ Killaura.Run = function()
                 if not actualRoot then continue end
 
                 local delta = actualRoot.Position - selfpos
-                local distance = delta.Magnitude
-
-                if distance > 20 then continue end
+                if delta.Magnitude > range then continue end
 
                 local dir = CFrame.lookAt(selfpos, actualRoot.Position).LookVector
-                local pos = selfpos + dir * math.max(distance - 14.4, 0)
+                local pos = selfpos + dir * math.max(delta.Magnitude - 14.4, 0)
 
                 bedwars.SwordController.lastAttack = workspace:GetServerTimeNow()
 
@@ -73,14 +79,13 @@ Killaura.Run = function()
                 })
             end
         end)
-        
+
     else
         print("Killaura Disabled")
         if connection then
             connection:Disconnect()
             connection = nil
         end
-        store.KillauraTarget = nil
     end
 end
 
