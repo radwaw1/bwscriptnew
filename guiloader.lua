@@ -150,8 +150,8 @@ local function createConfigWindow(moduleData)
     end
 
     local configFrame = Instance.new("Frame")
-    configFrame.Size = UDim2.new(0, 280, 0, 400)
-    configFrame.Position = UDim2.new(0.5, -140, 0.5, -200)
+    configFrame.Size = UDim2.new(0, 280, 0, 420)
+    configFrame.Position = UDim2.new(0.5, -140, 0.5, -210)
     configFrame.BackgroundColor3 = Color3.fromRGB(25,25,30)
     configFrame.Parent = screenGui
 
@@ -173,39 +173,102 @@ local function createConfigWindow(moduleData)
 
     makeDraggable(configFrame, titleBarConfig)
 
-    -- Keybind
-    local keybindLabel = Instance.new("TextLabel")
-    keybindLabel.Size = UDim2.new(1,-20,0,30)
-    keybindLabel.Position = UDim2.new(0,10,0,50)
-    keybindLabel.BackgroundTransparency = 1
-    keybindLabel.Text = "Keybind: None"
-    keybindLabel.TextColor3 = Color3.fromRGB(200,200,200)
-    keybindLabel.Font = Enum.Font.Gotham
-    keybindLabel.TextSize = 14
-    keybindLabel.Parent = configFrame
+    local content = Instance.new("ScrollingFrame")
+    content.Size = UDim2.new(1,-20,1,-50)
+    content.Position = UDim2.new(0,10,0,45)
+    content.BackgroundTransparency = 1
+    content.ScrollBarThickness = 6
+    content.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    content.Parent = configFrame
 
-    local keybindBtn = Instance.new("TextButton")
-    keybindBtn.Size = UDim2.new(1,-20,0,30)
-    keybindBtn.Position = UDim2.new(0,10,0,85)
-    keybindBtn.BackgroundColor3 = Color3.fromRGB(50,50,55)
-    keybindBtn.Text = "Click to set keybind"
-    keybindBtn.TextColor3 = Color3.fromRGB(255,255,255)
-    keybindBtn.Font = Enum.Font.Gotham
-    keybindBtn.TextSize = 14
-    keybindBtn.Parent = configFrame
+    local uiList = Instance.new("UIListLayout")
+    uiList.Padding = UDim.new(0,10)
+    uiList.SortOrder = Enum.SortOrder.LayoutOrder
+    uiList.Parent = content
 
-    keybindBtn.MouseButton1Click:Connect(function()
-        keybindBtn.Text = "Press any key..."
-        local conn
-        conn = UserInputService.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.Keyboard then
-                keybinds[name] = input.KeyCode
-                keybindBtn.Text = "Key: " .. input.KeyCode.Name
-                keybindLabel.Text = "Keybind: " .. input.KeyCode.Name
-                conn:Disconnect()
+    -- Config Options
+    for _, setting in ipairs(moduleData.Config or {}) do
+        if setting.Type == "Toggle" then
+            local btn = Instance.new("TextButton")
+            btn.Size = UDim2.new(1,0,0,40)
+            btn.BackgroundColor3 = setting.Value and Color3.fromRGB(40,120,60) or Color3.fromRGB(70,70,80)
+            btn.Text = "   " .. setting.Name
+            btn.TextColor3 = Color3.fromRGB(255,255,255)
+            btn.TextXAlignment = Enum.TextXAlignment.Left
+            btn.Font = Enum.Font.Gotham
+            btn.TextSize = 15
+            btn.Parent = content
+
+            local corner = Instance.new("UICorner"); corner.CornerRadius = UDim.new(0,6); corner.Parent = btn
+
+            btn.MouseButton1Click:Connect(function()
+                setting.Value = not setting.Value
+                btn.BackgroundColor3 = setting.Value and Color3.fromRGB(40,120,60) or Color3.fromRGB(70,70,80)
+            end)
+
+        elseif setting.Type == "Slider" then
+            local frame = Instance.new("Frame")
+            frame.Size = UDim2.new(1,0,0,65)
+            frame.BackgroundTransparency = 1
+            frame.Parent = content
+
+            local label = Instance.new("TextLabel")
+            label.Size = UDim2.new(1,0,0,20)
+            label.BackgroundTransparency = 1
+            label.Text = setting.Name .. ": " .. setting.Value .. (setting.Suffix or "")
+            label.TextColor3 = Color3.fromRGB(220,220,220)
+            label.Font = Enum.Font.Gotham
+            label.TextSize = 14
+            label.Parent = frame
+
+            local bg = Instance.new("Frame")
+            bg.Size = UDim2.new(1,0,0,12)
+            bg.Position = UDim2.new(0,0,0,32)
+            bg.BackgroundColor3 = Color3.fromRGB(45,45,50)
+            bg.Parent = frame
+
+            local fill = Instance.new("Frame")
+            fill.BackgroundColor3 = Color3.fromRGB(0, 170, 100)
+            fill.Parent = bg
+
+            local bCorner = Instance.new("UICorner"); bCorner.CornerRadius = UDim.new(0,6); bCorner.Parent = bg
+            bCorner:Clone().Parent = fill
+
+            local function updateFill()
+                local percent = (setting.Value - setting.Min) / (setting.Max - setting.Min)
+                fill.Size = UDim2.new(percent, 0, 1, 0)
+                label.Text = setting.Name .. ": " .. setting.Value .. (setting.Suffix or "")
             end
-        end)
-    end)
+            updateFill()
+
+            -- Draggable Slider
+            local dragging = false
+            bg.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    dragging = true
+                end
+            end)
+
+            UserInputService.InputChanged:Connect(function(input)
+                if not dragging then return end
+                if input.UserInputType == Enum.UserInputType.MouseMovement then
+                    local mouseX = UserInputService:GetMouseLocation().X
+                    local bgX = bg.AbsolutePosition.X
+                    local bgWidth = bg.AbsoluteSize.X
+
+                    local percent = math.clamp((mouseX - bgX) / bgWidth, 0, 1)
+                    setting.Value = math.floor(setting.Min + percent * (setting.Max - setting.Min))
+                    updateFill()
+                end
+            end)
+
+            UserInputService.InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    dragging = false
+                end
+            end)
+        end
+    end
 
     openConfigWindows[name] = configFrame
 end

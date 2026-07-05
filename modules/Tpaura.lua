@@ -16,7 +16,7 @@ TPAura.Run = function()
     TPAura.Enabled = not TPAura.Enabled
 
     if TPAura.Enabled then
-        print("✅ TPAura Enabled (Smart TP)")
+        print("✅ TPAura Enabled (Smart TP + Skip Dead)")
         
         connection = task.spawn(function()
             while TPAura.Enabled do
@@ -31,7 +31,12 @@ TPAura.Run = function()
                         if plr == player then continue end
 
                         local targetChar = plr.Character
-                        local targetRoot = targetChar and targetChar:FindFirstChild("HumanoidRootPart")
+                        if not targetChar then continue end
+
+                        local humanoid = targetChar:FindFirstChild("Humanoid")
+                        if not humanoid or humanoid.Health <= 0 then continue end  -- Skip dead players
+
+                        local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
                         if not targetRoot then continue end
 
                         local distance = (targetRoot.Position - selfPos).Magnitude
@@ -49,7 +54,7 @@ TPAura.Run = function()
                         local result = workspace:Raycast(behindPos + Vector3.new(0, 5, 0), Vector3.new(0, -10, 0), rayParams)
 
                         if result then
-                            -- If blocked, try left or right side
+                            -- Try left or right side
                             local leftPos = targetRoot.Position - targetRoot.CFrame.RightVector * 8
                             local rightPos = targetRoot.Position + targetRoot.CFrame.RightVector * 8
 
