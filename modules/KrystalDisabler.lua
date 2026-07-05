@@ -1,7 +1,9 @@
 local KrystalDisabler = {}
-KrystalDisabler.Name = "Disables Anticheat"
-
+ 
+KrystalDisabler.Name = "KrystalDisabler"
+ 
 KrystalDisabler.Run = function()
+	task.wait(3)
     local KnitInit, Knit
     repeat
         KnitInit, Knit = pcall(function()
@@ -24,29 +26,38 @@ KrystalDisabler.Run = function()
         end
     })
 
-    -- Original style hook but safer
+    -- Original main hook
     local oldUpdateMomentum = bedwars.GlacialSkaterController.updateMomentum
     hookfunction(oldUpdateMomentum, function(self, ...)
         self.momentum = 9e9
         self.lastMomentumReport = 9e9
-        
-        -- Very throttled send
         pcall(function()
-            local remote = bedwars.Client:Get("MomentumUpdate")
-            if remote and remote.SendToServer then
-                remote:SendToServer({ momentumValue = 9e9 })
-            end
+            bedwars.Client:Get("MomentumUpdate"):SendToServer({
+                momentumValue = 9e9
+            })
         end)
-        
-        return oldUpdateMomentum(self, ...)  -- This line was causing recursion in previous versions
     end)
 
-    -- Initial call
     pcall(function()
         bedwars.GlacialSkaterController:updateMomentum()
     end)
 
-    print("KrystalDisabler loaded (original style)")
-end
+    -- Very selective SendToServer hook
+    local momentumRemote = bedwars.Client:Get("MomentumUpdate")
+    if momentumRemote then
+        local oldSend = momentumRemote.SendToServer
+        hookfunction(oldSend, function(self, data)
+            -- Only intercept momentum packets
+            if type(data) == "table" and data.momentumValue ~= nil then
+                return oldSend(self, { momentumValue = 9e9 })
+            end
+            -- Let all other remotes (shop, etc.) pass through normally
+            return oldSend(self, data)
+        end)
+    end
 
+    print("KrystalDisabler loaded (selective)")
+end
+ 
 return KrystalDisabler
+
