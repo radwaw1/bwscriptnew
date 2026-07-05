@@ -1,6 +1,6 @@
 local TPAura = {}
 
-TPAura.Name = "TPAura"
+TPAura.Name = "TPaura"
 TPAura.Enabled = false
 
 local SwordHit = game:GetService("ReplicatedStorage")
@@ -15,17 +15,33 @@ TPAura.Run = function()
     TPAura.Enabled = not TPAura.Enabled
 
     if TPAura.Enabled then
-        print("✅ Shitaura Enabled (TP behind → Hit → Back)")
+        print("✅ Shitaura Enabled (40 studs + TP 15 behind + Hitreg 36)")
         
         connection = task.spawn(function()
             while TPAura.Enabled do
                 local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
                 if root then
-                    local oldCFrame = root.CFrame  -- Save original position
                     local selfPos = root.Position
 
-                    local weapon = player.Character and player.Character:FindFirstChildWhichIsA("Tool") 
-                                or player.Backpack:FindFirstChildWhichIsA("Tool")
+                    -- Find weapon
+                    local weapon = nil
+                    if player.Character then
+                        weapon = player.Character:FindFirstChildWhichIsA("Tool")
+                    end
+                    if not weapon then
+                        weapon = player.Backpack:FindFirstChildWhichIsA("Tool")
+                    end
+                    if not weapon then
+                        local inventory = game:GetService("ReplicatedStorage").Inventories:FindFirstChild(player.Name)
+                        if inventory then
+                            for _, item in ipairs(inventory:GetChildren()) do
+                                if item.Name:find("sword") or item.Name:find("Sword") then
+                                    weapon = item
+                                    break
+                                end
+                            end
+                        end
+                    end
 
                     for _, plr in ipairs(Players:GetPlayers()) do
                         if plr == player then continue end
@@ -37,11 +53,11 @@ TPAura.Run = function()
                         local distance = (targetRoot.Position - selfPos).Magnitude
                         if distance > 40 then continue end
 
-                        -- TP 8 studs behind
+                        -- TP 15 studs behind target
                         local behindPos = targetRoot.Position - targetRoot.CFrame.LookVector * 8
                         root.CFrame = CFrame.lookAt(behindPos, targetRoot.Position)
 
-                        -- Attack
+                        -- Improved Hitreg
                         local dir = CFrame.lookAt(selfPos, targetRoot.Position).LookVector
                         local selfValidatePos = selfPos + dir * math.max(distance - 36, 0)
 
@@ -54,9 +70,6 @@ TPAura.Run = function()
                             },
                             weapon = weapon
                         })
-
-                        -- TP back immediately
-                        root.CFrame = oldCFrame
                     end
                 end
 
