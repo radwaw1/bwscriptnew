@@ -60,7 +60,7 @@ local titleLabel = Instance.new("TextLabel")
 titleLabel.Size = UDim2.new(1, -100, 1, 0)
 titleLabel.Position = UDim2.new(0, 12, 0, 0)
 titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "shit script"
+titleLabel.Text = "Module Hub"
 titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 titleLabel.TextXAlignment = Enum.TextXAlignment.Left
 titleLabel.Font = Enum.Font.GothamBold
@@ -68,7 +68,6 @@ titleLabel.TextSize = 16
 titleLabel.Parent = titleBar
 
 local selfDestructBtn = Instance.new("TextButton")
-selfDestructBtn.Name = "SelfDestruct"
 selfDestructBtn.Size = UDim2.new(0, 85, 0, 24)
 selfDestructBtn.Position = UDim2.new(1, -92, 0.5, -12)
 selfDestructBtn.BackgroundColor3 = Color3.fromRGB(170, 30, 30)
@@ -79,7 +78,6 @@ selfDestructBtn.TextSize = 11
 selfDestructBtn.Parent = titleBar
 
 local reloadButton = Instance.new("TextButton")
-reloadButton.Name = "ReloadButton"
 reloadButton.Size = UDim2.new(0, 60, 0, 24)
 reloadButton.Position = UDim2.new(1, -155, 0.5, -12)
 reloadButton.BackgroundColor3 = Color3.fromRGB(45, 45, 52)
@@ -90,7 +88,6 @@ reloadButton.TextSize = 12
 reloadButton.Parent = titleBar
 
 local statusLabel = Instance.new("TextLabel")
-statusLabel.Name = "StatusLabel"
 statusLabel.Size = UDim2.new(1, -16, 0, 18)
 statusLabel.Position = UDim2.new(0, 8, 0, 40)
 statusLabel.BackgroundTransparency = 1
@@ -102,13 +99,10 @@ statusLabel.TextXAlignment = Enum.TextXAlignment.Left
 statusLabel.Parent = mainFrame
 
 local scrollFrame = Instance.new("ScrollingFrame")
-scrollFrame.Name = "ModuleList"
 scrollFrame.Size = UDim2.new(1, -16, 1, -68)
 scrollFrame.Position = UDim2.new(0, 8, 0, 60)
 scrollFrame.BackgroundTransparency = 1
-scrollFrame.BorderSizePixel = 0
 scrollFrame.ScrollBarThickness = 4
-scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
 scrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
 scrollFrame.Parent = mainFrame
 
@@ -123,37 +117,42 @@ listLayout.Parent = scrollFrame
 local modules = {}
 
 ----------------------------------------------------------------
--- SMOOTH DRAGGING (Improved)
+-- DRAG FUNCTION (Reusable)
 ----------------------------------------------------------------
-local dragging = false
-local dragStart = nil
-local startPos = nil
+local function makeDraggable(frame, dragBar)
+    local dragging = false
+    local dragInput = nil
+    local dragStart = nil
+    local startPos = nil
 
-titleBar.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = mainFrame.Position
-        
-        local conn
-        conn = input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-                conn:Disconnect()
-            end
-        end)
-    end
-end)
-
-UserInputService.InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+    local function update(input)
         local delta = input.Position - dragStart
-        mainFrame.Position = UDim2.new(
-            startPos.X.Scale, startPos.X.Offset + delta.X,
-            startPos.Y.Scale, startPos.Y.Offset + delta.Y
-        )
+        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
-end)
+
+    dragBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            update(input)
+        end
+    end)
+end
+
+-- Make main GUI draggable
+makeDraggable(mainFrame, titleBar)
 
 ----------------------------------------------------------------
 -- SELF DESTRUCT
@@ -164,7 +163,7 @@ selfDestructBtn.MouseButton1Click:Connect(function()
 end)
 
 ----------------------------------------------------------------
--- CONFIG WINDOW
+-- CONFIG WINDOW (with dragging)
 ----------------------------------------------------------------
 local function createConfigWindow(moduleData)
     if not moduleData.Config then
@@ -176,20 +175,28 @@ local function createConfigWindow(moduleData)
     configFrame.Size = UDim2.new(0, 260, 0, 340)
     configFrame.Position = UDim2.new(0.5, -130, 0.5, -170)
     configFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+    configFrame.BorderSizePixel = 0
     configFrame.Parent = screenGui
 
     local cCorner = Instance.new("UICorner")
     cCorner.CornerRadius = UDim.new(0, 8)
     cCorner.Parent = configFrame
 
-    local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, 0, 0, 36)
-    title.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
-    title.Text = moduleData.Name .. " Settings"
-    title.TextColor3 = Color3.fromRGB(255, 255, 255)
-    title.Font = Enum.Font.GothamBold
-    title.TextSize = 16
-    title.Parent = configFrame
+    local titleBarConfig = Instance.new("Frame")
+    titleBarConfig.Size = UDim2.new(1, 0, 0, 36)
+    titleBarConfig.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
+    titleBarConfig.Parent = configFrame
+
+    local titleLabelConfig = Instance.new("TextLabel")
+    titleLabelConfig.Size = UDim2.new(1, 0, 1, 0)
+    titleLabelConfig.BackgroundTransparency = 1
+    titleLabelConfig.Text = moduleData.Name .. " Settings"
+    titleLabelConfig.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabelConfig.Font = Enum.Font.GothamBold
+    titleLabelConfig.TextSize = 16
+    titleLabelConfig.Parent = titleBarConfig
+
+    makeDraggable(configFrame, titleBarConfig)  -- Config window is now draggable
 
     local y = 50
     for _, setting in ipairs(moduleData.Config) do
@@ -210,22 +217,10 @@ local function createConfigWindow(moduleData)
                 btn.BackgroundColor3 = setting.Value and Color3.fromRGB(40, 120, 60) or Color3.fromRGB(80, 80, 90)
             end)
             y += 44
-
-        elseif setting.Type == "Slider" then
-            local label = Instance.new("TextLabel")
-            label.Size = UDim2.new(1, -20, 0, 20)
-            label.Position = UDim2.new(0, 10, 0, y)
-            label.BackgroundTransparency = 1
-            label.Text = setting.Name .. ": " .. setting.Value .. (setting.Suffix or "")
-            label.TextColor3 = Color3.fromRGB(200, 200, 200)
-            label.Font = Enum.Font.Gotham
-            label.TextSize = 13
-            label.Parent = configFrame
-            y += 35
         end
     end
 
-    task.delay(12, function() if configFrame then configFrame:Destroy() end end)
+    task.delay(15, function() if configFrame.Parent then configFrame:Destroy() end end)
 end
 
 ----------------------------------------------------------------
@@ -287,37 +282,19 @@ end
 ----------------------------------------------------------------
 -- MODULE LOADING
 ----------------------------------------------------------------
-local function clearModuleList()
+local function refreshModules()
     for _, child in ipairs(scrollFrame:GetChildren()) do
         if child:IsA("Frame") then child:Destroy() end
     end
     modules = {}
-end
 
-local function loadModuleFromUrl(downloadUrl, fallbackName)
-    local ok, response = pcall(function()
-        return request({Url = downloadUrl, Method = "GET"})
-    end)
-    if not ok or not response.Success then return end
-
-    local compiled = loadstring(response.Body)
-    if not compiled then return end
-
-    local success, moduleData = pcall(compiled)
-    if success and moduleData and moduleData.Run then
-        createButtonForModule(moduleData)
-    end
-end
-
-local function refreshModules()
-    clearModuleList()
     statusLabel.Text = "Loading modules..."
 
     local url = string.format("https://api.github.com/repos/%s/%s/contents/%s?ref=%s", REPO_USER, REPO_NAME, GITHUB_FOLDER, REPO_BRANCH)
 
     local ok, response = pcall(function() return request({Url = url, Method = "GET"}) end)
     if not ok or not response.Success then
-        statusLabel.Text = "Failed to connect to GitHub"
+        statusLabel.Text = "Failed to reach GitHub"
         return
     end
 
@@ -326,8 +303,17 @@ local function refreshModules()
 
     for _, file in ipairs(files) do
         if file.type == "file" and file.name:match("%.lua$") and file.download_url then
-            loadModuleFromUrl(file.download_url, file.name)
-            count += 1
+            local ok2, res = pcall(function() return request({Url = file.download_url, Method = "GET"}) end)
+            if ok2 and res.Success then
+                local func = loadstring(res.Body)
+                if func then
+                    local s, mod = pcall(func)
+                    if s and mod and mod.Run then
+                        createButtonForModule(mod)
+                        count += 1
+                    end
+                end
+            end
         end
     end
 
@@ -336,5 +322,5 @@ end
 
 reloadButton.MouseButton1Click:Connect(refreshModules)
 
--- Initial Load
+-- Initial load
 refreshModules()
