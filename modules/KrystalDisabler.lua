@@ -1,9 +1,10 @@
 local KrystalDisabler = {}
- 
+
 KrystalDisabler.Name = "KrystalDisabler"
- 
+
 KrystalDisabler.Run = function()
-	task.wait(3)
+    task.wait(3)
+    
     local KnitInit, Knit
     repeat
         KnitInit, Knit = pcall(function()
@@ -13,7 +14,7 @@ KrystalDisabler.Run = function()
         task.wait()
     until KnitInit
 
-    if true and not debug.getupvalue(Knit.Start, 1) then
+    if not debug.getupvalue(Knit.Start, 1) then
         repeat task.wait() until debug.getupvalue(Knit.Start, 1)
     end
 
@@ -26,11 +27,12 @@ KrystalDisabler.Run = function()
         end
     })
 
-    -- Original main hook
+    -- === ONLY HOOK MOMENTUM (safest way) ===
     local oldUpdateMomentum = bedwars.GlacialSkaterController.updateMomentum
     hookfunction(oldUpdateMomentum, function(self, ...)
         self.momentum = 9e9
         self.lastMomentumReport = 9e9
+        
         pcall(function()
             bedwars.Client:Get("MomentumUpdate"):SendToServer({
                 momentumValue = 9e9
@@ -38,26 +40,25 @@ KrystalDisabler.Run = function()
         end)
     end)
 
+    -- Force initial update
     pcall(function()
         bedwars.GlacialSkaterController:updateMomentum()
     end)
 
-    -- Very selective SendToServer hook
+    -- Selective Momentum Remote Hook (only momentum packets)
     local momentumRemote = bedwars.Client:Get("MomentumUpdate")
     if momentumRemote then
         local oldSend = momentumRemote.SendToServer
         hookfunction(oldSend, function(self, data)
-            -- Only intercept momentum packets
             if type(data) == "table" and data.momentumValue ~= nil then
                 return oldSend(self, { momentumValue = 9e9 })
             end
-            -- Let all other remotes (shop, etc.) pass through normally
+            -- Let ALL other packets pass through normally
             return oldSend(self, data)
         end)
     end
 
-    print("KrystalDisabler loaded (selective)")
+    print("✅ KrystalDisabler loaded (safe version)")
 end
- 
-return KrystalDisabler
 
+return KrystalDisabler
