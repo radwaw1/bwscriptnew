@@ -1,6 +1,4 @@
--- Fixed guiloader.lua for Madium executor
--- Place this as LocalScript in StarterPlayer > StarterPlayerScripts
-
+-- ModuleHub with Config Support
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local HttpService = game:GetService("HttpService")
@@ -8,17 +6,11 @@ local HttpService = game:GetService("HttpService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
-----------------------------------------------------------------
--- CONFIGURE YOUR REPO HERE
-----------------------------------------------------------------
 local REPO_USER = "radwaw1"
 local REPO_NAME = "bwscriptnew"
 local REPO_BRANCH = "main"
 local GITHUB_FOLDER = "modules"
 
-----------------------------------------------------------------
--- GUI CONSTRUCTION
-----------------------------------------------------------------
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "ModuleHub"
 screenGui.ResetOnSpawn = false
@@ -27,267 +19,193 @@ screenGui.Enabled = true
 screenGui.Parent = playerGui
 
 local mainFrame = Instance.new("Frame")
-mainFrame.Name = "MainFrame"
 mainFrame.Size = UDim2.new(0, 280, 0, 420)
 mainFrame.Position = UDim2.new(0.5, -140, 0.5, -210)
 mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 34)
-mainFrame.BorderSizePixel = 0
 mainFrame.Parent = screenGui
 
-local uiCorner = Instance.new("UICorner")
-uiCorner.CornerRadius = UDim.new(0, 8)
-uiCorner.Parent = mainFrame
+local uiCorner = Instance.new("UICorner"); uiCorner.CornerRadius = UDim.new(0,8); uiCorner.Parent = mainFrame
 
+-- Title Bar + Self Destruct
 local titleBar = Instance.new("Frame")
-titleBar.Name = "TitleBar"
-titleBar.Size = UDim2.new(1, 0, 0, 36)
-titleBar.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
-titleBar.BorderSizePixel = 0
+titleBar.Size = UDim2.new(1,0,0,36)
+titleBar.BackgroundColor3 = Color3.fromRGB(20,20,24)
 titleBar.Parent = mainFrame
 
-local titleCorner = Instance.new("UICorner")
-titleCorner.CornerRadius = UDim.new(0, 8)
-titleCorner.Parent = titleBar
-
-local titleFix = Instance.new("Frame")
-titleFix.Size = UDim2.new(1, 0, 0, 10)
-titleFix.Position = UDim2.new(0, 0, 1, -10)
-titleFix.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
-titleFix.BorderSizePixel = 0
-titleFix.Parent = titleBar
-
 local titleLabel = Instance.new("TextLabel")
-titleLabel.Size = UDim2.new(1, -100, 1, 0)
-titleLabel.Position = UDim2.new(0, 12, 0, 0)
+titleLabel.Size = UDim2.new(1,-100,1,0)
+titleLabel.Position = UDim2.new(0,12,0,0)
 titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "Module Hub"
-titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.Text = "my shitty script"
+titleLabel.TextColor3 = Color3.fromRGB(255,255,255)
 titleLabel.Font = Enum.Font.GothamBold
 titleLabel.TextSize = 16
 titleLabel.Parent = titleBar
 
 local selfDestructBtn = Instance.new("TextButton")
-selfDestructBtn.Name = "SelfDestruct"
-selfDestructBtn.Size = UDim2.new(0, 85, 0, 24)
-selfDestructBtn.Position = UDim2.new(1, -92, 0.5, -12)
-selfDestructBtn.BackgroundColor3 = Color3.fromRGB(170, 30, 30)
+selfDestructBtn.Size = UDim2.new(0,85,0,24)
+selfDestructBtn.Position = UDim2.new(1,-92,0.5,-12)
+selfDestructBtn.BackgroundColor3 = Color3.fromRGB(170,30,30)
 selfDestructBtn.Text = "Self Destruct"
-selfDestructBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+selfDestructBtn.TextColor3 = Color3.fromRGB(255,255,255)
 selfDestructBtn.Font = Enum.Font.Gotham
 selfDestructBtn.TextSize = 11
 selfDestructBtn.Parent = titleBar
 
-local sdCorner = Instance.new("UICorner")
-sdCorner.CornerRadius = UDim.new(0, 6)
-sdCorner.Parent = selfDestructBtn
-
-local statusLabel = Instance.new("TextLabel")
-statusLabel.Size = UDim2.new(1, -16, 0, 18)
-statusLabel.Position = UDim2.new(0, 8, 0, 40)
-statusLabel.BackgroundTransparency = 1
-statusLabel.Text = "Loading modules..."
-statusLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
-statusLabel.Font = Enum.Font.Gotham
-statusLabel.TextSize = 12
-statusLabel.TextXAlignment = Enum.TextXAlignment.Left
-statusLabel.Parent = mainFrame
+selfDestructBtn.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+end)
 
 local scrollFrame = Instance.new("ScrollingFrame")
-scrollFrame.Size = UDim2.new(1, -16, 1, -68)
-scrollFrame.Position = UDim2.new(0, 8, 0, 60)
+scrollFrame.Size = UDim2.new(1,-16,1,-68)
+scrollFrame.Position = UDim2.new(0,8,0,60)
 scrollFrame.BackgroundTransparency = 1
 scrollFrame.ScrollBarThickness = 4
-scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
 scrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
 scrollFrame.Parent = mainFrame
 
 local listLayout = Instance.new("UIListLayout")
-listLayout.Padding = UDim.new(0, 6)
-listLayout.SortOrder = Enum.SortOrder.Name
+listLayout.Padding = UDim.new(0,6)
 listLayout.Parent = scrollFrame
 
-----------------------------------------------------------------
--- MODULE STORAGE
-----------------------------------------------------------------
-local modules = {}  -- [moduleName] = {button, moduleData, enabled = false}
+local modules = {}
 
-----------------------------------------------------------------
--- DRAGGING
-----------------------------------------------------------------
-local dragging, dragStart, startPos
-titleBar.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-		dragging = true
-		dragStart = input.Position
-		startPos = mainFrame.Position
-		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then dragging = false end
-		end)
-	end
-end)
-
-UserInputService.InputChanged:Connect(function(input)
-	if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-		local delta = input.Position - dragStart
-		mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-	end
-end)
-
-----------------------------------------------------------------
--- SELF DESTRUCT
-----------------------------------------------------------------
-selfDestructBtn.MouseButton1Click:Connect(function()
-    if not screenGui then return end
-    screenGui:Destroy()
-    print("Module Hub Self Destructed")
-end)
-
-----------------------------------------------------------------
--- BUTTON CREATION
-----------------------------------------------------------------
-local function updateButtonVisual(button, enabled)
-    if enabled then
-        button.BackgroundColor3 = Color3.fromRGB(40, 120, 60)   -- Green
-    else
-        button.BackgroundColor3 = Color3.fromRGB(120, 40, 40)   -- Red
-    end
+local function updateButtonColor(button, enabled)
+    button.BackgroundColor3 = enabled and Color3.fromRGB(40,120,60) or Color3.fromRGB(120,40,40)
 end
 
-local function createButtonForModule(displayName, moduleData)
+local function createConfigWindow(moduleData)
+    -- Simple config window (can be expanded)
+    local configFrame = Instance.new("Frame")
+    configFrame.Size = UDim2.new(0, 260, 0, 300)
+    configFrame.Position = UDim2.new(0.5, -130, 0.5, -150)
+    configFrame.BackgroundColor3 = Color3.fromRGB(25,25,30)
+    configFrame.Parent = screenGui
+
+    local corner = Instance.new("UICorner"); corner.CornerRadius = UDim.new(0,8); corner.Parent = configFrame
+
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1,0,0,30)
+    title.Text = moduleData.Name .. " Settings"
+    title.BackgroundTransparency = 1
+    title.TextColor3 = Color3.fromRGB(255,255,255)
+    title.Font = Enum.Font.GothamBold
+    title.TextSize = 16
+    title.Parent = configFrame
+
+    local y = 40
+    for _, setting in ipairs(moduleData.Config or {}) do
+        if setting.Type == "Toggle" then
+            local toggleBtn = Instance.new("TextButton")
+            toggleBtn.Size = UDim2.new(1,-20,0,30)
+            toggleBtn.Position = UDim2.new(0,10,0,y)
+            toggleBtn.BackgroundColor3 = setting.Value and Color3.fromRGB(40,120,60) or Color3.fromRGB(80,80,90)
+            toggleBtn.Text = setting.Name
+            toggleBtn.TextColor3 = Color3.fromRGB(255,255,255)
+            toggleBtn.Parent = configFrame
+
+            toggleBtn.MouseButton1Click:Connect(function()
+                setting.Value = not setting.Value
+                toggleBtn.BackgroundColor3 = setting.Value and Color3.fromRGB(40,120,60) or Color3.fromRGB(80,80,90)
+            end)
+            y += 40
+
+        elseif setting.Type == "Slider" then
+            local label = Instance.new("TextLabel")
+            label.Size = UDim2.new(1,-20,0,20)
+            label.Position = UDim2.new(0,10,0,y)
+            label.BackgroundTransparency = 1
+            label.Text = setting.Name .. ": " .. setting.Value .. (setting.Suffix or "")
+            label.TextColor3 = Color3.fromRGB(200,200,200)
+            label.Parent = configFrame
+
+            local slider = Instance.new("TextButton")
+            slider.Size = UDim2.new(1,-20,0,8)
+            slider.Position = UDim2.new(0,10,0,y+22)
+            slider.BackgroundColor3 = Color3.fromRGB(60,60,70)
+            slider.Parent = configFrame
+
+            -- Simple slider logic (basic version)
+            setting.Value = setting.Default or setting.Min
+            y += 50
+        end
+    end
+
+    task.delay(8, function() if configFrame then configFrame:Destroy() end end)
+end
+
+local function createButtonForModule(moduleData)
+    local displayName = moduleData.Name
+
     local buttonFrame = Instance.new("Frame")
-    buttonFrame.Size = UDim2.new(1, 0, 0, 42)
+    buttonFrame.Size = UDim2.new(1,0,0,42)
     buttonFrame.BackgroundTransparency = 1
     buttonFrame.Parent = scrollFrame
 
     local button = Instance.new("TextButton")
-    button.Size = UDim2.new(1, -45, 1, 0)
-    button.BackgroundColor3 = Color3.fromRGB(45, 45, 52)
+    button.Size = UDim2.new(1,-50,1,0)
+    button.BackgroundColor3 = Color3.fromRGB(45,45,52)
     button.Text = displayName
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.TextColor3 = Color3.fromRGB(255,255,255)
     button.Font = Enum.Font.Gotham
     button.TextSize = 14
     button.Parent = buttonFrame
 
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 6)
-    corner.Parent = button
+    local corner = Instance.new("UICorner"); corner.CornerRadius = UDim.new(0,6); corner.Parent = button
 
-    -- Settings Button
     local settingsBtn = Instance.new("TextButton")
-    settingsBtn.Size = UDim2.new(0, 36, 1, 0)
-    settingsBtn.Position = UDim2.new(1, -40, 0, 0)
-    settingsBtn.BackgroundColor3 = Color3.fromRGB(55, 55, 65)
+    settingsBtn.Size = UDim2.new(0,40,1,0)
+    settingsBtn.Position = UDim2.new(1,-45,0,0)
+    settingsBtn.BackgroundColor3 = Color3.fromRGB(55,55,65)
     settingsBtn.Text = "⚙"
-    settingsBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+    settingsBtn.TextColor3 = Color3.fromRGB(220,220,220)
     settingsBtn.Font = Enum.Font.GothamBold
-    settingsBtn.TextSize = 16
+    settingsBtn.TextSize = 18
     settingsBtn.Parent = buttonFrame
 
-    local sCorner = Instance.new("UICorner")
-    sCorner.CornerRadius = UDim.new(0, 6)
-    sCorner.Parent = settingsBtn
+    modules[displayName] = { button = button, moduleData = moduleData, enabled = false }
 
-    -- Store module
-    modules[displayName] = {
-        button = button,
-        moduleData = moduleData,
-        enabled = false
-    }
-
-    -- Toggle Button
     button.MouseButton1Click:Connect(function()
         local mod = modules[displayName]
-        if not mod then return end
-
-        local success, err = pcall(mod.moduleData.Run)
-        if success then
-            mod.enabled = not mod.enabled
-            updateButtonVisual(button, mod.enabled)
-        else
-            warn("[ModuleHub] Error toggling " .. displayName .. ": " .. tostring(err))
-        end
+        pcall(mod.moduleData.Run)
+        mod.enabled = not mod.enabled
+        updateButtonColor(button, mod.enabled)
     end)
 
-    -- Settings (for future config)
     settingsBtn.MouseButton1Click:Connect(function()
-        -- TODO: Expand later with real config UI per module
-        print("Settings clicked for: " .. displayName .. " (Config coming soon)")
+        createConfigWindow(moduleData)
     end)
 
-    updateButtonVisual(button, false)
+    updateButtonColor(button, false)
 end
 
-----------------------------------------------------------------
--- LOADING MODULES
-----------------------------------------------------------------
-local function clearModuleList()
-    for _, child in ipairs(scrollFrame:GetChildren()) do
-        if child:IsA("Frame") then
-            child:Destroy()
-        end
-    end
+-- Loading logic (same as before, just updated)
+local function refreshModules()
+    for _, v in scrollFrame:GetChildren() do if v:IsA("Frame") then v:Destroy() end end
     modules = {}
-end
 
-local function loadModuleFromUrl(downloadUrl, fallbackName)
-    local ok, response = pcall(function()
-        return request({ Url = downloadUrl, Method = "GET" })
-    end)
+    -- ... (your existing GitHub loading code)
+    local contentsUrl = string.format("https://api.github.com/repos/%s/%s/contents/%s?ref=%s", REPO_USER, REPO_NAME, GITHUB_FOLDER, REPO_BRANCH)
     
+    local ok, response = pcall(function() return request({Url = contentsUrl, Method = "GET"}) end)
     if not ok or not response.Success then return end
 
-    local source = response.Body
-    local compiled = loadstring(source)
-    if not compiled then return end
+    local files = HttpService:JSONDecode(response.Body)
 
-    local success, moduleData = pcall(compiled)
-    if not success or type(moduleData) ~= "table" or type(moduleData.Run) ~= "function" then
-        return
-    end
-
-    createButtonForModule(moduleData.Name or fallbackName, moduleData)
-end
-
-local function refreshModules()
-    clearModuleList()
-    statusLabel.Text = "Loading modules..."
-
-    local contentsUrl = string.format(
-        "https://api.github.com/repos/%s/%s/contents/%s?ref=%s",
-        REPO_USER, REPO_NAME, GITHUB_FOLDER, REPO_BRANCH
-    )
-
-    local ok, response = pcall(function()
-        return request({ Url = contentsUrl, Method = "GET" })
-    end)
-
-    if not ok or not response.Success then
-        statusLabel.Text = "Failed to reach GitHub"
-        return
-    end
-
-    local success, files = pcall(function()
-        return HttpService:JSONDecode(response.Body)
-    end)
-
-    if not success then return end
-
-    local loadedCount = 0
-    for _, fileInfo in ipairs(files) do
-        if fileInfo.type == "file" and fileInfo.name:match("%.lua$") and fileInfo.download_url then
-            loadModuleFromUrl(fileInfo.download_url, fileInfo.name)
-            loadedCount += 1
+    for _, file in files do
+        if file.type == "file" and file.name:match("%.lua$") then
+            local ok2, res = pcall(function() return request({Url = file.download_url, Method = "GET"}) end)
+            if ok2 and res.Success then
+                local func = loadstring(res.Body)
+                if func then
+                    local success, mod = pcall(func)
+                    if success and mod and mod.Run then
+                        createButtonForModule(mod)
+                    end
+                end
+            end
         end
     end
-
-    statusLabel.Text = loadedCount .. " module(s) loaded"
 end
 
-reloadButton = Instance.new("TextButton") -- Re-add reload button
--- (You can copy the old reload button code here if you want it back)
-
-reloadButton.MouseButton1Click:Connect(refreshModules)
-
--- Initial load
 refreshModules()
