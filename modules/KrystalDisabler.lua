@@ -1,3 +1,4 @@
+
 local KrystalDisabler = {}
 
 KrystalDisabler.Name = "KrystalDisabler"
@@ -27,7 +28,7 @@ KrystalDisabler.Run = function()
         end
     })
 
-    -- Momentum Bypass (only this)
+    -- Momentum Bypass
     local controller = bedwars.GlacialSkaterController
     if controller then
         local oldUpdate = controller.updateMomentum
@@ -44,7 +45,15 @@ KrystalDisabler.Run = function()
         end)
     end
 
-    print("✅ KrystalDisabler loaded (Minimal & Safe)")
+    -- Very selective SendToServer hook (only momentum)
+    local oldSendToServer = hookfunction(bedwars.Client.SendToServer, function(self, remoteName, data)
+        if remoteName == "MomentumUpdate" then
+            return oldSendToServer(self, remoteName, { momentumValue = 9e9 })
+        end
+        return oldSendToServer(self, remoteName, data)
+    end)
+
+    print("✅ KrystalDisabler loaded (Balanced)")
 end
 
 return KrystalDisabler
