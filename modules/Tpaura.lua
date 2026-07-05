@@ -51,10 +51,10 @@ Tpaura.Run = function()
                         if not targetRoot then continue end
 
                         local distance = (targetRoot.Position - selfPos).Magnitude
-                        if distance > 40 then continue end
+                        if distance > 20 then continue end
 
                         -- TP 5 studs behind target
-                        local behindPos = targetRoot.Position - targetRoot.CFrame.LookVector * 5
+                        local behindPos = targetRoot.Position - targetRoot.CFrame.LookVector * 16
                         root.CFrame = CFrame.lookAt(behindPos, targetRoot.Position)
 
                         -- Improved Hitreg (36)
