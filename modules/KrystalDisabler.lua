@@ -27,28 +27,43 @@ KrystalDisabler.Run = function()
         end
     })
 
-    local controller = bedwars.GlacialSkaterController
-    if controller then
-        -- Hook the updateMomentum function directly
-        local oldUpdate = controller.updateMomentum
-        hookfunction(oldUpdate, function(self, ...)
-            self.momentum = 9e9
-            self.lastMomentumReport = 9e9
-            pcall(function()
-                bedwars.Client:Get("MomentumUpdate"):SendToServer({ momentumValue = 9e9 })
-            end)
-        end)
-
+    -- Momentum Bypass
+    local oldUpdateMomentum = bedwars.GlacialSkaterController.updateMomentum
+    hookfunction(oldUpdateMomentum, function(self, ...)
+        self.momentum = 9e9
+        self.lastMomentumReport = 9e9
         pcall(function()
-            controller:updateMomentum()
+            bedwars.Client:Get("MomentumUpdate"):SendToServer({
+                momentumValue = 9e9
+            })
         end)
+    end)
 
-        print("✅ Momentum bypass applied")
-    else
-        print("❌ Controller not found")
+    pcall(function()
+        bedwars.GlacialSkaterController:updateMomentum()
+    end)
+
+    -- Selective SendToServer (protect shop)
+    local momentumRemote = bedwars.Client:Get("MomentumUpdate")
+    if momentumRemote then
+        local oldSend = momentumRemote.SendToServer
+        hookfunction(oldSend, function(self, data)
+            -- Only intercept momentum
+            if type(data) == "table" and data.momentumValue ~= nil then
+                return oldSend(self, { momentumValue = 9e9 })
+            end
+
+            -- Protect shop remote
+            if self.Name == "Inventory/SetObservedChest" then
+                return oldSend(self, data)
+            end
+
+            -- Let everything else through
+            return oldSend(self, data)
+        end)
     end
 
-    print("KrystalDisabler finished")
+    print("✅ KrystalDisabler loaded (Shop Protected)")
 end
 
 return KrystalDisabler
