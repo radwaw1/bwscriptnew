@@ -27,20 +27,15 @@ KrystalDisabler.Run = function()
         end
     })
 
-    -- Direct hook on GlacialSkaterController
     local controller = bedwars.GlacialSkaterController
     if controller then
-        print("Found GlacialSkaterController - Hooking...")
-
+        -- Hook the updateMomentum function directly
         local oldUpdate = controller.updateMomentum
         hookfunction(oldUpdate, function(self, ...)
             self.momentum = 9e9
             self.lastMomentumReport = 9e9
-            
             pcall(function()
-                bedwars.Client:Get("MomentumUpdate"):SendToServer({
-                    momentumValue = 9e9
-                })
+                bedwars.Client:Get("MomentumUpdate"):SendToServer({ momentumValue = 9e9 })
             end)
         end)
 
@@ -48,12 +43,12 @@ KrystalDisabler.Run = function()
             controller:updateMomentum()
         end)
 
-        print("Momentum bypass applied")
+        print("✅ Momentum bypass applied")
     else
-        print("GlacialSkaterController not found")
+        print("❌ Controller not found")
     end
 
-    print("✅ KrystalDisabler loaded")
+    print("KrystalDisabler finished")
 end
 
 return KrystalDisabler
