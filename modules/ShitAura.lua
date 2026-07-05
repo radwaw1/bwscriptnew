@@ -8,42 +8,45 @@ local SwordHit = game:GetService("ReplicatedStorage")
 
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
+
 local connection = nil
 
 Killaura.Run = function()
     Killaura.Enabled = not Killaura.Enabled
 
     if Killaura.Enabled then
-        print("Killaura Enabled")
-
+        print("Killaura Enabled - 20 studs")
+        
         connection = game:GetService("RunService").Heartbeat:Connect(function()
             if not Killaura.Enabled then return end
 
-            local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-            if not root then return end
+            local rootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+            if not rootPart then return end
 
-            local selfpos = root.Position
+            local selfPos = rootPart.Position
 
-            for _, v in ipairs(Players:GetPlayers()) do
-                if v == player then continue end
+            for _, plr in ipairs(Players:GetPlayers()) do
+                if plr == player then continue end
 
-                local targetChar = v.Character
+                local targetChar = plr.Character
                 local targetRoot = targetChar and targetChar:FindFirstChild("HumanoidRootPart")
                 if not targetRoot then continue end
 
-                local distance = (targetRoot.Position - selfpos).Magnitude
+                local distance = (targetRoot.Position - selfPos).Magnitude
                 if distance > 20 then continue end
 
-                local dir = CFrame.lookAt(selfpos, targetRoot.Position).LookVector
-                local pos = selfpos + dir * math.max(distance - 14.4, 0)
+                -- Calculate positions like the example
+                local dir = CFrame.lookAt(selfPos, targetRoot.Position).LookVector
+                local selfValidatePos = selfPos + dir * math.max(distance - 14.4, 0)
 
-                local weapon = player.Character:FindFirstChildWhichIsA("Tool") or player.Backpack:FindFirstChildWhichIsA("Tool")
+                local weapon = player.Character:FindFirstChildWhichIsA("Tool") 
+                           or player.Backpack:FindFirstChildWhichIsA("Tool")
 
                 SwordHit:FireServer({
                     chargedAttack = { chargeRatio = 0 },
                     entityInstance = targetChar,
                     validate = {
-                        selfPosition = { value = pos },
+                        selfPosition = { value = selfValidatePos },
                         targetPosition = { value = targetRoot.Position }
                     },
                     weapon = weapon
