@@ -1,16 +1,13 @@
 local Killaura = {}
 
-Killaura.Name = "ShitAura"
+Killaura.Name = "Killaura"
 Killaura.Enabled = false
 
-local AttackRemote = { FireServer = function() end }
-local connection = nil
+-- Correct Remote
+local SwordHit = game:GetService("ReplicatedStorage")
+    .rbxts_include.node_modules["@rbxts"].net.out._NetManaged.SwordHit
 
-task.spawn(function()
-    if bedwars and bedwars.Client then
-        AttackRemote = bedwars.Client:Get(remotes.AttackEntity).instance
-    end
-end)
+local connection = nil
 
 Killaura.Config = {
     { Name = "Range", Type = "Slider", Min = 5, Max = 25, Default = 20, Value = 20, Suffix = " studs" },
@@ -22,14 +19,13 @@ Killaura.Run = function()
     Killaura.Enabled = not Killaura.Enabled
 
     if Killaura.Enabled then
-        print("Killaura Enabled")
+        print("Killaura Enabled (20 studs)")
         
         connection = game:GetService("RunService").Heartbeat:Connect(function()
             if not Killaura.Enabled then return end
 
             local range = Killaura.Config[1].Value
             local maxTargets = Killaura.Config[2].Value
-            local rate = 1 / (Killaura.Config[3].Value / 10)
 
             local sword = store.tools.sword or store.hand
             if not sword or not sword.tool then return end
@@ -62,20 +58,15 @@ Killaura.Run = function()
                 local dir = CFrame.lookAt(selfpos, actualRoot.Position).LookVector
                 local pos = selfpos + dir * math.max(delta.Magnitude - 14.4, 0)
 
-                bedwars.SwordController.lastAttack = workspace:GetServerTimeNow()
-
-                AttackRemote:FireServer({
-                    weapon = sword.tool,
+                -- Updated to use the correct remote
+                SwordHit:FireServer({
                     chargedAttack = { chargeRatio = 0 },
                     entityInstance = target.Character,
                     validate = {
-                        raycast = {
-                            cameraPosition = { value = pos },
-                            cursorDirection = { value = dir }
-                        },
-                        targetPosition = { value = actualRoot.Position },
-                        selfPosition = { value = pos }
-                    }
+                        selfPosition = { value = pos },
+                        targetPosition = { value = actualRoot.Position }
+                    },
+                    weapon = sword.tool
                 })
             end
         end)
