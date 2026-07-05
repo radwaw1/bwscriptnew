@@ -54,7 +54,7 @@ KrystalDisabler.Run = function()
         return oldSendToServer(self, remoteName, data)
     end)
 
-    print("✅ KrystalDisabler loaded (Balanced)")
+    print(" KrystalDisabler loaded update")
 end
 
 return KrystalDisabler
