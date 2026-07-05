@@ -1,4 +1,4 @@
--- Fixed guiloader.lua with Dragging + Toggle Config
+-- ModuleHub with Keybinds
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local HttpService = game:GetService("HttpService")
@@ -35,7 +35,7 @@ local titleLabel = Instance.new("TextLabel")
 titleLabel.Size = UDim2.new(1,-100,1,0)
 titleLabel.Position = UDim2.new(0,12,0,0)
 titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "Module"
+titleLabel.Text = "Module Hub"
 titleLabel.TextColor3 = Color3.fromRGB(255,255,255)
 titleLabel.Font = Enum.Font.GothamBold
 titleLabel.TextSize = 16
@@ -84,7 +84,7 @@ listLayout.Padding = UDim.new(0,6)
 listLayout.Parent = scrollFrame
 
 local modules = {}
-local openConfigWindows = {}  -- Track open configs
+local openConfigWindows = {}
 
 local function makeDraggable(frame, dragBar)
     local dragging = false
@@ -104,20 +104,30 @@ local function makeDraggable(frame, dragBar)
             frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
         end
     end)
-
-    dragBar.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = false
-        end
-    end)
 end
 
 makeDraggable(mainFrame, titleBar)
 
--- Self Destruct
 selfDestructBtn.MouseButton1Click:Connect(function() screenGui:Destroy() end)
 
--- Config Window (Toggle on second click)
+-- Keybind System
+local keybinds = {}
+
+UserInputService.InputBegan:Connect(function(input, gp)
+    if gp then return end
+    for name, mod in pairs(modules) do
+        if keybinds[name] and input.KeyCode == keybinds[name] then
+            pcall(mod.moduleData.Run)
+            mod.enabled = not mod.enabled
+            updateButtonVisual(mod.button, mod.enabled)
+        end
+    end
+end)
+
+local function updateButtonVisual(button, enabled)
+    button.BackgroundColor3 = enabled and Color3.fromRGB(40,120,60) or Color3.fromRGB(120,40,40)
+end
+
 local function createConfigWindow(moduleData)
     local name = moduleData.Name
     if openConfigWindows[name] then
@@ -127,8 +137,8 @@ local function createConfigWindow(moduleData)
     end
 
     local configFrame = Instance.new("Frame")
-    configFrame.Size = UDim2.new(0, 280, 0, 420)
-    configFrame.Position = UDim2.new(0.5, -140, 0.5, -210)
+    configFrame.Size = UDim2.new(0, 280, 0, 400)
+    configFrame.Position = UDim2.new(0.5, -140, 0.5, -200)
     configFrame.BackgroundColor3 = Color3.fromRGB(25,25,30)
     configFrame.Parent = screenGui
 
@@ -150,109 +160,41 @@ local function createConfigWindow(moduleData)
 
     makeDraggable(configFrame, titleBarConfig)
 
-    local content = Instance.new("ScrollingFrame")
-    content.Size = UDim2.new(1,-20,1,-50)
-    content.Position = UDim2.new(0,10,0,45)
-    content.BackgroundTransparency = 1
-    content.ScrollBarThickness = 6
-    content.AutomaticCanvasSize = Enum.AutomaticSize.Y
-    content.Parent = configFrame
+    -- Keybind
+    local keybindLabel = Instance.new("TextLabel")
+    keybindLabel.Size = UDim2.new(1,-20,0,30)
+    keybindLabel.Position = UDim2.new(0,10,0,50)
+    keybindLabel.BackgroundTransparency = 1
+    keybindLabel.Text = "Keybind: None"
+    keybindLabel.TextColor3 = Color3.fromRGB(200,200,200)
+    keybindLabel.Font = Enum.Font.Gotham
+    keybindLabel.TextSize = 14
+    keybindLabel.Parent = configFrame
 
-    local uiList = Instance.new("UIListLayout")
-    uiList.Padding = UDim.new(0,12)
-    uiList.SortOrder = Enum.SortOrder.LayoutOrder
-    uiList.Parent = content
+    local keybindBtn = Instance.new("TextButton")
+    keybindBtn.Size = UDim2.new(1,-20,0,30)
+    keybindBtn.Position = UDim2.new(0,10,0,85)
+    keybindBtn.BackgroundColor3 = Color3.fromRGB(50,50,55)
+    keybindBtn.Text = "Click to set keybind"
+    keybindBtn.TextColor3 = Color3.fromRGB(255,255,255)
+    keybindBtn.Font = Enum.Font.Gotham
+    keybindBtn.TextSize = 14
+    keybindBtn.Parent = configFrame
 
-    for _, setting in ipairs(moduleData.Config or {}) do
-        if setting.Type == "Toggle" then
-            local btn = Instance.new("TextButton")
-            btn.Size = UDim2.new(1,0,0,40)
-            btn.BackgroundColor3 = setting.Value and Color3.fromRGB(40,120,60) or Color3.fromRGB(70,70,80)
-            btn.Text = "   " .. setting.Name
-            btn.TextColor3 = Color3.fromRGB(255,255,255)
-            btn.TextXAlignment = Enum.TextXAlignment.Left
-            btn.Font = Enum.Font.Gotham
-            btn.TextSize = 15
-            btn.Parent = content
-
-            local corner = Instance.new("UICorner"); corner.CornerRadius = UDim.new(0,6); corner.Parent = btn
-
-            btn.MouseButton1Click:Connect(function()
-                setting.Value = not setting.Value
-                btn.BackgroundColor3 = setting.Value and Color3.fromRGB(40,120,60) or Color3.fromRGB(70,70,80)
-            end)
-
-        elseif setting.Type == "Slider" then
-            local frame = Instance.new("Frame")
-            frame.Size = UDim2.new(1,0,0,65)
-            frame.BackgroundTransparency = 1
-            frame.Parent = content
-
-            local label = Instance.new("TextLabel")
-            label.Size = UDim2.new(1,0,0,20)
-            label.BackgroundTransparency = 1
-            label.Text = setting.Name .. ": " .. setting.Value .. (setting.Suffix or "")
-            label.TextColor3 = Color3.fromRGB(220,220,220)
-            label.Font = Enum.Font.Gotham
-            label.TextSize = 14
-            label.Parent = frame
-
-            local bg = Instance.new("Frame")
-            bg.Size = UDim2.new(1,0,0,12)
-            bg.Position = UDim2.new(0,0,0,32)
-            bg.BackgroundColor3 = Color3.fromRGB(45,45,50)
-            bg.Parent = frame
-
-            local fill = Instance.new("Frame")
-            fill.BackgroundColor3 = Color3.fromRGB(0, 170, 100)
-            fill.Parent = bg
-
-            local bCorner = Instance.new("UICorner"); bCorner.CornerRadius = UDim.new(0,6); bCorner.Parent = bg
-            bCorner:Clone().Parent = fill
-
-            -- Update fill based on value
-            local function updateFill()
-                local percent = (setting.Value - setting.Min) / (setting.Max - setting.Min)
-                fill.Size = UDim2.new(percent, 0, 1, 0)
-                label.Text = setting.Name .. ": " .. setting.Value .. (setting.Suffix or "")
+    keybindBtn.MouseButton1Click:Connect(function()
+        keybindBtn.Text = "Press any key..."
+        local conn
+        conn = UserInputService.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.Keyboard then
+                keybinds[name] = input.KeyCode
+                keybindBtn.Text = "Key: " .. input.KeyCode.Name
+                keybindLabel.Text = "Keybind: " .. input.KeyCode.Name
+                conn:Disconnect()
             end
-            updateFill()
-
-            -- Dragging
-            local dragging = false
-            bg.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                    dragging = true
-                end
-            end)
-
-            UserInputService.InputChanged:Connect(function(input)
-                if not dragging then return end
-                if input.UserInputType == Enum.UserInputType.MouseMovement then
-                    local mouseX = UserInputService:GetMouseLocation().X
-                    local bgX = bg.AbsolutePosition.X
-                    local bgWidth = bg.AbsoluteSize.X
-
-                    local percent = math.clamp((mouseX - bgX) / bgWidth, 0, 1)
-                    setting.Value = math.floor(setting.Min + percent * (setting.Max - setting.Min))
-                    updateFill()
-                end
-            end)
-
-            UserInputService.InputEnded:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                    dragging = false
-                end
-            end)
-        end
-    end
+        end)
+    end)
 
     openConfigWindows[name] = configFrame
-end
-
--- Button Creation
-local function updateButtonVisual(button, enabled)
-    button.BackgroundColor3 = enabled and Color3.fromRGB(40,120,60) or Color3.fromRGB(120,40,40)
 end
 
 local function createButtonForModule(moduleData)
@@ -288,11 +230,9 @@ local function createButtonForModule(moduleData)
 
     button.MouseButton1Click:Connect(function()
         local mod = modules[displayName]
-        local success = pcall(mod.moduleData.Run)
-        if success then
-            mod.enabled = not mod.enabled
-            updateButtonVisual(button, mod.enabled)
-        end
+        pcall(mod.moduleData.Run)
+        mod.enabled = not mod.enabled
+        updateButtonVisual(button, mod.enabled)
     end)
 
     settingsBtn.MouseButton1Click:Connect(function()
@@ -302,11 +242,10 @@ local function createButtonForModule(moduleData)
     updateButtonVisual(button, false)
 end
 
--- Loading
+-- Loading (same as before)
 local function refreshModules()
     for _, v in scrollFrame:GetChildren() do if v:IsA("Frame") then v:Destroy() end end
     modules = {}
-    openConfigWindows = {}
 
     statusLabel.Text = "Loading modules..."
 

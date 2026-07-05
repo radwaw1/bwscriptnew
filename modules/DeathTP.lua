@@ -4,48 +4,45 @@ DeathTP.Name = "DeathTP"
 DeathTP.Enabled = false
 
 local player = game:GetService("Players").LocalPlayer
-local savedPosition = nil
-local deathConnection = nil
-local respawnConnection = nil
+local savedCFrame = nil
+
+local deathConn = nil
+local respawnConn = nil
 
 DeathTP.Run = function()
     DeathTP.Enabled = not DeathTP.Enabled
 
     if DeathTP.Enabled then
-        print("✅ DeathTP Enabled (6 second delay)")
+        print("✅ DeathTP Enabled (6s delay)")
 
-        -- Save position before death
-        deathConnection = player.CharacterAdded:Connect(function(char)
-            task.wait(0.5) -- Small delay to let character load
-            local root = char:WaitForChild("HumanoidRootPart", 3)
+        -- Save position when character dies
+        deathConn = player.CharacterAdded:Connect(function(char)
+            task.wait(0.3)
+            local root = char:WaitForChild("HumanoidRootPart", 2)
             if root then
-                savedPosition = root.CFrame
+                savedCFrame = root.CFrame
             end
         end)
 
-        -- TP back after death
-        respawnConnection = player.CharacterAdded:Connect(function(char)
-            task.delay(6, function()  -- 6 seconds after respawn
-                if not DeathTP.Enabled then return end
-                
-                local root = char:WaitForChild("HumanoidRootPart", 5)
-                if root and savedPosition then
-                    root.CFrame = savedPosition
-                    print("DeathTP: Teleported back to previous position")
+        -- Teleport back after respawn
+        respawnConn = player.CharacterAdded:Connect(function(char)
+            task.delay(6, function() -- 6 seconds after respawn
+                if not DeathTP.Enabled or not savedCFrame then return end
+
+                local root = char:WaitForChild("HumanoidRootPart", 3)
+                if root then
+                    root.CFrame = savedCFrame
+                    print("DeathTP: Teleported back")
                 end
             end)
         end)
 
     else
         print("❌ DeathTP Disabled")
-        if deathConnection then
-            deathConnection:Disconnect()
-            deathConnection = nil
-        end
-        if respawnConnection then
-            respawnConnection:Disconnect()
-            respawnConnection = nil
-        end
+        if deathConn then deathConn:Disconnect() end
+        if respawnConn then respawnConn:Disconnect() end
+        deathConn = nil
+        respawnConn = nil
     end
 end
 
