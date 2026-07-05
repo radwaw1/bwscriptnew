@@ -14,7 +14,7 @@ local playerGui = player:WaitForChild("PlayerGui")
 local REPO_USER = "radwaw1"
 local REPO_NAME = "bwscriptnew"
 local REPO_BRANCH = "main"
-local GITHUB_FOLDER = "modules"   -- change if needed
+local GITHUB_FOLDER = "modules"
 
 ----------------------------------------------------------------
 -- GUI CONSTRUCTION
@@ -60,7 +60,7 @@ local titleLabel = Instance.new("TextLabel")
 titleLabel.Size = UDim2.new(1, -100, 1, 0)
 titleLabel.Position = UDim2.new(0, 12, 0, 0)
 titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "My shitty script"
+titleLabel.Text = "shit script"
 titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 titleLabel.TextXAlignment = Enum.TextXAlignment.Left
 titleLabel.Font = Enum.Font.GothamBold
@@ -118,35 +118,41 @@ listLayout.SortOrder = Enum.SortOrder.Name
 listLayout.Parent = scrollFrame
 
 ----------------------------------------------------------------
--- MODULE STORAGE & STATE
+-- MODULE STORAGE
 ----------------------------------------------------------------
-local modules = {}  -- [name] = {button, moduleData, enabled}
+local modules = {}
 
 ----------------------------------------------------------------
--- DRAGGING
+-- SMOOTH DRAGGING (Improved)
 ----------------------------------------------------------------
-local dragging, dragStart, startPos
+local dragging = false
+local dragStart = nil
+local startPos = nil
+
 titleBar.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-		dragging = true
-		dragStart = input.Position
-		startPos = mainFrame.Position
-		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then
-				dragging = false
-			end
-		end)
-	end
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+        
+        local conn
+        conn = input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+                conn:Disconnect()
+            end
+        end)
+    end
 end)
 
 UserInputService.InputChanged:Connect(function(input)
-	if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-		local delta = input.Position - dragStart
-		mainFrame.Position = UDim2.new(
-			startPos.X.Scale, startPos.X.Offset + delta.X,
-			startPos.Y.Scale, startPos.Y.Offset + delta.Y
-		)
-	end
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        mainFrame.Position = UDim2.new(
+            startPos.X.Scale, startPos.X.Offset + delta.X,
+            startPos.Y.Scale, startPos.Y.Offset + delta.Y
+        )
+    end
 end)
 
 ----------------------------------------------------------------
@@ -154,23 +160,22 @@ end)
 ----------------------------------------------------------------
 selfDestructBtn.MouseButton1Click:Connect(function()
     screenGui:Destroy()
-    print("Module Hub has been self-destructed.")
+    print("Module Hub Self Destructed")
 end)
 
 ----------------------------------------------------------------
 -- CONFIG WINDOW
 ----------------------------------------------------------------
 local function createConfigWindow(moduleData)
-    if not moduleData.Config then 
-        print(moduleData.Name .. " has no config options.")
-        return 
+    if not moduleData.Config then
+        print(moduleData.Name .. " has no settings.")
+        return
     end
 
     local configFrame = Instance.new("Frame")
     configFrame.Size = UDim2.new(0, 260, 0, 340)
     configFrame.Position = UDim2.new(0.5, -130, 0.5, -170)
     configFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
-    configFrame.BorderSizePixel = 0
     configFrame.Parent = screenGui
 
     local cCorner = Instance.new("UICorner")
@@ -180,55 +185,47 @@ local function createConfigWindow(moduleData)
     local title = Instance.new("TextLabel")
     title.Size = UDim2.new(1, 0, 0, 36)
     title.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
-    title.Text = moduleData.Name .. " - Settings"
+    title.Text = moduleData.Name .. " Settings"
     title.TextColor3 = Color3.fromRGB(255, 255, 255)
     title.Font = Enum.Font.GothamBold
     title.TextSize = 16
     title.Parent = configFrame
 
-    local tCorner = Instance.new("UICorner")
-    tCorner.CornerRadius = UDim.new(0, 8)
-    tCorner.Parent = title
-
-    local yOffset = 50
+    local y = 50
     for _, setting in ipairs(moduleData.Config) do
         if setting.Type == "Toggle" then
             local btn = Instance.new("TextButton")
             btn.Size = UDim2.new(1, -20, 0, 34)
-            btn.Position = UDim2.new(0, 10, 0, yOffset)
+            btn.Position = UDim2.new(0, 10, 0, y)
             btn.BackgroundColor3 = setting.Value and Color3.fromRGB(40, 120, 60) or Color3.fromRGB(80, 80, 90)
             btn.Text = "  " .. setting.Name
             btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+            btn.TextXAlignment = Enum.TextXAlignment.Left
             btn.Font = Enum.Font.Gotham
             btn.TextSize = 14
-            btn.TextXAlignment = Enum.TextXAlignment.Left
             btn.Parent = configFrame
 
             btn.MouseButton1Click:Connect(function()
                 setting.Value = not setting.Value
                 btn.BackgroundColor3 = setting.Value and Color3.fromRGB(40, 120, 60) or Color3.fromRGB(80, 80, 90)
             end)
-
-            yOffset += 44
+            y += 44
 
         elseif setting.Type == "Slider" then
             local label = Instance.new("TextLabel")
             label.Size = UDim2.new(1, -20, 0, 20)
-            label.Position = UDim2.new(0, 10, 0, yOffset)
+            label.Position = UDim2.new(0, 10, 0, y)
             label.BackgroundTransparency = 1
-            label.Text = setting.Name .. ": " .. tostring(setting.Value) .. (setting.Suffix or "")
+            label.Text = setting.Name .. ": " .. setting.Value .. (setting.Suffix or "")
             label.TextColor3 = Color3.fromRGB(200, 200, 200)
             label.Font = Enum.Font.Gotham
             label.TextSize = 13
-            label.TextXAlignment = Enum.TextXAlignment.Left
             label.Parent = configFrame
-
-            -- Basic slider (click to change for now)
-            yOffset += 30
+            y += 35
         end
     end
 
-    task.delay(10, function() if configFrame.Parent then configFrame:Destroy() end end)
+    task.delay(12, function() if configFrame then configFrame:Destroy() end end)
 end
 
 ----------------------------------------------------------------
@@ -239,7 +236,7 @@ local function updateButtonVisual(button, enabled)
 end
 
 local function createButtonForModule(moduleData)
-    local displayName = moduleData.Name or "Unnamed Module"
+    local displayName = moduleData.Name or "Unnamed"
 
     local buttonFrame = Instance.new("Frame")
     buttonFrame.Size = UDim2.new(1, 0, 0, 42)
@@ -269,29 +266,17 @@ local function createButtonForModule(moduleData)
     settingsBtn.TextSize = 18
     settingsBtn.Parent = buttonFrame
 
-    local sCorner = Instance.new("UICorner")
-    sCorner.CornerRadius = UDim.new(0, 6)
-    sCorner.Parent = settingsBtn
+    modules[displayName] = { button = button, moduleData = moduleData, enabled = false }
 
-    modules[displayName] = {
-        button = button,
-        moduleData = moduleData,
-        enabled = false
-    }
-
-    -- Toggle Module
     button.MouseButton1Click:Connect(function()
         local mod = modules[displayName]
-        local success, err = pcall(mod.moduleData.Run)
+        local success = pcall(mod.moduleData.Run)
         if success then
             mod.enabled = not mod.enabled
             updateButtonVisual(button, mod.enabled)
-        else
-            warn("[ModuleHub] Error running " .. displayName .. ": " .. tostring(err))
         end
     end)
 
-    -- Open Config
     settingsBtn.MouseButton1Click:Connect(function()
         createConfigWindow(modules[displayName].moduleData)
     end)
@@ -300,82 +285,56 @@ local function createButtonForModule(moduleData)
 end
 
 ----------------------------------------------------------------
--- LOADING MODULES
+-- MODULE LOADING
 ----------------------------------------------------------------
 local function clearModuleList()
     for _, child in ipairs(scrollFrame:GetChildren()) do
-        if child:IsA("Frame") then
-            child:Destroy()
-        end
+        if child:IsA("Frame") then child:Destroy() end
     end
     modules = {}
 end
 
 local function loadModuleFromUrl(downloadUrl, fallbackName)
     local ok, response = pcall(function()
-        return request({ Url = downloadUrl, Method = "GET" })
+        return request({Url = downloadUrl, Method = "GET"})
     end)
-    
-    if not ok or not response.Success then
-        warn("[ModuleHub] Failed to fetch " .. fallbackName)
-        return
-    end
+    if not ok or not response.Success then return end
 
-    local source = response.Body
-    local compiled, compileErr = loadstring(source)
-    if not compiled then
-        warn("[ModuleHub] Compile error in " .. fallbackName)
-        return
-    end
+    local compiled = loadstring(response.Body)
+    if not compiled then return end
 
     local success, moduleData = pcall(compiled)
-    if not success or type(moduleData) ~= "table" or type(moduleData.Run) ~= "function" then
-        warn("[ModuleHub] Invalid module: " .. fallbackName)
-        return
+    if success and moduleData and moduleData.Run then
+        createButtonForModule(moduleData)
     end
-
-    createButtonForModule(moduleData)
 end
 
 local function refreshModules()
     clearModuleList()
     statusLabel.Text = "Loading modules..."
 
-    local contentsUrl = string.format(
-        "https://api.github.com/repos/%s/%s/contents/%s?ref=%s",
-        REPO_USER, REPO_NAME, GITHUB_FOLDER, REPO_BRANCH
-    )
+    local url = string.format("https://api.github.com/repos/%s/%s/contents/%s?ref=%s", REPO_USER, REPO_NAME, GITHUB_FOLDER, REPO_BRANCH)
 
-    local ok, response = pcall(function()
-        return request({ Url = contentsUrl, Method = "GET" })
-    end)
-
+    local ok, response = pcall(function() return request({Url = url, Method = "GET"}) end)
     if not ok or not response.Success then
-        statusLabel.Text = "Failed to reach GitHub"
+        statusLabel.Text = "Failed to connect to GitHub"
         return
     end
 
-    local success, files = pcall(function()
-        return HttpService:JSONDecode(response.Body)
-    end)
+    local files = HttpService:JSONDecode(response.Body)
+    local count = 0
 
-    if not success or type(files) ~= "table" then
-        statusLabel.Text = "Bad GitHub response"
-        return
-    end
-
-    local loadedCount = 0
-    for _, fileInfo in ipairs(files) do
-        if fileInfo.type == "file" and fileInfo.name:match("%.lua$") and fileInfo.download_url then
-            loadModuleFromUrl(fileInfo.download_url, fileInfo.name)
-            loadedCount += 1
+    for _, file in ipairs(files) do
+        if file.type == "file" and file.name:match("%.lua$") and file.download_url then
+            loadModuleFromUrl(file.download_url, file.name)
+            count += 1
         end
     end
 
-    statusLabel.Text = loadedCount .. " module(s) loaded"
+    statusLabel.Text = count .. " module(s) loaded"
 end
 
 reloadButton.MouseButton1Click:Connect(refreshModules)
 
--- Initial load
+-- Initial Load
 refreshModules()
