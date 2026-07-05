@@ -1,22 +1,13 @@
--- KrystalDisabler.lua
--- Place ModuleScripts like this inside ReplicatedStorage.Modules
--- Every module MUST return a table with:
---   Name (string, optional - what shows on the button, defaults to script name)
---   Run  (function - what happens when the button is clicked)
-
 local KrystalDisabler = {}
-
 KrystalDisabler.Name = "Disables Anticheat using Krystal Kit (OP!)"
 
 KrystalDisabler.Run = function()
-	local KnitInit, Knit
+    local KnitInit, Knit
     repeat
         KnitInit, Knit = pcall(function()
             return require(game:GetService('ReplicatedStorage').rbxts_include.node_modules["@easy-games"].knit.src).KnitClient
         end)
-        if KnitInit then
-            break
-        end
+        if KnitInit then break end
         task.wait()
     until KnitInit
 
@@ -35,28 +26,45 @@ KrystalDisabler.Run = function()
         end
     })
 
-    -- Hook into the updateMomentum function
+    -- Safe hook for updateMomentum
     local oldUpdateMomentum = bedwars.GlacialSkaterController.updateMomentum
-    hookfunction(oldUpdateMomentum, function(self, ...)
-        self.momentum = 9e9
-        self.lastMomentumReport = 9e9
-        bedwars.Client:Get("MomentumUpdate"):SendToServer({
-            momentumValue = 9e9
-        })
+    if oldUpdateMomentum then
+        hookfunction(oldUpdateMomentum, function(self, ...)
+            self.momentum = 9e9
+            self.lastMomentumReport = 9e9
+            
+            -- Safe SendToServer with pcall
+            local momentumRemote = bedwars.Client:Get("MomentumUpdate")
+            if momentumRemote and momentumRemote.SendToServer then
+                pcall(function()
+                    momentumRemote:SendToServer({
+                        momentumValue = 9e9
+                    })
+                end)
+            end
+            
+            return oldUpdateMomentum(self, ...)
+        end)
+    end
+
+    -- Safe hook for SendToServer
+    local momentumEvent = bedwars.Client:Get("MomentumUpdate")
+    if momentumEvent and momentumEvent.SendToServer then
+        local oldSendToServer = momentumEvent.SendToServer
+        hookfunction(oldSendToServer, function(self, data)
+            if type(data) == "table" and data.momentumValue == 9e9 then
+                return pcall(oldSendToServer, self, { momentumValue = 9e9 })
+            end
+            return pcall(oldSendToServer, self, data)
+        end)
+    end
+
+    -- Initial call
+    pcall(function()
+        bedwars.GlacialSkaterController:updateMomentum()
     end)
 
-    -- Call the original updateMomentum to ensure it runs
-    bedwars.GlacialSkaterController:updateMomentum()
-
-    -- Additional hook to ensure the anticheat doesn't detect changes
-    local oldSendToServer = bedwars.Client:Get("MomentumUpdate").SendToServer
-    hookfunction(oldSendToServer, function(self, data)
-        if data.momentumValue == 9e9 then
-            return oldSendToServer(self, { momentumValue = 9e9 })
-        end
-        return oldSendToServer(self, data)
-    end)
-
+    print("KrystalDisabler loaded successfully")
 end
 
 return KrystalDisabler
