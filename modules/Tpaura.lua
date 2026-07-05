@@ -1,7 +1,7 @@
-local TpAura = {}
+local Tpaura = {}
 
-TpAura.Name = "TPaura"
-TpAura.Enabled = false
+Tpaura.Name = "TPaura"
+Tpaura.Enabled = false
 
 local SwordHit = game:GetService("ReplicatedStorage")
     .rbxts_include.node_modules["@rbxts"].net.out._NetManaged.SwordHit
@@ -11,14 +11,14 @@ local player = Players.LocalPlayer
 
 local connection = nil
 
-TpAura.Run = function()
-    TpAura.Enabled = not TpAura.Enabled
+Tpaura.Run = function()
+    Tpaura.Enabled = not Tpaura.Enabled
 
-    if TpAura.Enabled then
-        print("✅ Shitaura Enabled (40 studs + TP behind)")
+    if Tpaura.Enabled then
+        print("✅ Shitaura Enabled (40 studs + TP behind + Hitreg 36)")
         
         connection = task.spawn(function()
-            while TpAura.Enabled do
+            while Tpaura.Enabled do
                 local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
                 if root then
                     local selfPos = root.Position
@@ -55,12 +55,11 @@ TpAura.Run = function()
 
                         -- TP 5 studs behind target
                         local behindPos = targetRoot.Position - targetRoot.CFrame.LookVector * 5
-                        if root then
-                            root.CFrame = CFrame.lookAt(behindPos, targetRoot.Position)
-                        end
+                        root.CFrame = CFrame.lookAt(behindPos, targetRoot.Position)
 
+                        -- Improved Hitreg (36)
                         local dir = CFrame.lookAt(selfPos, targetRoot.Position).LookVector
-                        local selfValidatePos = selfPos + dir * math.max(distance - 14.4, 0)
+                        local selfValidatePos = selfPos + dir * math.max(distance - 36, 0)
 
                         SwordHit:FireServer({
                             chargedAttack = { chargeRatio = 0 },
@@ -74,7 +73,7 @@ TpAura.Run = function()
                     end
                 end
 
-                task.wait(0.05)  -- Fast attack
+                task.wait(0.05)
             end
         end)
 
@@ -87,4 +86,4 @@ TpAura.Run = function()
     end
 end
 
-return TpAura
+return Tpaura
