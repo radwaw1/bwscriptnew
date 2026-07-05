@@ -1,21 +1,44 @@
--- Speed.lua
--- Place ModuleScripts like this inside ReplicatedStorage.Modules
--- Every module MUST return a table with:
---   Name (string, optional - what shows on the button, defaults to script name)
---   Run  (function - what happens when the button is clicked)
- 
-local Speed = {}
+local WalkSpeed = {}
 
-Speed.Config = {
-    { WS = "Walkspeed", Type = "Slider", Min = 1, Max = 100, Default = 20, Value = 20, Suffix = " studs" }
+WalkSpeed.Name = "WalkSpeed"
+WalkSpeed.Enabled = false
+
+local player = game:GetService("Players").LocalPlayer
+local originalSpeed = 16
+
+WalkSpeed.Config = {
+    { Name = "Speed", Type = "Slider", Min = 0, Max = 100, Default = 20, Value = 20 }
 }
 
-Speed.Name = "Speed"
- 
-Speed.Run = function()
-	local player = game:GetService("Players").LocalPlayer
-	player.Character.Humanoid.WalkSpeed = WS
+WalkSpeed.Run = function()
+    WalkSpeed.Enabled = not WalkSpeed.Enabled
+
+    if WalkSpeed.Enabled then
+        print("WalkSpeed Enabled")
+        
+        task.spawn(function()
+            while WalkSpeed.Enabled do
+                local char = player.Character
+                if char then
+                    local hum = char:FindFirstChild("Humanoid")
+                    if hum then
+                        hum.WalkSpeed = WalkSpeed.Config[1].Value
+                    end
+                end
+                task.wait(0.1)
+            end
+        end)
+
+    else
+        print(" WalkSpeed Disabled")
+        local char = player.Character
+        if char then
+            local hum = char:FindFirstChild("Humanoid")
+            if hum then
+                hum.WalkSpeed = originalSpeed
+            end
+        end
+    end
 end
- 
-return Speed
- 
+
+return WalkSpeed

@@ -1,4 +1,4 @@
--- ModuleHub with Keybinds
+-- ModuleHub with Fixed Dragging + Keybinds
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local HttpService = game:GetService("HttpService")
@@ -24,77 +24,88 @@ mainFrame.Position = UDim2.new(0.5, -140, 0.5, -210)
 mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 34)
 mainFrame.Parent = screenGui
 
-local uiCorner = Instance.new("UICorner"); uiCorner.CornerRadius = UDim.new(0,8); uiCorner.Parent = mainFrame
+local uiCorner = Instance.new("UICorner")
+uiCorner.CornerRadius = UDim.new(0, 8)
+uiCorner.Parent = mainFrame
 
 local titleBar = Instance.new("Frame")
-titleBar.Size = UDim2.new(1,0,0,36)
-titleBar.BackgroundColor3 = Color3.fromRGB(20,20,24)
+titleBar.Size = UDim2.new(1, 0, 0, 36)
+titleBar.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
 titleBar.Parent = mainFrame
 
 local titleLabel = Instance.new("TextLabel")
-titleLabel.Size = UDim2.new(1,-100,1,0)
-titleLabel.Position = UDim2.new(0,12,0,0)
+titleLabel.Size = UDim2.new(1, -100, 1, 0)
+titleLabel.Position = UDim2.new(0, 12, 0, 0)
 titleLabel.BackgroundTransparency = 1
 titleLabel.Text = "Module Hub"
-titleLabel.TextColor3 = Color3.fromRGB(255,255,255)
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 titleLabel.Font = Enum.Font.GothamBold
 titleLabel.TextSize = 16
 titleLabel.Parent = titleBar
 
 local selfDestructBtn = Instance.new("TextButton")
-selfDestructBtn.Size = UDim2.new(0,85,0,24)
-selfDestructBtn.Position = UDim2.new(1,-92,0.5,-12)
-selfDestructBtn.BackgroundColor3 = Color3.fromRGB(170,30,30)
+selfDestructBtn.Size = UDim2.new(0, 85, 0, 24)
+selfDestructBtn.Position = UDim2.new(1, -92, 0.5, -12)
+selfDestructBtn.BackgroundColor3 = Color3.fromRGB(170, 30, 30)
 selfDestructBtn.Text = "Self Destruct"
-selfDestructBtn.TextColor3 = Color3.fromRGB(255,255,255)
+selfDestructBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 selfDestructBtn.Font = Enum.Font.Gotham
 selfDestructBtn.TextSize = 11
 selfDestructBtn.Parent = titleBar
 
 local reloadButton = Instance.new("TextButton")
-reloadButton.Size = UDim2.new(0,60,0,24)
-reloadButton.Position = UDim2.new(1,-155,0.5,-12)
-reloadButton.BackgroundColor3 = Color3.fromRGB(45,45,52)
+reloadButton.Size = UDim2.new(0, 60, 0, 24)
+reloadButton.Position = UDim2.new(1, -155, 0.5, -12)
+reloadButton.BackgroundColor3 = Color3.fromRGB(45, 45, 52)
 reloadButton.Text = "Reload"
-reloadButton.TextColor3 = Color3.fromRGB(255,255,255)
+reloadButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 reloadButton.Font = Enum.Font.Gotham
 reloadButton.TextSize = 12
 reloadButton.Parent = titleBar
 
 local statusLabel = Instance.new("TextLabel")
-statusLabel.Size = UDim2.new(1,-16,0,18)
-statusLabel.Position = UDim2.new(0,8,0,40)
+statusLabel.Size = UDim2.new(1, -16, 0, 18)
+statusLabel.Position = UDim2.new(0, 8, 0, 40)
 statusLabel.BackgroundTransparency = 1
 statusLabel.Text = "Loading modules..."
-statusLabel.TextColor3 = Color3.fromRGB(160,160,165)
+statusLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
 statusLabel.Font = Enum.Font.Gotham
 statusLabel.TextSize = 12
 statusLabel.Parent = mainFrame
 
 local scrollFrame = Instance.new("ScrollingFrame")
-scrollFrame.Size = UDim2.new(1,-16,1,-68)
-scrollFrame.Position = UDim2.new(0,8,0,60)
+scrollFrame.Size = UDim2.new(1, -16, 1, -68)
+scrollFrame.Position = UDim2.new(0, 8, 0, 60)
 scrollFrame.BackgroundTransparency = 1
 scrollFrame.ScrollBarThickness = 4
 scrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
 scrollFrame.Parent = mainFrame
 
 local listLayout = Instance.new("UIListLayout")
-listLayout.Padding = UDim.new(0,6)
+listLayout.Padding = UDim.new(0, 6)
 listLayout.Parent = scrollFrame
 
 local modules = {}
 local openConfigWindows = {}
+local keybinds = {}
 
+-- FIXED DRAGGING
 local function makeDraggable(frame, dragBar)
     local dragging = false
-    local dragStart, startPos
+    local dragStart = nil
+    local startPos = nil
 
     dragBar.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
             startPos = frame.Position
+        end
+    end)
+
+    dragBar.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
         end
     end)
 
@@ -108,18 +119,20 @@ end
 
 makeDraggable(mainFrame, titleBar)
 
-selfDestructBtn.MouseButton1Click:Connect(function() screenGui:Destroy() end)
+selfDestructBtn.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+end)
 
 -- Keybind System
-local keybinds = {}
-
 UserInputService.InputBegan:Connect(function(input, gp)
     if gp then return end
     for name, mod in pairs(modules) do
         if keybinds[name] and input.KeyCode == keybinds[name] then
-            pcall(mod.moduleData.Run)
-            mod.enabled = not mod.enabled
-            updateButtonVisual(mod.button, mod.enabled)
+            local success = pcall(mod.moduleData.Run)
+            if success then
+                mod.enabled = not mod.enabled
+                mod.button.BackgroundColor3 = mod.enabled and Color3.fromRGB(40,120,60) or Color3.fromRGB(120,40,40)
+            end
         end
     end
 end)
@@ -242,14 +255,16 @@ local function createButtonForModule(moduleData)
     updateButtonVisual(button, false)
 end
 
--- Loading (same as before)
 local function refreshModules()
-    for _, v in scrollFrame:GetChildren() do if v:IsA("Frame") then v:Destroy() end end
+    for _, child in ipairs(scrollFrame:GetChildren()) do
+        if child:IsA("Frame") then child:Destroy() end
+    end
     modules = {}
 
     statusLabel.Text = "Loading modules..."
 
     local url = string.format("https://api.github.com/repos/%s/%s/contents/%s?ref=%s", REPO_USER, REPO_NAME, GITHUB_FOLDER, REPO_BRANCH)
+
     local ok, response = pcall(function() return request({Url = url, Method = "GET"}) end)
 
     if ok and response.Success then
@@ -260,8 +275,8 @@ local function refreshModules()
                 if ok2 and res.Success then
                     local func = loadstring(res.Body)
                     if func then
-                        local s, mod = pcall(func)
-                        if s and mod and mod.Run then
+                        local success, mod = pcall(func)
+                        if success and mod and mod.Run then
                             createButtonForModule(mod)
                         end
                     end
