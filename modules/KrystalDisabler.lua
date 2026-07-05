@@ -1,4 +1,3 @@
-
 local KrystalDisabler = {}
 
 KrystalDisabler.Name = "KrystalDisabler"
@@ -6,14 +5,16 @@ KrystalDisabler.Name = "KrystalDisabler"
 KrystalDisabler.Run = function()
     task.wait(3)
     
-    local KnitInit, Knit
-    repeat
-        KnitInit, Knit = pcall(function()
-            return require(game:GetService('ReplicatedStorage').rbxts_include.node_modules["@easy-games"].knit.src).KnitClient
-        end)
-        if KnitInit then break end
-        task.wait()
-    until KnitInit
+    print("KrystalDisabler: Starting...")
+
+    local KnitInit, Knit = pcall(function()
+        return require(game:GetService('ReplicatedStorage').rbxts_include.node_modules["@easy-games"].knit.src).KnitClient
+    end)
+
+    if not KnitInit then
+        print("Failed to load Knit")
+        return
+    end
 
     if not debug.getupvalue(Knit.Start, 1) then
         repeat task.wait() until debug.getupvalue(Knit.Start, 1)
@@ -28,7 +29,7 @@ KrystalDisabler.Run = function()
         end
     })
 
-    -- Momentum Bypass
+    -- Only momentum bypass
     local controller = bedwars.GlacialSkaterController
     if controller then
         local oldUpdate = controller.updateMomentum
@@ -43,17 +44,10 @@ KrystalDisabler.Run = function()
         pcall(function()
             controller:updateMomentum()
         end)
+        print("Momentum bypass applied")
     end
 
-    -- Very selective SendToServer hook (only momentum)
-    local oldSendToServer = hookfunction(bedwars.Client.SendToServer, function(self, remoteName, data)
-        if remoteName == "MomentumUpdate" then
-            return oldSendToServer(self, remoteName, { momentumValue = 9e9 })
-        end
-        return oldSendToServer(self, remoteName, data)
-    end)
-
-    print("✅ KrystalDisabler loaded (Balanced)")
+    print("✅ KrystalDisabler loaded (Safe)")
 end
 
 return KrystalDisabler
