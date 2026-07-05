@@ -12,7 +12,9 @@ KrystalDisabler.Run = function()
     until KnitInit
 
     if true and not debug.getupvalue(Knit.Start, 1) then
-        repeat task.wait() until debug.getupvalue(Knit.Start, 1)
+        repeat
+            task.wait()
+        until debug.getupvalue(Knit.Start, 1)
     end
 
     local bedwars = setmetatable({
@@ -24,46 +26,45 @@ KrystalDisabler.Run = function()
         end
     })
 
-    local momentumRemote = bedwars.Client:Get("MomentumUpdate")
-    local lastSend = 0
-
-    -- Main hook
+    -- Safe hook for updateMomentum
     local oldUpdateMomentum = bedwars.GlacialSkaterController.updateMomentum
     if oldUpdateMomentum then
         hookfunction(oldUpdateMomentum, function(self, ...)
             self.momentum = 9e9
             self.lastMomentumReport = 9e9
-
-            -- Throttle sending to server (max once every 0.3 seconds)
-            local now = tick()
-            if momentumRemote and momentumRemote.SendToServer and (now - lastSend > 0.3) then
+            
+            -- Safe SendToServer with pcall
+            local momentumRemote = bedwars.Client:Get("MomentumUpdate")
+            if momentumRemote and momentumRemote.SendToServer then
                 pcall(function()
-                    momentumRemote:SendToServer({ momentumValue = 9e9 })
+                    momentumRemote:SendToServer({
+                        momentumValue = 9e9
+                    })
                 end)
-                lastSend = now
             end
-
+            
             return oldUpdateMomentum(self, ...)
         end)
     end
 
-    -- Optional: Also hook SendToServer as backup
-    if momentumRemote and momentumRemote.SendToServer then
-        local oldSend = momentumRemote.SendToServer
-        hookfunction(oldSend, function(self, data)
+    -- Safe hook for SendToServer
+    local momentumEvent = bedwars.Client:Get("MomentumUpdate")
+    if momentumEvent and momentumEvent.SendToServer then
+        local oldSendToServer = momentumEvent.SendToServer
+        hookfunction(oldSendToServer, function(self, data)
             if type(data) == "table" and data.momentumValue == 9e9 then
-                return pcall(oldSend, self, { momentumValue = 9e9 })
+                return pcall(oldSendToServer, self, { momentumValue = 9e9 })
             end
-            return pcall(oldSend, self, data)
+            return pcall(oldSendToServer, self, data)
         end)
     end
 
-    -- One initial call
+    -- Initial call
     pcall(function()
         bedwars.GlacialSkaterController:updateMomentum()
     end)
 
-    print("KrystalDisabler loaded (throttled version)")
+    print("KrystalDisabler loaded successfully")
 end
 
 return KrystalDisabler
