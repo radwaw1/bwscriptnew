@@ -1,5 +1,5 @@
 local KrystalDisabler = {}
-KrystalDisabler.Name = "Disables Anticheat"
+KrystalDisabler.Name = "Krystal Disabler"
 
 KrystalDisabler.Run = function()
     local KnitInit, Knit
@@ -27,42 +27,43 @@ KrystalDisabler.Run = function()
     local momentumRemote = bedwars.Client:Get("MomentumUpdate")
     local lastSend = 0
 
-    -- Better hook - avoid recursion
-    local controller = bedwars.GlacialSkaterController
-    if controller then
-        local oldUpdateMomentum = controller.updateMomentum
-        
-        controller.updateMomentum = function(self, ...)
-            -- Force high momentum locally
+    -- Main hook
+    local oldUpdateMomentum = bedwars.GlacialSkaterController.updateMomentum
+    if oldUpdateMomentum then
+        hookfunction(oldUpdateMomentum, function(self, ...)
             self.momentum = 9e9
             self.lastMomentumReport = 9e9
 
-            -- Throttled server update
+            -- Throttle sending to server (max once every 0.3 seconds)
             local now = tick()
-            if momentumRemote and momentumRemote.SendToServer and (now - lastSend > 0.4) then
+            if momentumRemote and momentumRemote.SendToServer and (now - lastSend > 0.3) then
                 pcall(function()
                     momentumRemote:SendToServer({ momentumValue = 9e9 })
                 end)
                 lastSend = now
             end
 
-            -- Call original safely
-            if oldUpdateMomentum then
-                return oldUpdateMomentum(self, ...)
-            end
-        end
-
-        print("Momentum hook applied successfully")
+            return oldUpdateMomentum(self, ...)
+        end)
     end
 
-    -- One-time boost
+    -- Optional: Also hook SendToServer as backup
+    if momentumRemote and momentumRemote.SendToServer then
+        local oldSend = momentumRemote.SendToServer
+        hookfunction(oldSend, function(self, data)
+            if type(data) == "table" and data.momentumValue == 9e9 then
+                return pcall(oldSend, self, { momentumValue = 9e9 })
+            end
+            return pcall(oldSend, self, data)
+        end)
+    end
+
+    -- One initial call
     pcall(function()
-        if controller then
-            controller:updateMomentum()
-        end
+        bedwars.GlacialSkaterController:updateMomentum()
     end)
 
-    print("KrystalDisabler loaded")
+    print("KrystalDisabler loaded (throttled version)")
 end
 
 return KrystalDisabler
