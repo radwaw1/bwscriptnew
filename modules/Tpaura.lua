@@ -15,15 +15,14 @@ TpAura.Run = function()
     TpAura.Enabled = not TpAura.Enabled
 
     if TpAura.Enabled then
-        print("✅ Shitaura Enabled (TP 8 behind → Back)")
+        print("✅ Shitaura Enabled (Fake TP behind)")
         
         connection = task.spawn(function()
             while TpAura.Enabled do
                 local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
                 if root then
-                    local oldCFrame = root.CFrame  -- Save original position
-
                     local selfPos = root.Position
+                    local oldCFrame = root.CFrame
 
                     -- Find weapon
                     local weapon = nil
@@ -55,13 +54,11 @@ TpAura.Run = function()
                         local distance = (targetRoot.Position - selfPos).Magnitude
                         if distance > 40 then continue end
 
-                        -- TP 8 studs behind target
-                        local behindPos = targetRoot.Position - targetRoot.CFrame.LookVector * 8
-                        root.CFrame = CFrame.lookAt(behindPos, targetRoot.Position)
+                        -- Fake position behind target for server
+                        local fakeBehindPos = targetRoot.Position - targetRoot.CFrame.LookVector * 8
 
-                        -- Attack
                         local dir = CFrame.lookAt(selfPos, targetRoot.Position).LookVector
-                        local selfValidatePos = selfPos + dir * math.max(distance - 36, 0)
+                        local selfValidatePos = fakeBehindPos   -- Server thinks you're here
 
                         SwordHit:FireServer({
                             chargedAttack = { chargeRatio = 0 },
@@ -72,9 +69,6 @@ TpAura.Run = function()
                             },
                             weapon = weapon
                         })
-
-                        -- TP back to original position
-                        root.CFrame = oldCFrame
                     end
                 end
 
