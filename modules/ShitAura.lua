@@ -15,15 +15,15 @@ Killaura.Run = function()
     Killaura.Enabled = not Killaura.Enabled
 
     if Killaura.Enabled then
-        print("Killaura Enabled - 20 studs")
+        print("✅ Killaura Enabled (20 studs)")
         
         connection = game:GetService("RunService").Heartbeat:Connect(function()
             if not Killaura.Enabled then return end
 
-            local rootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-            if not rootPart then return end
+            local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+            if not root then return end
 
-            local selfPos = rootPart.Position
+            local selfPos = root.Position
 
             for _, plr in ipairs(Players:GetPlayers()) do
                 if plr == player then continue end
@@ -35,7 +35,6 @@ Killaura.Run = function()
                 local distance = (targetRoot.Position - selfPos).Magnitude
                 if distance > 20 then continue end
 
-                -- Calculate positions like the example
                 local dir = CFrame.lookAt(selfPos, targetRoot.Position).LookVector
                 local selfValidatePos = selfPos + dir * math.max(distance - 14.4, 0)
 
@@ -55,7 +54,7 @@ Killaura.Run = function()
         end)
 
     else
-        print("Killaura Disabled")
+        print("❌ Killaura Disabled")
         if connection then
             connection:Disconnect()
             connection = nil
