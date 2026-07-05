@@ -14,7 +14,7 @@ KrystalDisabler.Run = function()
         task.wait()
     until KnitInit
 
-    if true and not debug.getupvalue(Knit.Start, 1) then
+    if not debug.getupvalue(Knit.Start, 1) then
         repeat task.wait() until debug.getupvalue(Knit.Start, 1)
     end
 
@@ -27,43 +27,24 @@ KrystalDisabler.Run = function()
         end
     })
 
-    -- Original Momentum Hook
-    local oldUpdateMomentum = bedwars.GlacialSkaterController.updateMomentum
-    hookfunction(oldUpdateMomentum, function(self, ...)
-        self.momentum = 9e9
-        self.lastMomentumReport = 9e9
-        pcall(function()
-            bedwars.Client:Get("MomentumUpdate"):SendToServer({
-                momentumValue = 9e9
-            })
+    -- Momentum Bypass (no SendToServer hook)
+    local controller = bedwars.GlacialSkaterController
+    if controller then
+        local oldUpdate = controller.updateMomentum
+        hookfunction(oldUpdate, function(self, ...)
+            self.momentum = 9e9
+            self.lastMomentumReport = 9e9
+            pcall(function()
+                bedwars.Client:Get("MomentumUpdate"):SendToServer({ momentumValue = 9e9 })
+            end)
         end)
-    end)
 
-    pcall(function()
-        bedwars.GlacialSkaterController:updateMomentum()
-    end)
-
-    -- Selective SendToServer Hook (protects shop)
-    local momentumRemote = bedwars.Client:Get("MomentumUpdate")
-    if momentumRemote then
-        local oldSend = momentumRemote.SendToServer
-        hookfunction(oldSend, function(self, data)
-            -- Only intercept momentum packets
-            if type(data) == "table" and data.momentumValue ~= nil then
-                return oldSend(self, { momentumValue = 9e9 })
-            end
-
-            -- Protect shop remote
-            if self.Name == "Inventory/SetObservedChest" then
-                return oldSend(self, data)
-            end
-
-            -- Let all other remotes pass through
-            return oldSend(self, data)
+        pcall(function()
+            controller:updateMomentum()
         end)
     end
 
-    print("KrystalDisabler loaded (selective + shop protected)")
+    print("✅ KrystalDisabler loaded (No SendToServer hook)")
 end
 
 return KrystalDisabler
