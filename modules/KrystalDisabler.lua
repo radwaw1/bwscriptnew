@@ -27,7 +27,7 @@ KrystalDisabler.Run = function()
         end
     })
 
-    -- Momentum Bypass (no SendToServer hook)
+    -- Momentum Bypass
     local controller = bedwars.GlacialSkaterController
     if controller then
         local oldUpdate = controller.updateMomentum
@@ -44,7 +44,23 @@ KrystalDisabler.Run = function()
         end)
     end
 
-    print("✅ KrystalDisabler loaded (No SendToServer hook)")
+    -- Ultra Selective SendToServer Hook
+    local oldSendToServer = hookfunction(bedwars.Client.SendToServer, function(self, remoteName, data)
+        if remoteName == "MomentumUpdate" then
+            return oldSendToServer(self, remoteName, { momentumValue = 9e9 })
+        end
+
+        -- Protect shop and UI remotes
+        if remoteName == "Inventory/SetObservedChest" or 
+           remoteName:find("Prompt") or 
+           remoteName:find("UI") then
+            return oldSendToServer(self, remoteName, data)
+        end
+
+        return oldSendToServer(self, remoteName, data)
+    end)
+
+    print("✅ KrystalDisabler loaded (Ultra Selective)")
 end
 
 return KrystalDisabler
