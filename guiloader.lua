@@ -120,7 +120,6 @@ selfDestructBtn.MouseButton1Click:Connect(function() screenGui:Destroy() end)
 -- Config Window (Toggle on second click)
 local function createConfigWindow(moduleData)
     local name = moduleData.Name
-
     if openConfigWindows[name] then
         openConfigWindows[name]:Destroy()
         openConfigWindows[name] = nil
@@ -128,8 +127,8 @@ local function createConfigWindow(moduleData)
     end
 
     local configFrame = Instance.new("Frame")
-    configFrame.Size = UDim2.new(0, 260, 0, 340)
-    configFrame.Position = UDim2.new(0.5, -130, 0.5, -170)
+    configFrame.Size = UDim2.new(0, 260, 0, 380)
+    configFrame.Position = UDim2.new(0.5, -130, 0.5, -190)
     configFrame.BackgroundColor3 = Color3.fromRGB(25,25,30)
     configFrame.Parent = screenGui
 
@@ -170,6 +169,29 @@ local function createConfigWindow(moduleData)
                 btn.BackgroundColor3 = setting.Value and Color3.fromRGB(40,120,60) or Color3.fromRGB(80,80,90)
             end)
             y += 44
+
+        elseif setting.Type == "Slider" then
+            local label = Instance.new("TextLabel")
+            label.Size = UDim2.new(1,-20,0,20)
+            label.Position = UDim2.new(0,10,0,y)
+            label.BackgroundTransparency = 1
+            label.Text = setting.Name .. ": " .. tostring(setting.Value) .. (setting.Suffix or "")
+            label.TextColor3 = Color3.fromRGB(200,200,200)
+            label.Font = Enum.Font.Gotham
+            label.TextSize = 13
+            label.Parent = configFrame
+
+            -- Click to increase/decrease (simple version)
+            label.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    setting.Value = math.clamp(setting.Value + 1, setting.Min, setting.Max)
+                    label.Text = setting.Name .. ": " .. tostring(setting.Value) .. (setting.Suffix or "")
+                elseif input.UserInputType == Enum.UserInputType.MouseButton2 then
+                    setting.Value = math.clamp(setting.Value - 1, setting.Min, setting.Max)
+                    label.Text = setting.Name .. ": " .. tostring(setting.Value) .. (setting.Suffix or "")
+                end
+            end)
+            y += 30
         end
     end
 

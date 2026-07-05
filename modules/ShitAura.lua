@@ -3,7 +3,6 @@ local Killaura = {}
 Killaura.Name = "Killaura"
 Killaura.Enabled = false
 
--- Correct Remote
 local SwordHit = game:GetService("ReplicatedStorage")
     .rbxts_include.node_modules["@rbxts"].net.out._NetManaged.SwordHit
 
@@ -19,7 +18,7 @@ Killaura.Run = function()
     Killaura.Enabled = not Killaura.Enabled
 
     if Killaura.Enabled then
-        print("Killaura Enabled (20 studs)")
+        print("Killaura Enabled")
         
         connection = game:GetService("RunService").Heartbeat:Connect(function()
             if not Killaura.Enabled then return end
@@ -27,7 +26,14 @@ Killaura.Run = function()
             local range = Killaura.Config[1].Value
             local maxTargets = Killaura.Config[2].Value
 
-            local sword = store.tools.sword or store.hand
+            -- Fixed sword detection
+            local sword = nil
+            if store and store.tools and store.tools.sword then
+                sword = store.tools.sword
+            elseif store and store.hand and store.hand.tool then
+                sword = store.hand
+            end
+
             if not sword or not sword.tool then return end
 
             local targets = entitylib.AllPosition({
@@ -58,7 +64,6 @@ Killaura.Run = function()
                 local dir = CFrame.lookAt(selfpos, actualRoot.Position).LookVector
                 local pos = selfpos + dir * math.max(delta.Magnitude - 14.4, 0)
 
-                -- Updated to use the correct remote
                 SwordHit:FireServer({
                     chargedAttack = { chargeRatio = 0 },
                     entityInstance = target.Character,
