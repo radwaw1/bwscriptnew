@@ -127,26 +127,23 @@ local function createConfigWindow(moduleData)
     end
 
     local configFrame = Instance.new("Frame")
-    configFrame.Size = UDim2.new(0, 280, 0, 400)
-    configFrame.Position = UDim2.new(0.5, -140, 0.5, -200)
-    configFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+    configFrame.Size = UDim2.new(0, 280, 0, 420)
+    configFrame.Position = UDim2.new(0.5, -140, 0.5, -210)
+    configFrame.BackgroundColor3 = Color3.fromRGB(25,25,30)
     configFrame.Parent = screenGui
 
-    local cCorner = Instance.new("UICorner")
-    cCorner.CornerRadius = UDim.new(0, 8)
-    cCorner.Parent = configFrame
+    local cCorner = Instance.new("UICorner"); cCorner.CornerRadius = UDim.new(0,8); cCorner.Parent = configFrame
 
-    -- Title Bar
     local titleBarConfig = Instance.new("Frame")
-    titleBarConfig.Size = UDim2.new(1, 0, 0, 40)
-    titleBarConfig.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
+    titleBarConfig.Size = UDim2.new(1,0,0,40)
+    titleBarConfig.BackgroundColor3 = Color3.fromRGB(20,20,24)
     titleBarConfig.Parent = configFrame
 
     local titleLabel = Instance.new("TextLabel")
-    titleLabel.Size = UDim2.new(1, 0, 1, 0)
+    titleLabel.Size = UDim2.new(1,0,1,0)
     titleLabel.BackgroundTransparency = 1
     titleLabel.Text = name .. " Settings"
-    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.TextColor3 = Color3.fromRGB(255,255,255)
     titleLabel.Font = Enum.Font.GothamBold
     titleLabel.TextSize = 16
     titleLabel.Parent = titleBarConfig
@@ -154,80 +151,90 @@ local function createConfigWindow(moduleData)
     makeDraggable(configFrame, titleBarConfig)
 
     local content = Instance.new("ScrollingFrame")
-    content.Size = UDim2.new(1, -20, 1, -50)
-    content.Position = UDim2.new(0, 10, 0, 45)
+    content.Size = UDim2.new(1,-20,1,-50)
+    content.Position = UDim2.new(0,10,0,45)
     content.BackgroundTransparency = 1
     content.ScrollBarThickness = 6
     content.AutomaticCanvasSize = Enum.AutomaticSize.Y
     content.Parent = configFrame
 
-    local list = Instance.new("UIListLayout")
-    list.Padding = UDim.new(0, 8)
-    list.SortOrder = Enum.SortOrder.LayoutOrder
-    list.Parent = content
+    local uiList = Instance.new("UIListLayout")
+    uiList.Padding = UDim.new(0,10)
+    uiList.SortOrder = Enum.SortOrder.LayoutOrder
+    uiList.Parent = content
 
-    for i, setting in ipairs(moduleData.Config or {}) do
+    for _, setting in ipairs(moduleData.Config or {}) do
         if setting.Type == "Toggle" then
             local btn = Instance.new("TextButton")
-            btn.Size = UDim2.new(1, 0, 0, 40)
-            btn.BackgroundColor3 = setting.Value and Color3.fromRGB(40, 120, 60) or Color3.fromRGB(70, 70, 80)
+            btn.Size = UDim2.new(1,0,0,40)
+            btn.BackgroundColor3 = setting.Value and Color3.fromRGB(40,120,60) or Color3.fromRGB(70,70,80)
             btn.Text = "   " .. setting.Name
-            btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+            btn.TextColor3 = Color3.fromRGB(255,255,255)
             btn.TextXAlignment = Enum.TextXAlignment.Left
             btn.Font = Enum.Font.Gotham
             btn.TextSize = 15
-            btn.LayoutOrder = i
             btn.Parent = content
 
-            local bCorner = Instance.new("UICorner")
-            bCorner.CornerRadius = UDim.new(0, 6)
-            bCorner.Parent = btn
+            local corner = Instance.new("UICorner"); corner.CornerRadius = UDim.new(0,6); corner.Parent = btn
 
             btn.MouseButton1Click:Connect(function()
                 setting.Value = not setting.Value
-                btn.BackgroundColor3 = setting.Value and Color3.fromRGB(40, 120, 60) or Color3.fromRGB(70, 70, 80)
+                btn.BackgroundColor3 = setting.Value and Color3.fromRGB(40,120,60) or Color3.fromRGB(70,70,80)
             end)
 
         elseif setting.Type == "Slider" then
             local frame = Instance.new("Frame")
-            frame.Size = UDim2.new(1, 0, 0, 55)
+            frame.Size = UDim2.new(1,0,0,60)
             frame.BackgroundTransparency = 1
-            frame.LayoutOrder = i
             frame.Parent = content
 
             local label = Instance.new("TextLabel")
-            label.Size = UDim2.new(1, 0, 0, 20)
+            label.Size = UDim2.new(1,0,0,20)
             label.BackgroundTransparency = 1
-            label.Text = setting.Name .. ": " .. tostring(setting.Value) .. (setting.Suffix or "")
-            label.TextColor3 = Color3.fromRGB(220, 220, 220)
+            label.Text = setting.Name .. ": " .. setting.Value .. (setting.Suffix or "")
+            label.TextColor3 = Color3.fromRGB(220,220,220)
             label.Font = Enum.Font.Gotham
             label.TextSize = 14
             label.Parent = frame
 
-            local sliderBg = Instance.new("Frame")
-            sliderBg.Size = UDim2.new(1, 0, 0, 8)
-            sliderBg.Position = UDim2.new(0, 0, 0, 28)
-            sliderBg.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
-            sliderBg.Parent = frame
+            local bg = Instance.new("Frame")
+            bg.Size = UDim2.new(1,0,0,10)
+            bg.Position = UDim2.new(0,0,0,30)
+            bg.BackgroundColor3 = Color3.fromRGB(45,45,50)
+            bg.Parent = frame
 
-            local sliderFill = Instance.new("Frame")
-            sliderFill.Size = UDim2.new(0.5, 0, 1, 0)  -- placeholder
-            sliderFill.BackgroundColor3 = Color3.fromRGB(0, 170, 100)
-            sliderFill.Parent = sliderBg
+            local fill = Instance.new("Frame")
+            fill.Size = UDim2.new((setting.Value - setting.Min) / (setting.Max - setting.Min), 0, 1, 0)
+            fill.BackgroundColor3 = Color3.fromRGB(0, 170, 100)
+            fill.Parent = bg
 
-            local sCorner = Instance.new("UICorner")
-            sCorner.CornerRadius = UDim.new(0, 4)
-            sCorner.Parent = sliderBg
-            sCorner:Clone().Parent = sliderFill
+            local bCorner = Instance.new("UICorner"); bCorner.CornerRadius = UDim.new(0,5); bCorner.Parent = bg
+            bCorner:Clone().Parent = fill
 
-            -- Click to adjust
-            sliderBg.InputBegan:Connect(function(input)
+            -- Draggable Slider
+            local dragging = false
+            bg.InputBegan:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                    setting.Value = math.clamp(setting.Value + 1, setting.Min, setting.Max)
-                    label.Text = setting.Name .. ": " .. tostring(setting.Value) .. (setting.Suffix or "")
-                elseif input.UserInputType == Enum.UserInputType.MouseButton2 then
-                    setting.Value = math.clamp(setting.Value - 1, setting.Min, setting.Max)
-                    label.Text = setting.Name .. ": " .. tostring(setting.Value) .. (setting.Suffix or "")
+                    dragging = true
+                end
+            end)
+
+            UserInputService.InputChanged:Connect(function(input)
+                if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                    local mousePos = UserInputService:GetMouseLocation().X
+                    local bgPos = bg.AbsolutePosition.X
+                    local bgSize = bg.AbsoluteSize.X
+
+                    local percent = math.clamp((mousePos - bgPos) / bgSize, 0, 1)
+                    setting.Value = math.floor(setting.Min + percent * (setting.Max - setting.Min))
+                    fill.Size = UDim2.new(percent, 0, 1, 0)
+                    label.Text = setting.Name .. ": " .. setting.Value .. (setting.Suffix or "")
+                end
+            end)
+
+            UserInputService.InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    dragging = false
                 end
             end)
         end

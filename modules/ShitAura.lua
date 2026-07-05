@@ -26,11 +26,10 @@ Killaura.Run = function()
             local range = Killaura.Config[1].Value
             local maxTargets = Killaura.Config[2].Value
 
-            -- Fixed sword detection
             local sword = nil
             if store and store.tools and store.tools.sword then
                 sword = store.tools.sword
-            elseif store and store.hand and store.hand.tool then
+            elseif store and store.hand then
                 sword = store.hand
             end
 
@@ -52,7 +51,7 @@ Killaura.Run = function()
             if not root then return end
 
             local selfpos = root.Position
-            switchItem(sword.tool, 0)
+            pcall(switchItem, sword.tool, 0)
 
             for _, target in ipairs(targets) do
                 local actualRoot = target.Character and target.Character.PrimaryPart
@@ -78,10 +77,8 @@ Killaura.Run = function()
 
     else
         print("Killaura Disabled")
-        if connection then
-            connection:Disconnect()
-            connection = nil
-        end
+        if connection then connection:Disconnect() end
+        connection = nil
     end
 end
 
