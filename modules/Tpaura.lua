@@ -15,12 +15,14 @@ TpAura.Run = function()
     TpAura.Enabled = not TpAura.Enabled
 
     if TpAura.Enabled then
-        print("✅ Shitaura Enabled (40 studs + TP 15 behind + Hitreg 36)")
+        print("✅ Shitaura Enabled (TP 8 behind → Back)")
         
         connection = task.spawn(function()
             while TpAura.Enabled do
                 local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
                 if root then
+                    local oldCFrame = root.CFrame  -- Save original position
+
                     local selfPos = root.Position
 
                     -- Find weapon
@@ -53,11 +55,11 @@ TpAura.Run = function()
                         local distance = (targetRoot.Position - selfPos).Magnitude
                         if distance > 40 then continue end
 
-                        -- TP 15 studs behind target
+                        -- TP 8 studs behind target
                         local behindPos = targetRoot.Position - targetRoot.CFrame.LookVector * 8
                         root.CFrame = CFrame.lookAt(behindPos, targetRoot.Position)
 
-                        -- Improved Hitreg
+                        -- Attack
                         local dir = CFrame.lookAt(selfPos, targetRoot.Position).LookVector
                         local selfValidatePos = selfPos + dir * math.max(distance - 36, 0)
 
@@ -70,6 +72,9 @@ TpAura.Run = function()
                             },
                             weapon = weapon
                         })
+
+                        -- TP back to original position
+                        root.CFrame = oldCFrame
                     end
                 end
 
