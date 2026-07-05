@@ -54,7 +54,7 @@ TpAura.Run = function()
                         if distance > 40 then continue end
 
                         -- TP 15 studs behind target
-                        local behindPos = targetRoot.Position - targetRoot.CFrame.LookVector * 15
+                        local behindPos = targetRoot.Position - targetRoot.CFrame.LookVector * 8
                         root.CFrame = CFrame.lookAt(behindPos, targetRoot.Position)
 
                         -- Improved Hitreg
