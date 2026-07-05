@@ -1,6 +1,6 @@
 local TPAura = {}
 
-TPAura.Name = "TPaura"
+TPAura.Name = "TPAura"
 TPAura.Enabled = false
 
 local SwordHit = game:GetService("ReplicatedStorage")
@@ -15,12 +15,13 @@ TPAura.Run = function()
     TPAura.Enabled = not TPAura.Enabled
 
     if TPAura.Enabled then
-        print("✅ Shitaura Enabled")
+        print("✅ Shitaura Enabled (TP behind → Hit → Back)")
         
         connection = task.spawn(function()
             while TPAura.Enabled do
                 local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
                 if root then
+                    local oldCFrame = root.CFrame  -- Save original position
                     local selfPos = root.Position
 
                     local weapon = player.Character and player.Character:FindFirstChildWhichIsA("Tool") 
@@ -36,17 +37,26 @@ TPAura.Run = function()
                         local distance = (targetRoot.Position - selfPos).Magnitude
                         if distance > 40 then continue end
 
-                        local fakePos = targetRoot.Position - targetRoot.CFrame.LookVector * 12
+                        -- TP 8 studs behind
+                        local behindPos = targetRoot.Position - targetRoot.CFrame.LookVector * 8
+                        root.CFrame = CFrame.lookAt(behindPos, targetRoot.Position)
+
+                        -- Attack
+                        local dir = CFrame.lookAt(selfPos, targetRoot.Position).LookVector
+                        local selfValidatePos = selfPos + dir * math.max(distance - 36, 0)
 
                         SwordHit:FireServer({
                             chargedAttack = { chargeRatio = 0 },
                             entityInstance = targetChar,
                             validate = {
-                                selfPosition = { value = fakePos },
+                                selfPosition = { value = selfValidatePos },
                                 targetPosition = { value = targetRoot.Position }
                             },
                             weapon = weapon
                         })
+
+                        -- TP back immediately
+                        root.CFrame = oldCFrame
                     end
                 end
 
