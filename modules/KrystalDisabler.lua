@@ -19,11 +19,13 @@ KrystalDisabler.Run = function()
         end
         task.wait()
     until KnitInit
+
     if true and not debug.getupvalue(Knit.Start, 1) then
         repeat
             task.wait()
         until debug.getupvalue(Knit.Start, 1)
     end
+
     local bedwars = setmetatable({
         Client = require(game:GetService('ReplicatedStorage').TS.remotes).default.Client
     }, {
@@ -32,15 +34,29 @@ KrystalDisabler.Run = function()
             return rawget(self, ind)
         end
     })
-    old = clonefunction(bedwars.GlacialSkaterController.updateMomentum)
-    hookfunction(bedwars.GlacialSkaterController.updateMomentum, function(self, ...)
+
+    -- Hook into the updateMomentum function
+    local oldUpdateMomentum = bedwars.GlacialSkaterController.updateMomentum
+    hookfunction(oldUpdateMomentum, function(self, ...)
         self.momentum = 9e9
         self.lastMomentumReport = 9e9
         bedwars.Client:Get("MomentumUpdate"):SendToServer({
             momentumValue = 9e9
         })
     end)
+
+    -- Call the original updateMomentum to ensure it runs
     bedwars.GlacialSkaterController:updateMomentum()
+
+    -- Additional hook to ensure the anticheat doesn't detect changes
+    local oldSendToServer = bedwars.Client:Get("MomentumUpdate").SendToServer
+    hookfunction(oldSendToServer, function(self, data)
+        if data.momentumValue == 9e9 then
+            return oldSendToServer(self, { momentumValue = 9e9 })
+        end
+        return oldSendToServer(self, data)
+    end)
+
 end
 
 return KrystalDisabler
