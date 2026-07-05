@@ -1,7 +1,7 @@
-local Tpaura = {}
+local TpAura = {}
 
-Tpaura.Name = "TPaura"
-Tpaura.Enabled = false
+TpAura.Name = "TPaura"
+TpAura.Enabled = false
 
 local SwordHit = game:GetService("ReplicatedStorage")
     .rbxts_include.node_modules["@rbxts"].net.out._NetManaged.SwordHit
@@ -11,14 +11,14 @@ local player = Players.LocalPlayer
 
 local connection = nil
 
-Tpaura.Run = function()
-    Tpaura.Enabled = not Tpaura.Enabled
+TpAura.Run = function()
+    TpAura.Enabled = not TpAura.Enabled
 
-    if Tpaura.Enabled then
-        print("✅ Shitaura Enabled (40 studs + TP behind + Hitreg 36)")
+    if TpAura.Enabled then
+        print("✅ Shitaura Enabled (40 studs + TP 15 behind + Hitreg 36)")
         
         connection = task.spawn(function()
-            while Tpaura.Enabled do
+            while TpAura.Enabled do
                 local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
                 if root then
                     local selfPos = root.Position
@@ -53,11 +53,11 @@ Tpaura.Run = function()
                         local distance = (targetRoot.Position - selfPos).Magnitude
                         if distance > 40 then continue end
 
-                        -- TP 5 studs behind target
-                        local behindPos = targetRoot.Position - targetRoot.CFrame.LookVector * 10
+                        -- TP 15 studs behind target
+                        local behindPos = targetRoot.Position - targetRoot.CFrame.LookVector * 15
                         root.CFrame = CFrame.lookAt(behindPos, targetRoot.Position)
 
-                        -- Improved Hitreg (36)
+                        -- Improved Hitreg
                         local dir = CFrame.lookAt(selfPos, targetRoot.Position).LookVector
                         local selfValidatePos = selfPos + dir * math.max(distance - 36, 0)
 
@@ -86,4 +86,4 @@ Tpaura.Run = function()
     end
 end
 
-return Tpaura
+return TpAura
