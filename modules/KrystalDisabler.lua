@@ -43,27 +43,15 @@ KrystalDisabler.Run = function()
         bedwars.GlacialSkaterController:updateMomentum()
     end)
 
-    -- Selective SendToServer (protect shop)
-    local momentumRemote = bedwars.Client:Get("MomentumUpdate")
-    if momentumRemote then
-        local oldSend = momentumRemote.SendToServer
-        hookfunction(oldSend, function(self, data)
-            -- Only intercept momentum
-            if type(data) == "table" and data.momentumValue ~= nil then
-                return oldSend(self, { momentumValue = 9e9 })
-            end
+    -- Permissive SendToServer Hook
+    local oldSend = hookfunction(bedwars.Client.SendToServer, function(self, remoteName, data)
+        if remoteName == "MomentumUpdate" then
+            return oldSend(self, remoteName, { momentumValue = 9e9 })
+        end
+        return oldSend(self, remoteName, data)
+    end)
 
-            -- Protect shop remote
-            if self.Name == "Inventory/SetObservedChest" then
-                return oldSend(self, data)
-            end
-
-            -- Let everything else through
-            return oldSend(self, data)
-        end)
-    end
-
-    print("✅ KrystalDisabler loaded (Shop Protected)")
+    print("✅ KrystalDisabler loaded (Permissive)")
 end
 
 return KrystalDisabler
