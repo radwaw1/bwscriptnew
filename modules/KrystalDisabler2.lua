@@ -6,7 +6,7 @@
 
 local KrystalDisabler = {}
 
-KrystalDisabler.Name = "Disables Anticheat using Krystal Kit (OP!)"
+KrystalDisabler.Name = "Old Krystal Disabler"
 
 KrystalDisabler.Run = function()
 	local KnitInit, Knit
