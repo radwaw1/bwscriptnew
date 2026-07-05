@@ -11,11 +11,19 @@ local player = Players.LocalPlayer
 
 local connection = nil
 
+-- Config
+Killaura.Config = {
+    { Name = "Range", Type = "Slider", Min = 0, Max = 30, Default = 20, Value = 20, Suffix = " studs" },
+    { Name = "Max Targets", Type = "Slider", Min = 1, Max = 10, Default = 5, Value = 5 },
+    { Name = "Attack Speed", Type = "Slider", Min = 1, Max = 120, Default = 60, Value = 60, Suffix = " Hz" },
+    { Name = "Sword Only", Type = "Toggle", Default = false, Value = false }
+}
+
 Killaura.Run = function()
     Killaura.Enabled = not Killaura.Enabled
 
     if Killaura.Enabled then
-        print("Killaura Enabled")
+        print("✅ Killaura Enabled")
         
         connection = game:GetService("RunService").Heartbeat:Connect(function()
             if not Killaura.Enabled then return end
@@ -25,36 +33,35 @@ Killaura.Run = function()
 
             local selfPos = root.Position
 
-            -- Find a sword from inventory or character
-            local weapon = nil
-            if player.Character then
-                weapon = player.Character:FindFirstChildWhichIsA("Tool")
-            end
-            if not weapon then
-                weapon = player.Backpack:FindFirstChildWhichIsA("Tool")
-            end
-            if not weapon then
-                -- Try to find any sword from inventory
-                local inventory = game:GetService("ReplicatedStorage").Inventories:FindFirstChild(player.Name)
-                if inventory then
-                    for _, item in ipairs(inventory:GetChildren()) do
-                        if item.Name:find("sword") or item.Name:find("Sword") then
-                            weapon = item
-                            break
-                        end
+            -- Sword Only Check
+            if Killaura.Config[4].Value then
+                local holdingSword = false
+                if player.Character then
+                    local tool = player.Character:FindFirstChildWhichIsA("Tool")
+                    if tool and tool.Name:lower():find("sword") then
+                        holdingSword = true
                     end
                 end
+                if not holdingSword then return end
             end
 
+            local range = Killaura.Config[1].Value
+            local maxTargets = Killaura.Config[2].Value
+            local attackRate = 1 / math.max(Killaura.Config[3].Value, 1)
+
+            local targetsAttacked = 0
+            local weapon = player.Character and player.Character:FindFirstChildWhichIsA("Tool") 
+                        or player.Backpack:FindFirstChildWhichIsA("Tool")
+
             for _, plr in ipairs(Players:GetPlayers()) do
-                if plr == player then continue end
+                if plr == player or targetsAttacked >= maxTargets then continue end
 
                 local targetChar = plr.Character
                 local targetRoot = targetChar and targetChar:FindFirstChild("HumanoidRootPart")
                 if not targetRoot then continue end
 
                 local distance = (targetRoot.Position - selfPos).Magnitude
-                if distance > 20 then continue end
+                if distance > range then continue end
 
                 local dir = CFrame.lookAt(selfPos, targetRoot.Position).LookVector
                 local selfValidatePos = selfPos + dir * math.max(distance - 14.4, 0)
@@ -68,11 +75,13 @@ Killaura.Run = function()
                     },
                     weapon = weapon
                 })
+
+                targetsAttacked += 1
             end
         end)
 
     else
-        print("Killaura Disabled")
+        print("❌ Killaura Disabled")
         if connection then
             connection:Disconnect()
             connection = nil
