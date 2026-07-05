@@ -159,7 +159,7 @@ local function createConfigWindow(moduleData)
     content.Parent = configFrame
 
     local uiList = Instance.new("UIListLayout")
-    uiList.Padding = UDim.new(0,10)
+    uiList.Padding = UDim.new(0,12)
     uiList.SortOrder = Enum.SortOrder.LayoutOrder
     uiList.Parent = content
 
@@ -184,7 +184,7 @@ local function createConfigWindow(moduleData)
 
         elseif setting.Type == "Slider" then
             local frame = Instance.new("Frame")
-            frame.Size = UDim2.new(1,0,0,60)
+            frame.Size = UDim2.new(1,0,0,65)
             frame.BackgroundTransparency = 1
             frame.Parent = content
 
@@ -198,20 +198,27 @@ local function createConfigWindow(moduleData)
             label.Parent = frame
 
             local bg = Instance.new("Frame")
-            bg.Size = UDim2.new(1,0,0,10)
-            bg.Position = UDim2.new(0,0,0,30)
+            bg.Size = UDim2.new(1,0,0,12)
+            bg.Position = UDim2.new(0,0,0,32)
             bg.BackgroundColor3 = Color3.fromRGB(45,45,50)
             bg.Parent = frame
 
             local fill = Instance.new("Frame")
-            fill.Size = UDim2.new((setting.Value - setting.Min) / (setting.Max - setting.Min), 0, 1, 0)
             fill.BackgroundColor3 = Color3.fromRGB(0, 170, 100)
             fill.Parent = bg
 
-            local bCorner = Instance.new("UICorner"); bCorner.CornerRadius = UDim.new(0,5); bCorner.Parent = bg
+            local bCorner = Instance.new("UICorner"); bCorner.CornerRadius = UDim.new(0,6); bCorner.Parent = bg
             bCorner:Clone().Parent = fill
 
-            -- Draggable Slider
+            -- Update fill based on value
+            local function updateFill()
+                local percent = (setting.Value - setting.Min) / (setting.Max - setting.Min)
+                fill.Size = UDim2.new(percent, 0, 1, 0)
+                label.Text = setting.Name .. ": " .. setting.Value .. (setting.Suffix or "")
+            end
+            updateFill()
+
+            -- Dragging
             local dragging = false
             bg.InputBegan:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -220,15 +227,15 @@ local function createConfigWindow(moduleData)
             end)
 
             UserInputService.InputChanged:Connect(function(input)
-                if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-                    local mousePos = UserInputService:GetMouseLocation().X
-                    local bgPos = bg.AbsolutePosition.X
-                    local bgSize = bg.AbsoluteSize.X
+                if not dragging then return end
+                if input.UserInputType == Enum.UserInputType.MouseMovement then
+                    local mouseX = UserInputService:GetMouseLocation().X
+                    local bgX = bg.AbsolutePosition.X
+                    local bgWidth = bg.AbsoluteSize.X
 
-                    local percent = math.clamp((mousePos - bgPos) / bgSize, 0, 1)
+                    local percent = math.clamp((mouseX - bgX) / bgWidth, 0, 1)
                     setting.Value = math.floor(setting.Min + percent * (setting.Max - setting.Min))
-                    fill.Size = UDim2.new(percent, 0, 1, 0)
-                    label.Text = setting.Name .. ": " .. setting.Value .. (setting.Suffix or "")
+                    updateFill()
                 end
             end)
 

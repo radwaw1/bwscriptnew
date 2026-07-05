@@ -18,7 +18,7 @@ Killaura.Run = function()
     Killaura.Enabled = not Killaura.Enabled
 
     if Killaura.Enabled then
-        print("Killaura Enabled")
+        print("Killaura Enabled - Always attacking")
         
         connection = game:GetService("RunService").Heartbeat:Connect(function()
             if not Killaura.Enabled then return end
@@ -26,14 +26,12 @@ Killaura.Run = function()
             local range = Killaura.Config[1].Value
             local maxTargets = Killaura.Config[2].Value
 
-            local sword = nil
+            local swordTool = nil
             if store and store.tools and store.tools.sword then
-                sword = store.tools.sword
-            elseif store and store.hand then
-                sword = store.hand
+                swordTool = store.tools.sword.tool
+            elseif store and store.hand and store.hand.tool then
+                swordTool = store.hand.tool
             end
-
-            if not sword or not sword.tool then return end
 
             local targets = entitylib.AllPosition({
                 Range = range,
@@ -51,7 +49,6 @@ Killaura.Run = function()
             if not root then return end
 
             local selfpos = root.Position
-            pcall(switchItem, sword.tool, 0)
 
             for _, target in ipairs(targets) do
                 local actualRoot = target.Character and target.Character.PrimaryPart
@@ -70,15 +67,17 @@ Killaura.Run = function()
                         selfPosition = { value = pos },
                         targetPosition = { value = actualRoot.Position }
                     },
-                    weapon = sword.tool
+                    weapon = swordTool
                 })
             end
         end)
 
     else
         print("Killaura Disabled")
-        if connection then connection:Disconnect() end
-        connection = nil
+        if connection then
+            connection:Disconnect()
+            connection = nil
+        end
     end
 end
 
