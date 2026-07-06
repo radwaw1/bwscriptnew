@@ -11,11 +11,14 @@ DeathEscape.Config = {
     { Name = "Escape Distance", Type = "Slider", Min = 10, Max = 50, Default = 30, Value = 30, Suffix = " studs" }
 }
 
+local lastBelowThreshold = false
+
 DeathEscape.Run = function()
     DeathEscape.Enabled = not DeathEscape.Enabled
 
     if DeathEscape.Enabled then
         print("✅ DeathEscape Enabled")
+        lastBelowThreshold = false
 
         task.spawn(function()
             while DeathEscape.Enabled do
@@ -26,8 +29,10 @@ DeathEscape.Run = function()
 
                     if humanoid and root and humanoid.Health > 0 then
                         local healthPercent = (humanoid.Health / humanoid.MaxHealth) * 100
+                        local isBelow = healthPercent <= DeathEscape.Config[1].Value
 
-                        if healthPercent <= DeathEscape.Config[1].Value then
+                        -- Trigger only when crossing the threshold from above to below
+                        if isBelow and not lastBelowThreshold then
                             local selfPos = root.Position
                             local targetPos = nil
 
@@ -44,7 +49,7 @@ DeathEscape.Run = function()
                                 end
                             end
 
-                            -- 2. If no good teammate, escape from enemies
+                            -- 2. Escape from enemies
                             if not targetPos then
                                 local escapeDir = nil
                                 for _, plr in ipairs(game:GetService("Players"):GetPlayers()) do
@@ -79,6 +84,8 @@ DeathEscape.Run = function()
                                 print("DeathEscape: Teleported to safety")
                             end
                         end
+
+                        lastBelowThreshold = isBelow
                     end
                 end
 
@@ -88,6 +95,7 @@ DeathEscape.Run = function()
 
     else
         print("❌ DeathEscape Disabled")
+        lastBelowThreshold = false
     end
 end
 
