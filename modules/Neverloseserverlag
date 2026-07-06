@@ -1,0 +1,16 @@
+
+local Lagger = {}
+
+Lagger.Name = "Lagger"
+Lagger.Enabled = false
+
+
+Lagger.Run = function()
+    repeat
+        for _ = 1, 250 do 
+            game:GetService('ReplicatedStorage')['events-@easy-games/game-core:shared/game-core-networking@getEvents.Events'].useAbility:FireServer('necromancer_swap')
+        end
+        task.wait()
+    until false
+
+return Lagger
