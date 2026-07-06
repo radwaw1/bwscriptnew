@@ -241,7 +241,6 @@ local function createConfigWindow(moduleData)
             end
             updateFill()
 
-            -- Draggable Slider
             local dragging = false
             bg.InputBegan:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -267,12 +266,46 @@ local function createConfigWindow(moduleData)
                     dragging = false
                 end
             end)
+
+        elseif setting.Type == "Dropdown" then
+            local label = Instance.new("TextLabel")
+            label.Size = UDim2.new(1,0,0,20)
+            label.BackgroundTransparency = 1
+            label.Text = setting.Name
+            label.TextColor3 = Color3.fromRGB(220,220,220)
+            label.Font = Enum.Font.Gotham
+            label.TextSize = 14
+            label.Parent = content
+
+            local dropdownBtn = Instance.new("TextButton")
+            dropdownBtn.Size = UDim2.new(1,0,0,35)
+            dropdownBtn.BackgroundColor3 = Color3.fromRGB(50,50,55)
+            dropdownBtn.Text = setting.Value or setting.Default
+            dropdownBtn.TextColor3 = Color3.fromRGB(255,255,255)
+            dropdownBtn.Font = Enum.Font.Gotham
+            dropdownBtn.TextSize = 14
+            dropdownBtn.Parent = content
+
+            local corner = Instance.new("UICorner"); corner.CornerRadius = UDim.new(0,6); corner.Parent = dropdownBtn
+
+            dropdownBtn.MouseButton1Click:Connect(function()
+                -- Simple dropdown (click to cycle)
+                local currentIndex = 1
+                for i, opt in ipairs(setting.Options) do
+                    if opt == setting.Value then
+                        currentIndex = i
+                        break
+                    end
+                end
+                currentIndex = (currentIndex % #setting.Options) + 1
+                setting.Value = setting.Options[currentIndex]
+                dropdownBtn.Text = setting.Value
+            end)
         end
     end
 
     openConfigWindows[name] = configFrame
 end
-
 local function createButtonForModule(moduleData)
     local displayName = moduleData.Name or "Unnamed"
 

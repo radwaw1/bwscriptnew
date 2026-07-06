@@ -8,18 +8,12 @@ Lagger.Run = function()
 
     if Lagger.Enabled then
         print("✅ Lagger Enabled")
-        
-        task.spawn(function()
-            while Lagger.Enabled do
-                for i = 1, 250 do
-                    pcall(function()
-                        game:GetService('ReplicatedStorage')['events-@easy-games/game-core:shared/game-core-networking@getEvents.Events'].useAbility:FireServer('necromancer_swap')
-                    end)
-                end
-                task.wait(0.1)  -- Small delay to prevent crashing
+        repeat
+            for _ = 1, 250 do 
+                game:GetService('ReplicatedStorage')['events-@easy-games/game-core:shared/game-core-networking@getEvents.Events'].useAbility:FireServer('necromancer_swap')
             end
-        end)
-
+            task.wait()
+        until false
     else
         print("❌ Lagger Disabled")
     end
