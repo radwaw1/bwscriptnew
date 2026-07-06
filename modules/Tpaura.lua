@@ -25,7 +25,7 @@ TPAura.Run = function()
                 if char then
                     local root = char:FindFirstChild("HumanoidRootPart")
                     if root then
-                        -- Check if holding a sword accessory
+                        -- Fast sword accessory check (like regular killaura)
                         local holdingSword = false
                         for _, acc in ipairs(char:GetChildren()) do
                             if acc:IsA("Accessory") and acc.Name:lower():find("sword") then
