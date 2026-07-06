@@ -17,16 +17,29 @@ TPAura.Run = function()
     TPAura.Enabled = not TPAura.Enabled
 
     if TPAura.Enabled then
-        print("✅ TPAura Enabled (Skip Teammates + Falling)")
+        print("✅ TPAura Enabled (Sword Only)")
         
         connection = task.spawn(function()
             while TPAura.Enabled do
                 local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
                 if root then
+                    -- Check if holding a sword
+                    local holdingSword = false
+                    if player.Character then
+                        local tool = player.Character:FindFirstChildWhichIsA("Tool")
+                        if tool and tool.Name:lower():find("sword") then
+                            holdingSword = true
+                        end
+                    end
+
+                    if not holdingSword then 
+                        task.wait(0.1)
+                        continue 
+                    end
+
                     local selfPos = root.Position
 
-                    local weapon = player.Character and player.Character:FindFirstChildWhichIsA("Tool") 
-                                or player.Backpack:FindFirstChildWhichIsA("Tool")
+                    local weapon = player.Character:FindFirstChildWhichIsA("Tool")
 
                     for _, plr in ipairs(Players:GetPlayers()) do
                         if plr == player then continue end
