@@ -21,7 +21,7 @@ Nuker.Run = function()
     Nuker.Enabled = not Nuker.Enabled
 
     if Nuker.Enabled then
-        print("✅ Nuker Enableadfsd")
+        print("✅ Nuker fucking Enableadfsd")
         
         connection = task.spawn(function()
             while Nuker.Enabled do
