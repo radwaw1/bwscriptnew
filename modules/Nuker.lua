@@ -9,26 +9,27 @@ local DamageBlock = game:GetService("ReplicatedStorage")
 local connection = nil
 
 Nuker.Config = {
-    { Name = "Range", Type = "Slider", Min = 5, Max = 40, Default = 25, Value = 25, Suffix = " studs" },
-    { Name = "Break Speed", Type = "Slider", Min = 0, Max = 0.5, Default = 0.1, Value = 0.1, Suffix = " seconds" },
+    { Name = "Range", Type = "Slider", Min = 1, Max = 30, Default = 25, Value = 25, Suffix = " studs" },
+    { Name = "Break Speed", Type = "Slider", Min = 0, Max = 0.3, Default = 0.1, Value = 0.1, Suffix = " seconds" },
     { Name = "Break Beds", Type = "Toggle", Default = true, Value = true },
     { Name = "Break Lucky Blocks", Type = "Toggle", Default = true, Value = true },
-    { Name = "Break Iron Ore", Type = "Toggle", Default = true, Value = true }
+    { Name = "Break Iron Ore", Type = "Toggle", Default = true, Value = true },
+    { Name = "Instant Break", Type = "Toggle", Default = false, Value = false }
 }
 
 Nuker.Run = function()
     Nuker.Enabled = not Nuker.Enabled
 
     if Nuker.Enabled then
-        print("✅ Nuker Enablevvv")
+        print("✅ Nuker Enableadfsd")
         
         connection = task.spawn(function()
             while Nuker.Enabled do
                 local char = game.Players.LocalPlayer.Character
                 if char and char:FindFirstChild("HumanoidRootPart") then
-                    local rootPos = char.HumanoidRootPart.Position
+                    local localPosition = char.HumanoidRootPart.Position
 
-                    -- Break Beds
+                    -- Break Beds First
                     if Nuker.Config[3].Value then
                         for _, obj in ipairs(workspace:GetDescendants()) do
                             if obj.Name:lower():find("bed") and obj:IsA("BasePart") then
@@ -43,7 +44,7 @@ Nuker.Run = function()
                     end
 
                     -- Break other blocks
-                    for _, part in ipairs(workspace:GetPartBoundsInRadius(rootPos, Nuker.Config[1].Value)) do
+                    for _, part in ipairs(workspace:GetPartBoundsInRadius(localPosition, Nuker.Config[1].Value)) do
                         local name = part.Name:lower()
                         if (Nuker.Config[4].Value and name:find("lucky")) or 
                            (Nuker.Config[5].Value and name:find("iron")) or
