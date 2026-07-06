@@ -1,10 +1,9 @@
 local KrystalDisabler = {}
-
+ 
 KrystalDisabler.Name = "KrystalDisabler"
-
+ 
 KrystalDisabler.Run = function()
-    task.wait(3)
-    
+	task.wait(3)
     local KnitInit, Knit
     repeat
         KnitInit, Knit = pcall(function()
@@ -14,7 +13,7 @@ KrystalDisabler.Run = function()
         task.wait()
     until KnitInit
 
-    if not debug.getupvalue(Knit.Start, 1) then
+    if true and not debug.getupvalue(Knit.Start, 1) then
         repeat task.wait() until debug.getupvalue(Knit.Start, 1)
     end
 
@@ -27,7 +26,7 @@ KrystalDisabler.Run = function()
         end
     })
 
-    -- Momentum Bypass
+    -- Original main hook
     local oldUpdateMomentum = bedwars.GlacialSkaterController.updateMomentum
     hookfunction(oldUpdateMomentum, function(self, ...)
         self.momentum = 9e9
@@ -43,15 +42,21 @@ KrystalDisabler.Run = function()
         bedwars.GlacialSkaterController:updateMomentum()
     end)
 
-    -- Permissive SendToServer Hook
-    local oldSend = hookfunction(bedwars.Client.SendToServer, function(self, remoteName, data)
-        if remoteName == "MomentumUpdate" then
-            return oldSend(self, remoteName, { momentumValue = 9e9 })
-        end
-        return oldSend(self, remoteName, data)
-    end)
+    -- Very selective SendToServer hook
+    local momentumRemote = bedwars.Client:Get("MomentumUpdate")
+    if momentumRemote then
+        local oldSend = momentumRemote.SendToServer
+        hookfunction(oldSend, function(self, data)
+            -- Only intercept momentum packets
+            if type(data) == "table" and data.momentumValue ~= nil then
+                return oldSend(self, { momentumValue = 9e9 })
+            end
+            -- Let all other remotes (shop, etc.) pass through normally
+            return oldSend(self, data)
+        end)
+    end
 
-    print("✅ KrystalDisabler loaded (Permissive)")
+    print("KrystalDisabler loaded (selective)")
 end
-
+ 
 return KrystalDisabler
