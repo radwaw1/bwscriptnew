@@ -16,7 +16,7 @@ Lagger.Run = function()
                         game:GetService('ReplicatedStorage')['events-@easy-games/game-core:shared/game-core-networking@getEvents.Events'].useAbility:FireServer('necromancer_swap')
                     end)
                 end
-                
+                task.wait(0.1)
             end
         end)
 
