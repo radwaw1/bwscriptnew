@@ -12,7 +12,7 @@ Nuker.Run = function()
     Nuker.Enabled = not Nuker.Enabled
 
     if Nuker.Enabled then
-        print("✅ Nuker Enabled")
+        print("✅ Smart Nuker Enabled (Beds first)")
         
         connection = game:GetService("RunService").Heartbeat:Connect(function()
             if not Nuker.Enabled then return end
@@ -20,18 +20,28 @@ Nuker.Run = function()
             local char = game.Players.LocalPlayer.Character
             if not char or not char:FindFirstChild("HumanoidRootPart") then return end
 
-            local root = char.HumanoidRootPart
-            local pos = root.Position
+            local rootPos = char.HumanoidRootPart.Position
 
-            -- Get nearby blocks
-            for _, part in ipairs(workspace:GetPartBoundsInRadius(pos, 20)) do
-                if part.Name == "Block" or part:FindFirstChild("Block") then
+            -- 1. Find and break beds first
+            for _, bed in ipairs(workspace:GetChildren()) do
+                if bed.Name:lower() == "bed" or bed.Name:find("bed") then
+                    local blockPos = bed.Position
+
+                    DamageBlock:InvokeServer({
+                        blockRef = { blockPosition = blockPos },
+                        hitPosition = blockPos + Vector3.new(0.5, 0.5, 0.5),
+                        hitNormal = Vector3.new(0, 1, 0)
+                    })
+                end
+            end
+
+            -- 2. Break nearby blocks (including around beds)
+            for _, part in ipairs(workspace:GetPartBoundsInRadius(rootPos, 25)) do
+                if part.Name == "Block" or part.Parent.Name == "Blocks" then
                     local blockPos = part.Position
 
                     DamageBlock:InvokeServer({
-                        blockRef = {
-                            blockPosition = blockPos
-                        },
+                        blockRef = { blockPosition = blockPos },
                         hitPosition = blockPos + Vector3.new(0.5, 0.5, 0.5),
                         hitNormal = Vector3.new(0, 1, 0)
                     })
