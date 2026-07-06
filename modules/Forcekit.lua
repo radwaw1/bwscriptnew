@@ -44,18 +44,14 @@ ForceKit.Run = function()
     ForceKit.Enabled = not ForceKit.Enabled
 
     if ForceKit.Enabled then
-        print("✅ ForceKit Enabled - " .. ForceKit.Config[1].Value)
-        
-        -- Force the kit
         local kitName = ForceKit.Config[1].Value
-        if kitName then
-            pcall(function()
-                game:GetService("ReplicatedStorage").TS.kit["bedwars-kit"].setKit:FireServer(kitName)
-            end)
-        end
-
+        print("ForceKit Enabled - " .. kitName)
+        
+        pcall(function()
+            game:GetService("ReplicatedStorage").TS.kit["bedwars-kit"].setKit:FireServer(kitName)
+        end)
     else
-        print("❌ ForceKit Disabled")
+        print("ForceKit Disabled")
     end
 end
 
