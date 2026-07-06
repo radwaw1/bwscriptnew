@@ -3,18 +3,15 @@ local ProjectileAura = {}
 ProjectileAura.Name = "ProjectileAura"
 ProjectileAura.Enabled = false
 
-local projectileRemote = {InvokeServer = function() end}
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local httpService = game:GetService("HttpService")
 
-task.spawn(function()
-    projectileRemote = game:GetService("ReplicatedStorage").rbxts_include.node_modules["@rbxts"].net.out._NetManaged.FireProjectile.instance
-end)
-
-local FireDelays = {}
+local connection = nil
 
 ProjectileAura.Config = {
     { Name = "Range", Type = "Slider", Min = 1, Max = 50, Default = 50, Value = 50, Suffix = " studs" },
-    { Name = "Projectiles", Type = "TextList", Default = {"arrow", "snowball"} },
-    { Name = "Custom Projectiles", Type = "TextList", Default = {"meteor_shower", "star", "black_hole"} }
+    { Name = "Projectile Type", Type = "TextBox", Default = "meteor_shower", Value = "meteor_shower" }
 }
 
 ProjectileAura.Run = function()
@@ -23,38 +20,46 @@ ProjectileAura.Run = function()
     if ProjectileAura.Enabled then
         print("✅ ProjectileAura Enabled")
         
-        task.spawn(function()
+        connection = task.spawn(function()
             while ProjectileAura.Enabled do
-                local char = game.Players.LocalPlayer.Character
+                local char = player.Character
                 if char and char:FindFirstChild("HumanoidRootPart") then
                     local root = char.HumanoidRootPart
-                    local pos = root.Position
+                    local pos = root.CFrame.Position + Vector3.new(0, 2, 0)
 
-                    -- Find targets
-                    for _, plr in ipairs(game:GetService("Players"):GetPlayers()) do
-                        if plr == game.Players.LocalPlayer then continue end
+                    for _, plr in ipairs(Players:GetPlayers()) do
+                        if plr == player then continue end
 
                         local targetChar = plr.Character
                         if not targetChar or not targetChar:FindFirstChild("HumanoidRootPart") then continue end
 
-                        local distance = (targetChar.HumanoidRootPart.Position - pos).Magnitude
+                        local targetRoot = targetChar.HumanoidRootPart
+                        local distance = (targetRoot.Position - pos).Magnitude
                         if distance > ProjectileAura.Config[1].Value then continue end
 
-                        -- Get projectiles
-                        for _, item in ipairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
-                            if item:IsA("Tool") then
-                                local projType = "arrow" -- default
-                                if ProjectileAura.Config[2].Value and table.find(ProjectileAura.Config[2].Value, projType) then
-                                    local meta = {} -- simplified
-                                    local dir = (targetChar.HumanoidRootPart.Position - pos).Unit
-                                    local id = game:GetService("HttpService"):GenerateGUID(true)
+                        local direction = (targetRoot.Position - pos).Unit
 
-                                    pcall(function()
-                                        projectileRemote:InvokeServer(item, projType, "arrow", pos, pos, dir * 100, id, {}, workspace:GetServerTimeNow())
-                                    end)
-                                end
+                        -- Your preferred call
+                        pcall(function()
+                            local tool = char:FindFirstChildWhichIsA("Tool") or player.Backpack:FindFirstChildWhichIsA("Tool")
+                            if tool then
+                                local itemProjs = {} -- You can expand this if needed
+                                ProjFire:CallServerAsync(
+                                    tool,
+                                    itemProjs[tool.Name] or "arrow",
+                                    ProjectileAura.Config[2].Value,  -- Custom projectile
+                                    pos,
+                                    pos,
+                                    direction,
+                                    httpService:GenerateGUID(false),
+                                    {
+                                        shotId = httpService:GenerateGUID(false),
+                                        drawDurationSec = 1,
+                                    },
+                                    workspace:GetServerTimeNow()
+                                )
                             end
-                        end
+                        end)
                     end
                 end
 
@@ -64,6 +69,10 @@ ProjectileAura.Run = function()
 
     else
         print("❌ ProjectileAura Disabled")
+        if connection then
+            connection:Disconnect()
+            connection = nil
+        end
     end
 end
 
