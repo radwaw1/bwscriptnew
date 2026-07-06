@@ -12,7 +12,7 @@ Nuker.Run = function()
     Nuker.Enabled = not Nuker.Enabled
 
     if Nuker.Enabled then
-        print("✅ Smart Nuker Enablfdded")
+        print("✅ Nuker Enabled")
         
         connection = task.spawn(function()
             while Nuker.Enabled do
@@ -32,9 +32,9 @@ Nuker.Run = function()
                         end
                     end
 
-                    -- Break nearby blocks
+                    -- Break normal blocks
                     for _, part in ipairs(workspace:GetPartBoundsInRadius(rootPos, 30)) do
-                        if part.Name == "Block" or part.Parent.Name == "Blocks" then
+                        if part.Name == "Block" or (part.Parent and part.Parent.Name == "Blocks") then
                             local pos = part.Position
                             DamageBlock:InvokeServer({
                                 blockRef = { blockPosition = pos },
