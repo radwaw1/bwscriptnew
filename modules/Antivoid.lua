@@ -7,8 +7,8 @@ local player = game:GetService("Players").LocalPlayer
 local workspace = game:GetService("Workspace")
 
 AntiVoid.Config = {
-    { Name = "Bounce Height", Type = "Slider", Min = 50, Max = 200, Default = 100, Value = 100, Suffix = "" },
-    { Name = "Void Y Level", Type = "Slider", Min = -100, Max = 0, Default = -10, Value = -10, Suffix = "" }
+    { Name = "Bounce Height", Type = "Slider", Min = 50, Max = 200, Default = 200, Value = 200, Suffix = "" },
+    { Name = "Void Y Level", Type = "Slider", Min = -50, Max = 25, Default = 10, Value = 10, Suffix = "" }
 }
 
 AntiVoid.Run = function()
