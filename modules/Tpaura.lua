@@ -16,7 +16,7 @@ TPAura.Run = function()
     TPAura.Enabled = not TPAura.Enabled
 
     if TPAura.Enabled then
-        print("✅ TPAura Enabled (Smart TP + Skip Dead)")
+        print("✅ TPAura Enabled (Smart TP + Team Skip)")
         
         connection = task.spawn(function()
             while TPAura.Enabled do
@@ -30,11 +30,14 @@ TPAura.Run = function()
                     for _, plr in ipairs(Players:GetPlayers()) do
                         if plr == player then continue end
 
+                        -- Skip same team
+                        if plr.Team == player.Team then continue end
+
                         local targetChar = plr.Character
                         if not targetChar then continue end
 
                         local humanoid = targetChar:FindFirstChild("Humanoid")
-                        if not humanoid or humanoid.Health <= 0 then continue end  -- Skip dead players
+                        if not humanoid or humanoid.Health <= 0 then continue end  -- Skip dead
 
                         local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
                         if not targetRoot then continue end
@@ -54,7 +57,6 @@ TPAura.Run = function()
                         local result = workspace:Raycast(behindPos + Vector3.new(0, 5, 0), Vector3.new(0, -10, 0), rayParams)
 
                         if result then
-                            -- Try left or right side
                             local leftPos = targetRoot.Position - targetRoot.CFrame.RightVector * 8
                             local rightPos = targetRoot.Position + targetRoot.CFrame.RightVector * 8
 
