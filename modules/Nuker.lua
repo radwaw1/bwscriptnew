@@ -12,40 +12,40 @@ Nuker.Run = function()
     Nuker.Enabled = not Nuker.Enabled
 
     if Nuker.Enabled then
-        print("✅ Smart Nuker Enabled (Beds first)")
+        print("✅ Smart Nuker Enablfdded")
         
-        connection = game:GetService("RunService").Heartbeat:Connect(function()
-            if not Nuker.Enabled then return end
+        connection = task.spawn(function()
+            while Nuker.Enabled do
+                local char = game.Players.LocalPlayer.Character
+                if char and char:FindFirstChild("HumanoidRootPart") then
+                    local rootPos = char.HumanoidRootPart.Position
 
-            local char = game.Players.LocalPlayer.Character
-            if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+                    -- Break beds first
+                    for _, obj in ipairs(workspace:GetDescendants()) do
+                        if obj.Name:lower():find("bed") and obj:IsA("BasePart") then
+                            local pos = obj.Position
+                            DamageBlock:InvokeServer({
+                                blockRef = { blockPosition = pos },
+                                hitPosition = pos + Vector3.new(0.5, 0.5, 0.5),
+                                hitNormal = Vector3.new(0, 1, 0)
+                            })
+                        end
+                    end
 
-            local rootPos = char.HumanoidRootPart.Position
-
-            -- 1. Find and break beds first
-            for _, bed in ipairs(workspace:GetChildren()) do
-                if bed.Name:lower() == "bed" or bed.Name:find("bed") then
-                    local blockPos = bed.Position
-
-                    DamageBlock:InvokeServer({
-                        blockRef = { blockPosition = blockPos },
-                        hitPosition = blockPos + Vector3.new(0.5, 0.5, 0.5),
-                        hitNormal = Vector3.new(0, 1, 0)
-                    })
+                    -- Break nearby blocks
+                    for _, part in ipairs(workspace:GetPartBoundsInRadius(rootPos, 30)) do
+                        if part.Name == "Block" or part.Parent.Name == "Blocks" then
+                            local pos = part.Position
+                            DamageBlock:InvokeServer({
+                                blockRef = { blockPosition = pos },
+                                hitPosition = pos + Vector3.new(0.5, 0.5, 0.5),
+                                hitNormal = Vector3.new(0, 1, 0)
+                            })
+                        end
+                    end
                 end
-            end
 
-            -- 2. Break nearby blocks (including around beds)
-            for _, part in ipairs(workspace:GetPartBoundsInRadius(rootPos, 25)) do
-                if part.Name == "Block" or part.Parent.Name == "Blocks" then
-                    local blockPos = part.Position
-
-                    DamageBlock:InvokeServer({
-                        blockRef = { blockPosition = blockPos },
-                        hitPosition = blockPos + Vector3.new(0.5, 0.5, 0.5),
-                        hitNormal = Vector3.new(0, 1, 0)
-                    })
-                end
+                task.wait(0.1)
             end
         end)
 
