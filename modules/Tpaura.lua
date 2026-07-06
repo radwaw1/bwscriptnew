@@ -17,73 +17,82 @@ TPAura.Run = function()
     TPAura.Enabled = not TPAura.Enabled
 
     if TPAura.Enabled then
-        print("✅ TPAura Enabled (Sword Only)")
+        print("✅ TPAura Enabled (Sword Accessory Only)")
         
         connection = task.spawn(function()
             while TPAura.Enabled do
-                local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-                if root then
-                    -- Check if holding a sword
-                    local holdingSword = false
-                    if player.Character then
-                        local tool = player.Character:FindFirstChildWhichIsA("Tool")
-                        if tool and tool.Name:lower():find("sword") then
-                            holdingSword = true
-                        end
-                    end
-
-                    if not holdingSword then 
-                        task.wait(0.1)
-                        continue 
-                    end
-
-                    local selfPos = root.Position
-
-                    local weapon = player.Character:FindFirstChildWhichIsA("Tool")
-
-                    for _, plr in ipairs(Players:GetPlayers()) do
-                        if plr == player then continue end
-
-                        -- Skip teammates
-                        if plr.Team == player.Team then continue end
-
-                        local targetChar = plr.Character
-                        if not targetChar then continue end
-
-                        local humanoid = targetChar:FindFirstChild("Humanoid")
-                        if not humanoid or humanoid.Health <= 0 then continue end
-
-                        local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
-                        if not targetRoot then continue end
-
-                        -- Skip if falling for more than 1 second
-                        if humanoid:GetState() == Enum.HumanoidStateType.Freefall then
-                            fallTimers[plr] = (fallTimers[plr] or 0) + 0.05
-                            if fallTimers[plr] > 1 then continue end
-                        else
-                            fallTimers[plr] = 0
+                local char = player.Character
+                if char then
+                    local root = char:FindFirstChild("HumanoidRootPart")
+                    if root then
+                        -- Check if holding a sword accessory
+                        local holdingSword = false
+                        for _, acc in ipairs(char:GetChildren()) do
+                            if acc:IsA("Accessory") and acc.Name:lower():find("sword") then
+                                holdingSword = true
+                                break
+                            end
                         end
 
-                        local distance = (targetRoot.Position - selfPos).Magnitude
-                        if distance > 40 then continue end
+                        if not holdingSword then 
+                            task.wait(0.1)
+                            continue 
+                        end
 
-                        -- TP 8 studs behind
-                        local behindPos = targetRoot.Position - targetRoot.CFrame.LookVector * 8
-                        root.CFrame = CFrame.lookAt(behindPos, targetRoot.Position)
+                        local selfPos = root.Position
 
-                        -- Attack
-                        local dir = CFrame.lookAt(selfPos, targetRoot.Position).LookVector
-                        local selfValidatePos = selfPos + dir * math.max(distance - 36, 0)
+                        local weapon = nil
+                        for _, tool in ipairs(char:GetChildren()) do
+                            if tool:IsA("Tool") then
+                                weapon = tool
+                                break
+                            end
+                        end
 
-                        SwordHit:FireServer({
-                            chargedAttack = { chargeRatio = 0 },
-                            entityInstance = targetChar,
-                            validate = {
-                                selfPosition = { value = selfValidatePos },
-                                targetPosition = { value = targetRoot.Position }
-                            },
-                            weapon = weapon
-                        })
+                        for _, plr in ipairs(Players:GetPlayers()) do
+                            if plr == player then continue end
+
+                            -- Skip teammates
+                            if plr.Team == player.Team then continue end
+
+                            local targetChar = plr.Character
+                            if not targetChar then continue end
+
+                            local humanoid = targetChar:FindFirstChild("Humanoid")
+                            if not humanoid or humanoid.Health <= 0 then continue end
+
+                            local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
+                            if not targetRoot then continue end
+
+                            -- Skip if falling for more than 1 second
+                            if humanoid:GetState() == Enum.HumanoidStateType.Freefall then
+                                fallTimers[plr] = (fallTimers[plr] or 0) + 0.05
+                                if fallTimers[plr] > 1 then continue end
+                            else
+                                fallTimers[plr] = 0
+                            end
+
+                            local distance = (targetRoot.Position - selfPos).Magnitude
+                            if distance > 40 then continue end
+
+                            -- TP 8 studs behind
+                            local behindPos = targetRoot.Position - targetRoot.CFrame.LookVector * 8
+                            root.CFrame = CFrame.lookAt(behindPos, targetRoot.Position)
+
+                            -- Attack
+                            local dir = CFrame.lookAt(selfPos, targetRoot.Position).LookVector
+                            local selfValidatePos = selfPos + dir * math.max(distance - 36, 0)
+
+                            SwordHit:FireServer({
+                                chargedAttack = { chargeRatio = 0 },
+                                entityInstance = targetChar,
+                                validate = {
+                                    selfPosition = { value = selfValidatePos },
+                                    targetPosition = { value = targetRoot.Position }
+                                },
+                                weapon = weapon
+                            })
+                        end
                     end
                 end
 
