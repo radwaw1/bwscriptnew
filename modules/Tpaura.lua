@@ -11,13 +11,13 @@ local player = Players.LocalPlayer
 local workspace = game:GetService("Workspace")
 
 local connection = nil
-local fallTimers = {}  -- Track falling time per player
+local fallTimers = {}
 
 TPAura.Run = function()
     TPAura.Enabled = not TPAura.Enabled
 
     if TPAura.Enabled then
-        print("✅ TPAura Enabled (Skip Falling)")
+        print("✅ TPAura Enabled (Skip Teammates + Falling)")
         
         connection = task.spawn(function()
             while TPAura.Enabled do
@@ -30,6 +30,9 @@ TPAura.Run = function()
 
                     for _, plr in ipairs(Players:GetPlayers()) do
                         if plr == player then continue end
+
+                        -- Skip teammates
+                        if plr.Team == player.Team then continue end
 
                         local targetChar = plr.Character
                         if not targetChar then continue end
