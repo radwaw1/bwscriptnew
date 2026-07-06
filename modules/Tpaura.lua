@@ -11,12 +11,13 @@ local player = Players.LocalPlayer
 local workspace = game:GetService("Workspace")
 
 local connection = nil
+local fallTimers = {}  -- Track falling time per player
 
 TPAura.Run = function()
     TPAura.Enabled = not TPAura.Enabled
 
     if TPAura.Enabled then
-        print("✅ TPAura Enabled (Smart TP + Team Skip)")
+        print("✅ TPAura Enabled (Skip Falling)")
         
         connection = task.spawn(function()
             while TPAura.Enabled do
@@ -30,44 +31,28 @@ TPAura.Run = function()
                     for _, plr in ipairs(Players:GetPlayers()) do
                         if plr == player then continue end
 
-                        -- Skip same team
-                        if plr.Team == player.Team then continue end
-
                         local targetChar = plr.Character
                         if not targetChar then continue end
 
                         local humanoid = targetChar:FindFirstChild("Humanoid")
-                        if not humanoid or humanoid.Health <= 0 then continue end  -- Skip dead
+                        if not humanoid or humanoid.Health <= 0 then continue end
 
                         local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
                         if not targetRoot then continue end
 
+                        -- Skip if falling for more than 1 second
+                        if humanoid:GetState() == Enum.HumanoidStateType.Freefall then
+                            fallTimers[plr] = (fallTimers[plr] or 0) + 0.05
+                            if fallTimers[plr] > 1 then continue end
+                        else
+                            fallTimers[plr] = 0
+                        end
+
                         local distance = (targetRoot.Position - selfPos).Magnitude
                         if distance > 40 then continue end
 
-                        -- Try to TP 8 studs behind
-                        local direction = targetRoot.CFrame.LookVector
-                        local behindPos = targetRoot.Position - direction * 8
-
-                        -- Check if position is blocked
-                        local rayParams = RaycastParams.new()
-                        rayParams.FilterDescendantsInstances = {player.Character}
-                        rayParams.FilterType = Enum.RaycastFilterType.Exclude
-
-                        local result = workspace:Raycast(behindPos + Vector3.new(0, 5, 0), Vector3.new(0, -10, 0), rayParams)
-
-                        if result then
-                            local leftPos = targetRoot.Position - targetRoot.CFrame.RightVector * 8
-                            local rightPos = targetRoot.Position + targetRoot.CFrame.RightVector * 8
-
-                            if not workspace:Raycast(leftPos + Vector3.new(0,5,0), Vector3.new(0,-10,0), rayParams) then
-                                behindPos = leftPos
-                            elseif not workspace:Raycast(rightPos + Vector3.new(0,5,0), Vector3.new(0,-10,0), rayParams) then
-                                behindPos = rightPos
-                            end
-                        end
-
-                        -- TP to safe position
+                        -- TP 8 studs behind
+                        local behindPos = targetRoot.Position - targetRoot.CFrame.LookVector * 8
                         root.CFrame = CFrame.lookAt(behindPos, targetRoot.Position)
 
                         -- Attack
@@ -96,6 +81,7 @@ TPAura.Run = function()
             connection:Disconnect()
             connection = nil
         end
+        fallTimers = {}
     end
 end
 
