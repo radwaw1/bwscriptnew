@@ -35,8 +35,8 @@ ForceKit.Config = {
             "void_knight", "void_walker", "vulcan", "warlock", "warrior", 
             "wind_walker", "wizard", "yeti"
         }, 
-        Default = "random", 
-        Value = "random" 
+        Default = "glacial_skater", 
+        Value = "glacial_skater" 
     }
 }
 
