@@ -12,7 +12,7 @@ local REPO_BRANCH = "main"
 local GITHUB_FOLDER = "modules"
 
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "ModuleHub"
+screenGui.Name = "shitty script of doom and despair"
 screenGui.ResetOnSpawn = false
 screenGui.DisplayOrder = 100
 screenGui.Enabled = true
