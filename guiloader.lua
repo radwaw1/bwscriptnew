@@ -1,4 +1,4 @@
--- ModuleHub with Pop-out Category Windows (Full Script)
+-- ModuleHub with Pop-out Category Windows (FULL SCRIPT)
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local HttpService = game:GetService("HttpService")
@@ -35,7 +35,7 @@ local titleLabel = Instance.new("TextLabel")
 titleLabel.Size = UDim2.new(1,-100,1,0)
 titleLabel.Position = UDim2.new(0,12,0,0)
 titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "shitty script"
+titleLabel.Text = "Module Hub"
 titleLabel.TextColor3 = Color3.fromRGB(255,255,255)
 titleLabel.Font = Enum.Font.GothamBold
 titleLabel.TextSize = 16
@@ -432,5 +432,3 @@ reloadButton.MouseButton1Click:Connect(function()
     end
     categoryWindows = {}
 end)
-
-print("load")
