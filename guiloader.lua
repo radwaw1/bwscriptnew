@@ -288,17 +288,48 @@ local function createConfigWindow(moduleData)
 
             local corner = Instance.new("UICorner"); corner.CornerRadius = UDim.new(0,6); corner.Parent = dropdownBtn
 
+            local dropdownList = nil
+
             dropdownBtn.MouseButton1Click:Connect(function()
-                local currentIndex = 1
-                for i, opt in ipairs(setting.Options) do
-                    if opt == setting.Value then
-                        currentIndex = i
-                        break
-                    end
+                if dropdownList then
+                    dropdownList:Destroy()
+                    dropdownList = nil
+                    return
                 end
-                currentIndex = (currentIndex % #setting.Options) + 1
-                setting.Value = setting.Options[currentIndex]
-                dropdownBtn.Text = setting.Value
+
+                dropdownList = Instance.new("Frame")
+                dropdownList.Size = UDim2.new(1,0,0,200)
+                dropdownList.Position = UDim2.new(0,0,0,40)
+                dropdownList.BackgroundColor3 = Color3.fromRGB(35,35,40)
+                dropdownList.Parent = dropdownBtn.Parent
+
+                local listCorner = Instance.new("UICorner"); listCorner.CornerRadius = UDim.new(0,6); listCorner.Parent = dropdownList
+
+                local listLayout = Instance.new("UIListLayout")
+                listLayout.Padding = UDim.new(0,2)
+                listLayout.Parent = dropdownList
+
+                for _, opt in ipairs(setting.Options) do
+                    local optionBtn = Instance.new("TextButton")
+                    optionBtn.Size = UDim2.new(1,0,0,30)
+                    optionBtn.BackgroundColor3 = Color3.fromRGB(45,45,50)
+                    optionBtn.Text = opt
+                    optionBtn.TextColor3 = Color3.fromRGB(255,255,255)
+                    optionBtn.Font = Enum.Font.Gotham
+                    optionBtn.TextSize = 14
+                    optionBtn.Parent = dropdownList
+
+                    local optCorner = Instance.new("UICorner"); optCorner.CornerRadius = UDim.new(0,4); optCorner.Parent = optionBtn
+
+                    optionBtn.MouseButton1Click:Connect(function()
+                        setting.Value = opt
+                        dropdownBtn.Text = opt
+                        if dropdownList then
+                            dropdownList:Destroy()
+                            dropdownList = nil
+                        end
+                    end)
+                end
             end)
         end
     end
