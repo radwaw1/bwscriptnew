@@ -9,7 +9,7 @@ local DamageBlock = game:GetService("ReplicatedStorage")
 local connection = nil
 
 BedNuker.Config = {
-    { Name = "Range", Type = "Slider", Min = 10, Max = 40, Default = 30, Value = 30, Suffix = " studs" },
+    { Name = "Range", Type = "Slider", Min = 10, Max = 60, Default = 50, Value = 50, Suffix = " studs" },
     { Name = "Speed", Type = "Slider", Min = 0.05, Max = 1, Default = 0.2, Value = 0.2, Suffix = " seconds" }
 }
 

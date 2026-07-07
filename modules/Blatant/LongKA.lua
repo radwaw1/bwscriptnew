@@ -47,7 +47,7 @@ LongKA.Run = function()
                         local distance = (targetRoot.Position - selfPos).Magnitude
                         if distance > LongKA.Config[1].Value then continue end
 
-                        -- Bypass movement check by teleporting closer
+                        -- TP closer to bypass movement check
                         local behindPos = targetRoot.Position - targetRoot.CFrame.LookVector * 8
                         root.CFrame = CFrame.lookAt(behindPos, targetRoot.Position)
 
