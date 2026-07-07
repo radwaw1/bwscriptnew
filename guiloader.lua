@@ -150,7 +150,7 @@ local function createConfigWindow(moduleData)
     end
 
     local configFrame = Instance.new("Frame")
-    configFrame.Size = UDim2.new(0, 280, 0, 420)
+    configFrame.Size = UDim2.new(0, 280, 0, 50)  -- Start small
     configFrame.Position = UDim2.new(0.5, -140, 0.5, -210)
     configFrame.BackgroundColor3 = Color3.fromRGB(25,25,30)
     configFrame.Parent = screenGui
@@ -174,7 +174,7 @@ local function createConfigWindow(moduleData)
     makeDraggable(configFrame, titleBarConfig)
 
     local content = Instance.new("ScrollingFrame")
-    content.Size = UDim2.new(1,-20,1,-50)
+    content.Size = UDim2.new(1,-20,1,-55)
     content.Position = UDim2.new(0,10,0,45)
     content.BackgroundTransparency = 1
     content.ScrollBarThickness = 6
@@ -185,6 +185,8 @@ local function createConfigWindow(moduleData)
     uiList.Padding = UDim.new(0,10)
     uiList.SortOrder = Enum.SortOrder.LayoutOrder
     uiList.Parent = content
+
+    local totalHeight = 60  -- Title bar height
 
     -- Config Options
     for _, setting in ipairs(moduleData.Config or {}) do
@@ -205,6 +207,8 @@ local function createConfigWindow(moduleData)
                 setting.Value = not setting.Value
                 btn.BackgroundColor3 = setting.Value and Color3.fromRGB(40,120,60) or Color3.fromRGB(70,70,80)
             end)
+
+            totalHeight = totalHeight + 50
 
         elseif setting.Type == "Slider" then
             local frame = Instance.new("Frame")
@@ -267,6 +271,8 @@ local function createConfigWindow(moduleData)
                 end
             end)
 
+            totalHeight = totalHeight + 75
+
         elseif setting.Type == "Dropdown" then
             local label = Instance.new("TextLabel")
             label.Size = UDim2.new(1,0,0,20)
@@ -298,7 +304,7 @@ local function createConfigWindow(moduleData)
                 end
 
                 dropdownList = Instance.new("Frame")
-                dropdownList.Size = UDim2.new(1,0,0,200)
+                dropdownList.Size = UDim2.new(1,0,0, math.min(#setting.Options * 32, 300))  -- Auto size
                 dropdownList.Position = UDim2.new(0,0,0,40)
                 dropdownList.BackgroundColor3 = Color3.fromRGB(35,35,40)
                 dropdownList.Parent = dropdownBtn.Parent
@@ -331,8 +337,13 @@ local function createConfigWindow(moduleData)
                     end)
                 end
             end)
+
+            totalHeight = totalHeight + 65
         end
     end
+
+    -- Auto size the frame
+    configFrame.Size = UDim2.new(0, 280, 0, math.min(totalHeight + 60, 600))  -- Max height 600
 
     openConfigWindows[name] = configFrame
 end
