@@ -1,6 +1,6 @@
 local SigridAura = {}
 
-SigridAura.Name = "Sigrid Aura"
+SigridAura.Name = "SigridAura"
 SigridAura.Enabled = false
 
 local SigridBeginCharge = game:GetService("ReplicatedStorage")
