@@ -1,6 +1,6 @@
 local BedNuker = {}
 
-BedNuker.Name = "BedNuker"
+BedNuker.Name = "Bed Nuker"
 BedNuker.Enabled = false
 
 local DamageBlock = game:GetService("ReplicatedStorage")
@@ -9,7 +9,7 @@ local DamageBlock = game:GetService("ReplicatedStorage")
 local connection = nil
 
 BedNuker.Config = {
-    { Name = "Range", Type = "Slider", Min = 10, Max = 50, Default = 20, Value = 20, Suffix = " studs" }
+    { Name = "Range", Type = "Slider", Min = 10, Max = 100, Default = 20, Value = 20, Suffix = " studs" }
 }
 
 BedNuker.Run = function()
