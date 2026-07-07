@@ -432,3 +432,5 @@ reloadButton.MouseButton1Click:Connect(function()
     end
     categoryWindows = {}
 end)
+
+print("load")
