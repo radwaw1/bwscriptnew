@@ -19,7 +19,7 @@ DeathTP.Run = function()
         -- Track death position
         player.CharacterAdded:Connect(function(char)
             if lastDeathPos and lastDeathPos.Y > DeathTP.Config[1].Value then
-                task.wait(0.5) -- Wait for character to load
+                task.wait(4) -- Wait for character to load
                 local root = char:WaitForChild("HumanoidRootPart")
                 root.CFrame = CFrame.new(lastDeathPos + Vector3.new(0, 3, 0))
                 print("DeathTP: Returned to death position")
