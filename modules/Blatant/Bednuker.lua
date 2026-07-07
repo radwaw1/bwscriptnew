@@ -9,14 +9,14 @@ local DamageBlock = game:GetService("ReplicatedStorage")
 local connection = nil
 
 BedNuker.Config = {
-    { Name = "Range", Type = "Slider", Min = 10, Max = 50, Default = 20, Value = 20, Suffix = " studs" }
+    { Name = "Range", Type = "Slider", Min = 10, Max = 100, Default = 50, Value = 50, Suffix = " studs" }
 }
 
 BedNuker.Run = function()
     BedNuker.Enabled = not BedNuker.Enabled
 
     if BedNuker.Enabled then
-        print("✅ BedNuker Enabled")
+        print("✅ BedNukerda Enabled")
         
         connection = task.spawn(function()
             while BedNuker.Enabled do
@@ -28,11 +28,13 @@ BedNuker.Run = function()
                     for _, obj in ipairs(workspace:GetDescendants()) do
                         if obj.Name:lower():find("bed") and obj:IsA("BasePart") then
                             local pos = obj.Position
-                            DamageBlock:InvokeServer({
-                                blockRef = { blockPosition = pos },
-                                hitPosition = pos + Vector3.new(0.5, 0.5, 0.5),
-                                hitNormal = Vector3.new(0, 1, 0)
-                            })
+                            if (pos - rootPos).Magnitude < BedNuker.Config[1].Value then
+                                DamageBlock:InvokeServer({
+                                    blockRef = { blockPosition = pos },
+                                    hitPosition = pos + Vector3.new(0.5, 0.5, 0.5),
+                                    hitNormal = Vector3.new(0, 1, 0)
+                                })
+                            end
                         end
                     end
                 end
