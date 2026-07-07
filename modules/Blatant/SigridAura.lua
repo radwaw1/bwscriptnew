@@ -1,7 +1,10 @@
 local SigridAura = {}
 
-SigridAura.Name = "SigridAura"
+SigridAura.Name = "Sigrid Aura"
 SigridAura.Enabled = false
+
+local SigridBeginCharge = game:GetService("ReplicatedStorage")
+    .rbxts_include.node_modules["@rbxts"].net.out._NetManaged.SigridBeginChargeRequest
 
 local useAbility = game:GetService("ReplicatedStorage")
     ["events-@easy-games/game-core:shared/game-core-networking@getEvents.Events"].useAbility
@@ -13,7 +16,7 @@ local connection = nil
 
 SigridAura.Config = {
     { Name = "Range", Type = "Slider", Min = 10, Max = 100, Default = 50, Value = 50, Suffix = " studs" },
-    { Name = "Speed", Type = "Slider", Min = 0.05, Max = 0.5, Default = 0.1, Value = 0.1, Suffix = " seconds" }
+    { Name = "Speed", Type = "Slider", Min = 0.05, Max = 0.5, Default = 0.15, Value = 0.15, Suffix = " seconds" }
 }
 
 SigridAura.Run = function()
@@ -39,7 +42,14 @@ SigridAura.Run = function()
                         local distance = (targetRoot.Position - selfPos).Magnitude
                         if distance > SigridAura.Config[1].Value then continue end
 
-                        -- Fire ability at target
+                        -- Begin Charge
+                        pcall(function()
+                            SigridBeginCharge:InvokeServer({
+                                player = player
+                            })
+                        end)
+
+                        -- Fire ability
                         local direction = (targetRoot.Position - selfPos).Unit
 
                         useAbility:FireServer(
