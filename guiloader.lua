@@ -289,7 +289,6 @@ local function createConfigWindow(moduleData)
             local corner = Instance.new("UICorner"); corner.CornerRadius = UDim.new(0,6); corner.Parent = dropdownBtn
 
             dropdownBtn.MouseButton1Click:Connect(function()
-                -- Simple dropdown (click to cycle)
                 local currentIndex = 1
                 for i, opt in ipairs(setting.Options) do
                     if opt == setting.Value then
