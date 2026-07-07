@@ -1,4 +1,4 @@
--- ModuleHub with Categories (Full Script)
+-- ModuleHub with Categories + RightShift Toggle
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local HttpService = game:GetService("HttpService")
@@ -43,7 +43,7 @@ local titleLabel = Instance.new("TextLabel")
 titleLabel.Size = UDim2.new(1,-100,1,0)
 titleLabel.Position = UDim2.new(0,12,0,0)
 titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "Module Hub"
+titleLabel.Text = "aaaaaaaa's shitty script"
 titleLabel.TextColor3 = Color3.fromRGB(255,255,255)
 titleLabel.Font = Enum.Font.GothamBold
 titleLabel.TextSize = 16
@@ -157,6 +157,10 @@ local keybinds = {}
 
 UserInputService.InputBegan:Connect(function(input, gp)
     if gp then return end
+    if input.KeyCode == Enum.KeyCode.RightShift then
+        screenGui.Enabled = not screenGui.Enabled
+        return
+    end
     for name, mod in pairs(modules) do
         if keybinds[name] and input.KeyCode == keybinds[name] then
             pcall(mod.moduleData.Run)
