@@ -10,7 +10,7 @@ local connection = nil
 
 BedNuker.Config = {
     { Name = "Range", Type = "Slider", Min = 10, Max = 40, Default = 30, Value = 30, Suffix = " studs" },
-    { Name = "Speed", Type = "Slider", Min = 0.05, Max = 2, Default = 0.4, Value = 0.4, Suffix = " seconds" }
+    { Name = "Speed", Type = "Slider", Min = 0.05, Max = 2, Default = 0.3, Value = 0.3, Suffix = " seconds" }
 }
 
 BedNuker.Run = function()
