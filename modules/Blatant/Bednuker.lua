@@ -1,6 +1,6 @@
 local BedNuker = {}
 
-BedNuker.Name = "BedNuker"
+BedNuker.Name = "Bed Nuker"
 BedNuker.Enabled = false
 
 local DamageBlock = game:GetService("ReplicatedStorage")
