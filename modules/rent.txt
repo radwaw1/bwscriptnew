@@ -1,0 +1,148 @@
+-- https://lua.expert/
+local RuntimeLib = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
+local v1 = RuntimeLib.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@easy-games", "knit", "src")
+local KnitClient2 = v1.KnitClient
+local v2 = RuntimeLib.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@easy-games", "object-utils")
+local KnitController = RuntimeLib.import(script, script.Parent.Parent.Parent.Parent, "lib", "knit", "knit-controller").KnitController
+local ClientStore = RuntimeLib.import(script, script.Parent.Parent.Parent.Parent, "ui", "store").ClientStore
+local getConsumableMeta = RuntimeLib.import(script, game:GetService("ReplicatedStorage"), "TS", "consumable", "consumable-type-meta").getConsumableMeta
+local v3 = RuntimeLib.import(script, game:GetService("ReplicatedStorage"), "TS", "consumable", "consumable-types")
+local ConsumableCategory = v3.ConsumableCategory
+local ConsumableStatus = v3.ConsumableStatus
+local default = RuntimeLib.import(script, game:GetService("ReplicatedStorage"), "TS", "remotes").default
+local getKitRentalBedCoinProductId = RuntimeLib.import(script, game:GetService("ReplicatedStorage"), "TS", "util", "kit-util").getKitRentalBedCoinProductId
+local v4 = setmetatable({}, {
+	__tostring = function() --[[ __tostring | Line: 19 ]]
+		return "KitRentalController"
+	end,
+	__index = KnitController
+})
+
+v4.__index = v4
+function v4.new(...) --[[ new | Line: 25 | Upvalues: v4 (ref) ]]
+	local v2 = setmetatable({}, v4)
+
+	return v2:constructor(...) or v2
+end
+function v4.constructor(p1) --[[ constructor | Line: 29 | Upvalues: KnitController (copy), default (copy) ]]
+	KnitController.constructor(p1)
+	p1.Name = "KitRentalController"
+	p1.rentKitRemote = default.Client:Get("RentKit")
+end
+function v4.KnitStart(p1) --[[ KnitStart | Line: 34 | Upvalues: KnitController (copy) ]]
+	KnitController.KnitStart(p1)
+end
+function v4.rentKit(p1, p2) --[[ rentKit | Line: 37 ]]
+	return p1.rentKitRemote:CallServer(p2)
+end
+function v4.getEligibleRentalPass(p1, p2) --[[ getEligibleRentalPass | Line: 40 | Upvalues: KnitClient2 (copy), ConsumableCategory (copy), getConsumableMeta (copy) ]]
+	local count = 0
+	local t = {}
+
+	for v2, v3 in KnitClient2.Controllers.ConsumableController:getConsumablesOfCategoryFromInv(ConsumableCategory.KIT_RENTAL) do
+		local v1
+		local _ = v3[1]
+		local v4 = getConsumableMeta(v3[2].consumable)
+
+		v1 = if v4.category == ConsumableCategory.KIT_RENTAL then if table.find(v4.rentableKits, p2) == nil then false else true else nil
+
+		if v1 == true then
+			count = count + 1
+			t[count] = v3
+		end
+	end
+
+	local function f5(p1, p2) --[[ Line: 62 | Upvalues: getConsumableMeta (ref), ConsumableCategory (ref) ]]
+		local _ = p1[1]
+		local _2 = p2[1]
+		local v3 = getConsumableMeta(p1[2].consumable)
+		local v4 = getConsumableMeta(p2[2].consumable)
+
+		if v3.category ~= ConsumableCategory.KIT_RENTAL or v4.category ~= ConsumableCategory.KIT_RENTAL then
+			return false
+		end
+
+		return #v3.rentableKits < #v4.rentableKits
+	end
+
+	table.sort(t, f5)
+
+	if #t == 0 then
+		return
+	end
+
+	return t[1][2]
+end
+function v4.isKitRented(p1, p2) --[[ isKitRented | Line: 80 | Upvalues: v2 (copy), ClientStore (copy), ConsumableStatus (copy) ]]
+	local v1 = nil
+
+	for v22, v3 in v2.entries(ClientStore:getState().Consumable.record) do
+		local _ = v3[1]
+		local v4 = v3[2]
+		local v5 = if v4.status == ConsumableStatus.ACTIVE then true else false
+
+		if v5 then
+			local extraData = v4.extraData
+
+			if extraData ~= nil then
+				extraData = extraData.rentedKit
+			end
+
+			v5 = if extraData == p2 then true else false
+		end
+
+		if v5 == true then
+			v1 = v3
+
+			break
+		end
+	end
+
+	return (if v1 == nil then v1 else v1[2]) ~= nil
+end
+function v4.getRentedKit(p1, p2) --[[ getRentedKit | Line: 110 | Upvalues: v2 (copy), ClientStore (copy), ConsumableStatus (copy) ]]
+	local v1 = nil
+
+	for v22, v3 in v2.entries(ClientStore:getState().Consumable.record) do
+		local _ = v3[1]
+		local v4 = v3[2]
+		local v5 = if v4.status == ConsumableStatus.ACTIVE then true else false
+
+		if v5 then
+			local extraData = v4.extraData
+
+			if extraData ~= nil then
+				extraData = extraData.rentedKit
+			end
+
+			v5 = if extraData == p2 then true else false
+		end
+
+		if v5 == true then
+			v1 = v3
+
+			break
+		end
+	end
+
+	return if v1 == nil then v1 else v1[2]
+end
+function v4.promptBedCoinPurchaseKitRental(p1, p2) --[[ promptBedCoinPurchaseKitRental | Line: 140 | Upvalues: getKitRentalBedCoinProductId (copy), KnitClient2 (copy) ]]
+	local v1 = getKitRentalBedCoinProductId(p2)
+
+	if v1 == nil then
+		return false
+	end
+
+	KnitClient2.Controllers.BedCoinProductPurchaseController:purchase({
+		productId = v1,
+		selectedKit = p2
+	}, function() --[[ Line: 150 | Upvalues: p1 (copy), p2 (copy) ]]
+		p1:rentKit(p2)
+	end)
+
+	return true
+end
+v1.KnitClient.CreateController(v4.new())
+
+return nil
