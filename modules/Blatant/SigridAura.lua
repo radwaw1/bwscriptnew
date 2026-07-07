@@ -49,6 +49,8 @@ SigridAura.Run = function()
                             })
                         end)
 
+                        task.wait(0.1)  -- Small delay for charge
+
                         -- Fire ability
                         local direction = (targetRoot.Position - selfPos).Unit
 
