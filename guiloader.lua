@@ -193,6 +193,23 @@ local function createConfigWindow(moduleData)
         return
     end
 
+    -- Auto-add keybind if not present
+    local hasKeybind = false
+    for _, setting in ipairs(moduleData.Config or {}) do
+        if setting.Type == "Keybind" then
+            hasKeybind = true
+            break
+        end
+    end
+
+    if not hasKeybind then
+        table.insert(moduleData.Config, 1, {
+            Name = "Keybind",
+            Type = "Keybind",
+            Value = nil  -- Unbound by default
+        })
+    end
+
     local configFrame = Instance.new("Frame")
     configFrame.Size = UDim2.new(0, 300, 0, 500)
     configFrame.Position = UDim2.new(0.5, -150, 0.5, -250)
@@ -375,6 +392,40 @@ local function createConfigWindow(moduleData)
                         end
                     end)
                 end
+            end)
+
+        elseif setting.Type == "Keybind" then
+            local label = Instance.new("TextLabel")
+            label.Size = UDim2.new(1,0,0,20)
+            label.BackgroundTransparency = 1
+            label.Text = setting.Name
+            label.TextColor3 = Color3.fromRGB(220,220,220)
+            label.Font = Enum.Font.Gotham
+            label.TextSize = 14
+            label.Parent = content
+
+            local bindBtn = Instance.new("TextButton")
+            bindBtn.Size = UDim2.new(1,0,0,35)
+            bindBtn.BackgroundColor3 = Color3.fromRGB(50,50,55)
+            bindBtn.Text = setting.Value and setting.Value.Name or "None"
+            bindBtn.TextColor3 = Color3.fromRGB(255,255,255)
+            bindBtn.Font = Enum.Font.Gotham
+            bindBtn.TextSize = 14
+            bindBtn.Parent = content
+
+            local corner = Instance.new("UICorner"); corner.CornerRadius = UDim.new(0,6); corner.Parent = bindBtn
+
+            bindBtn.MouseButton1Click:Connect(function()
+                bindBtn.Text = "Press any key..."
+                local conn
+                conn = UserInputService.InputBegan:Connect(function(input, gp)
+                    if gp then return end
+                    if input.UserInputType == Enum.UserInputType.Keyboard then
+                        setting.Value = input.KeyCode
+                        bindBtn.Text = input.KeyCode.Name
+                        conn:Disconnect()
+                    end
+                end)
             end)
         end
     end
