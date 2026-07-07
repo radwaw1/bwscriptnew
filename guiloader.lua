@@ -130,13 +130,20 @@ local openConfigWindows = {}
 
 local function makeDraggable(frame, dragBar)
     local dragging = false
-    local dragStart, startPos
+    local dragStart = nil
+    local startPos = nil
 
     dragBar.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
             startPos = frame.Position
+        end
+    end)
+
+    dragBar.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
         end
     end)
 
