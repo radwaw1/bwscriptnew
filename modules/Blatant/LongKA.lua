@@ -1,7 +1,7 @@
-local LongKA = {}
+local Shitaura = {}
 
-LongKA.Name = "LongKA"
-LongKA.Enabled = false
+Shitaura.Name = "Shitaura"
+Shitaura.Enabled = false
 
 local SwordHit = game:GetService("ReplicatedStorage")
     .rbxts_include.node_modules["@rbxts"].net.out._NetManaged.SwordHit
@@ -11,19 +11,19 @@ local player = Players.LocalPlayer
 
 local connection = nil
 
-LongKA.Config = {
-    { Name = "Range", Type = "Slider", Min = 10, Max = 100, Default = 60, Value = 60, Suffix = " studs" },
+Shitaura.Config = {
+    { Name = "Range", Type = "Slider", Min = 10, Max = 200, Default = 80, Value = 80, Suffix = " studs" },
     { Name = "Speed", Type = "Slider", Min = 0.01, Max = 0.1, Default = 0.03, Value = 0.03, Suffix = " seconds" }
 }
 
-LongKA.Run = function()
-    LongKA.Enabled = not LongKA.Enabled
+Shitaura.Run = function()
+    Shitaura.Enabled = not Shitaura.Enabled
 
-    if LongKA.Enabled then
-        print("✅ LongKA Enabled")
+    if Shitaura.Enabled then
+        print("✅ Shitaura Enabled (Movement Bypass)")
         
         connection = task.spawn(function()
-            while LongKA.Enabled do
+            while Shitaura.Enabled do
                 local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
                 if root then
                     local selfPos = root.Position
@@ -36,17 +36,6 @@ LongKA.Run = function()
                     if not weapon then
                         weapon = player.Backpack:FindFirstChildWhichIsA("Tool")
                     end
-                    if not weapon then
-                        local inventory = game:GetService("ReplicatedStorage").Inventories:FindFirstChild(player.Name)
-                        if inventory then
-                            for _, item in ipairs(inventory:GetChildren()) do
-                                if item.Name:find("sword") or item.Name:find("Sword") then
-                                    weapon = item
-                                    break
-                                end
-                            end
-                        end
-                    end
 
                     for _, plr in ipairs(Players:GetPlayers()) do
                         if plr == player then continue end
@@ -56,8 +45,13 @@ LongKA.Run = function()
                         if not targetRoot then continue end
 
                         local distance = (targetRoot.Position - selfPos).Magnitude
-                        if distance > LongKA.Config[1].Value then continue end  -- Extended range
+                        if distance > Shitaura.Config[1].Value then continue end
 
+                        -- Bypass movement check by teleporting closer
+                        local behindPos = targetRoot.Position - targetRoot.CFrame.LookVector * 8
+                        root.CFrame = CFrame.lookAt(behindPos, targetRoot.Position)
+
+                        -- Attack
                         local dir = CFrame.lookAt(selfPos, targetRoot.Position).LookVector
                         local selfValidatePos = selfPos + dir * math.max(distance - 14.4, 0)
 
@@ -73,12 +67,12 @@ LongKA.Run = function()
                     end
                 end
 
-                task.wait(LongKA.Config[2].Value)  -- Configurable speed
+                task.wait(Shitaura.Config[2].Value)
             end
         end)
 
     else
-        print("❌ LongKA Disabled")
+        print("❌ Shitaura Disabled")
         if connection then
             connection:Disconnect()
             connection = nil
@@ -86,4 +80,4 @@ LongKA.Run = function()
     end
 end
 
-return LongKA
+return Shitaura
