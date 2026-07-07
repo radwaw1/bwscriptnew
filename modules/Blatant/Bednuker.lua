@@ -9,15 +9,29 @@ local DamageBlock = game:GetService("ReplicatedStorage")
 local connection = nil
 
 BedNuker.Config = {
-    { Name = "Range", Type = "Slider", Min = 10, Max = 40, Default = 30, Value = 30, Suffix = " studs" },
-    { Name = "Speed", Type = "Slider", Min = 0.05, Max = 2, Default = 0.3, Value = 0.3, Suffix = " seconds" }
+    { Name = "Range", Type = "Slider", Min = 10, Max = 100, Default = 50, Value = 50, Suffix = " studs" },
+    { Name = "Speed", Type = "Slider", Min = 0.05, Max = 1, Default = 0.2, Value = 0.2, Suffix = " seconds" }
 }
+
+local function getSurroundingBlocks(centerPos)
+    local blocks = {}
+    for x = -1, 1 do
+        for y = -1, 1 do
+            for z = -1, 1 do
+                if x == 0 and y == 0 and z == 0 then continue end
+                local pos = centerPos + Vector3.new(x, y, z) * 3
+                table.insert(blocks, pos)
+            end
+        end
+    end
+    return blocks
+end
 
 BedNuker.Run = function()
     BedNuker.Enabled = not BedNuker.Enabled
 
     if BedNuker.Enabled then
-        print("✅ BedNuker Enabled")
+        print("✅ Smart BedNuker Enabled")
         
         connection = task.spawn(function()
             while BedNuker.Enabled do
@@ -25,17 +39,27 @@ BedNuker.Run = function()
                 if char and char:FindFirstChild("HumanoidRootPart") then
                     local rootPos = char.HumanoidRootPart.Position
 
-                    -- Break beds
+                    -- Find and break beds
                     for _, obj in ipairs(workspace:GetDescendants()) do
                         if obj.Name:lower():find("bed") and obj:IsA("BasePart") then
-                            local pos = obj.Position
-                            if (pos - rootPos).Magnitude < BedNuker.Config[1].Value then
-                                local blockPos = pos / 3  -- BlockEngine coordinate
+                            local bedPos = obj.Position
+                            if (bedPos - rootPos).Magnitude > BedNuker.Config[1].Value then continue end
+
+                            local blockPos = bedPos / 3
+
+                            -- Break bed
+                            DamageBlock:InvokeServer({
+                                blockRef = { blockPosition = blockPos },
+                                hitPosition = bedPos + Vector3.new(0.5, 0.5, 0.5),
+                                hitNormal = Vector3.new(0, 1, 0)
+                            })
+
+                            -- Break surrounding blocks if needed
+                            local surrounding = getSurroundingBlocks(blockPos)
+                            for _, sPos in ipairs(surrounding) do
                                 DamageBlock:InvokeServer({
-                                    blockRef = {
-                                        blockPosition = blockPos
-                                    },
-                                    hitPosition = pos + Vector3.new(0.5, 0.5, 0.5),
+                                    blockRef = { blockPosition = sPos },
+                                    hitPosition = sPos * 3 + Vector3.new(0.5, 0.5, 0.5),
                                     hitNormal = Vector3.new(0, 1, 0)
                                 })
                             end

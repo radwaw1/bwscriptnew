@@ -52,12 +52,14 @@ Nametags.Run = function()
 
                     local distance = (root.Position - player.Character.HumanoidRootPart.Position).Magnitude
                     local healthPercent = math.floor((hum.Health / hum.MaxHealth) * 100)
+                    local name = player.name
 
                     nametagBillboards[plr].TextLabel.Text = string.format(
                         "%s\n%.1f studs\n%d%%", 
                         plr.Team and plr.Team.Name or "No Team",
                         distance,
-                        healthPercent
+                        healthPercent,
+                        name
                     )
                 end
 
