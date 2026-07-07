@@ -4,45 +4,38 @@ DeathTP.Name = "DeathTP"
 DeathTP.Enabled = false
 
 local player = game:GetService("Players").LocalPlayer
-local savedCFrame = nil
+local lastDeathPos = nil
 
-local deathConn = nil
-local respawnConn = nil
+DeathTP.Config = {
+    { Name = "Y Limit", Type = "Slider", Min = -50, Max = 100, Default = 0, Value = 0, Suffix = "" }
+}
 
 DeathTP.Run = function()
     DeathTP.Enabled = not DeathTP.Enabled
 
     if DeathTP.Enabled then
-        print("✅ DeathTP Enabled (6s delay)")
+        print("✅ DeathTP Enabled")
 
-        -- Save position when character dies
-        deathConn = player.CharacterAdded:Connect(function(char)
-            task.wait(0.3)
-            local root = char:WaitForChild("HumanoidRootPart", 2)
-            if root then
-                savedCFrame = root.CFrame
+        -- Track death position
+        player.CharacterAdded:Connect(function(char)
+            if lastDeathPos and lastDeathPos.Y > DeathTP.Config[1].Value then
+                task.wait(0.5) -- Wait for character to load
+                local root = char:WaitForChild("HumanoidRootPart")
+                root.CFrame = CFrame.new(lastDeathPos + Vector3.new(0, 3, 0))
+                print("DeathTP: Returned to death position")
             end
         end)
 
-        -- Teleport back after respawn
-        respawnConn = player.CharacterAdded:Connect(function(char)
-            task.delay(6, function() -- 6 seconds after respawn
-                if not DeathTP.Enabled or not savedCFrame then return end
-
-                local root = char:WaitForChild("HumanoidRootPart", 3)
-                if root then
-                    root.CFrame = savedCFrame
-                    print("DeathTP: Teleported back")
-                end
-            end)
+        player.CharacterRemoving:Connect(function(char)
+            local root = char:FindFirstChild("HumanoidRootPart")
+            if root then
+                lastDeathPos = root.Position
+            end
         end)
 
     else
         print("❌ DeathTP Disabled")
-        if deathConn then deathConn:Disconnect() end
-        if respawnConn then respawnConn:Disconnect() end
-        deathConn = nil
-        respawnConn = nil
+        lastDeathPos = nil
     end
 end
 
