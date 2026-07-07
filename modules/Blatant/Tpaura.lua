@@ -109,5 +109,5 @@ TPAura.Run = function()
         fallTimers = {}
     end
 end
-a
+
 return TPAura
