@@ -68,7 +68,7 @@ Killaura.Run = function()
                     end
                 end
 
-                task.wait(0.05)  -- Fast attack (every 0.05 seconds)
+                task.wait(0.03)  -- Fast attack (every 0.05 seconds)
             end
         end)
 
