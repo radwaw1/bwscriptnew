@@ -1,6 +1,6 @@
 local BedNuker = {}
 
-BedNuker.Name = "Bed Nuker"
+BedNuker.Name = "BedNuker"
 BedNuker.Enabled = false
 
 local DamageBlock = game:GetService("ReplicatedStorage")
@@ -10,7 +10,7 @@ local connection = nil
 
 BedNuker.Config = {
     { Name = "Range", Type = "Slider", Min = 10, Max = 100, Default = 50, Value = 50, Suffix = " studs" },
-    { Name = "Speed", Type = "Slider", Min = 0.05, Max = 1, Default = 0.2, Value = 0.2, Suffix = " seconds" }
+    { Name = "Speed", Type = "Slider", Min = 0.05, Max = 1, Default = 0.15, Value = 0.15, Suffix = " seconds" }
 }
 
 local function getSurroundingBlocks(centerPos)
@@ -39,7 +39,6 @@ BedNuker.Run = function()
                 if char and char:FindFirstChild("HumanoidRootPart") then
                     local rootPos = char.HumanoidRootPart.Position
 
-                    -- Find and break beds
                     for _, obj in ipairs(workspace:GetDescendants()) do
                         if obj.Name:lower():find("bed") and obj:IsA("BasePart") then
                             local bedPos = obj.Position
@@ -54,7 +53,7 @@ BedNuker.Run = function()
                                 hitNormal = Vector3.new(0, 1, 0)
                             })
 
-                            -- Break surrounding blocks if needed
+                            -- Break surrounding blocks
                             local surrounding = getSurroundingBlocks(blockPos)
                             for _, sPos in ipairs(surrounding) do
                                 DamageBlock:InvokeServer({
