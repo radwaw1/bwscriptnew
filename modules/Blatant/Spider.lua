@@ -5,6 +5,11 @@ Spider.Enabled = false
 
 local player = game:GetService("Players").LocalPlayer
 
+Spider.Config = {
+    { Name = "Speed", Type = "Slider", Min = 0.1, Max = 5, Default = 1.5, Value = 1.5, Suffix = "" },
+    { Name = "Keybind", Type = "Keybind", Value = Enum.KeyCode.LeftControl }
+}
+
 Spider.Run = function()
     Spider.Enabled = not Spider.Enabled
 
@@ -14,22 +19,19 @@ Spider.Run = function()
         task.spawn(function()
             while Spider.Enabled do
                 local char = player.Character
-                if char and char:FindFirstChild("HumanoidRootPart") then
+                if char and char:FindFirstChild("HumanoidRootPart") and char:FindFirstChild("Humanoid") then
                     local root = char.HumanoidRootPart
-                    local hum = char:FindFirstChild("Humanoid")
+                    local hum = char.Humanoid
 
-                    if hum then
-                        -- Auto step up blocks
+                    if hum:GetState() == Enum.HumanoidStateType.Freefall or hum:GetState() == Enum.HumanoidStateType.Jumping then
                         local rayParams = RaycastParams.new()
                         rayParams.FilterDescendantsInstances = {char}
                         rayParams.FilterType = Enum.RaycastFilterType.Exclude
 
-                        local ray = workspace:Raycast(root.Position, Vector3.new(0, -3, 0), rayParams)
+                        -- Check for wall in front
+                        local ray = workspace:Raycast(root.Position, root.CFrame.LookVector * 3, rayParams)
                         if ray then
-                            local height = root.Position.Y - ray.Position.Y
-                            if height > 2 and height < 6 then
-                                root.CFrame = root.CFrame + Vector3.new(0, height + 1.5, 0)
-                            end
+                            root.Velocity = Vector3.new(root.Velocity.X, Spider.Config[1].Value * 10, root.Velocity.Z)
                         end
                     end
                 end
