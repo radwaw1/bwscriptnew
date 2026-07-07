@@ -43,7 +43,7 @@ local titleLabel = Instance.new("TextLabel")
 titleLabel.Size = UDim2.new(1,-100,1,0)
 titleLabel.Position = UDim2.new(0,12,0,0)
 titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "aaaaaaaa's shitty script"
+titleLabel.Text = "Module Hub"
 titleLabel.TextColor3 = Color3.fromRGB(255,255,255)
 titleLabel.Font = Enum.Font.GothamBold
 titleLabel.TextSize = 16
@@ -152,15 +152,19 @@ makeDraggable(mainFrame, titleBar)
 
 selfDestructBtn.MouseButton1Click:Connect(function() screenGui:Destroy() end)
 
+-- RightShift Toggle
+UserInputService.InputBegan:Connect(function(input, gp)
+    if gp then return end
+    if input.KeyCode == Enum.KeyCode.RightShift then
+        screenGui.Enabled = not screenGui.Enabled
+    end
+end)
+
 -- Keybind System
 local keybinds = {}
 
 UserInputService.InputBegan:Connect(function(input, gp)
     if gp then return end
-    if input.KeyCode == Enum.KeyCode.RightShift then
-        screenGui.Enabled = not screenGui.Enabled
-        return
-    end
     for name, mod in pairs(modules) do
         if keybinds[name] and input.KeyCode == keybinds[name] then
             pcall(mod.moduleData.Run)
@@ -419,7 +423,7 @@ end
 local function refreshModules()
     for _, v in mainContent:GetChildren() do if v:IsA("Frame") then v:Destroy() end end
 
-    local url = string.format("https://api.github.com/repos/%s/%s/contents/%s?ref=%s", REPO_USER, REPO_NAME, GITHUB_FOLDER, REPO_BRANCH)
+    local url = string.format("https://api.github.com/repos/%s/%s/contents/%s/%s?ref=%s", REPO_USER, REPO_NAME, GITHUB_FOLDER, currentCategory, REPO_BRANCH)
     local ok, response = pcall(function() return request({Url = url, Method = "GET"}) end)
 
     if ok and response.Success then
