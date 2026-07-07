@@ -1,4 +1,4 @@
--- ModuleHub with Fixed Dragging + Keybinds
+-- ModuleHub with Categories (Full Script)
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local HttpService = game:GetService("HttpService")
@@ -19,93 +19,124 @@ screenGui.Enabled = true
 screenGui.Parent = playerGui
 
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 280, 0, 420)
-mainFrame.Position = UDim2.new(0.5, -140, 0.5, -210)
+mainFrame.Size = UDim2.new(0, 650, 0, 480)
+mainFrame.Position = UDim2.new(0, 20, 0.5, -240)
 mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 34)
 mainFrame.Parent = screenGui
 
-local uiCorner = Instance.new("UICorner")
-uiCorner.CornerRadius = UDim.new(0, 8)
-uiCorner.Parent = mainFrame
+local uiCorner = Instance.new("UICorner"); uiCorner.CornerRadius = UDim.new(0,8); uiCorner.Parent = mainFrame
+
+-- Left Sidebar (Categories)
+local sidebar = Instance.new("Frame")
+sidebar.Size = UDim2.new(0, 140, 1, 0)
+sidebar.BackgroundColor3 = Color3.fromRGB(25,25,30)
+sidebar.Parent = mainFrame
+
+local sidebarCorner = Instance.new("UICorner"); sidebarCorner.CornerRadius = UDim.new(0,8); sidebarCorner.Parent = sidebar
 
 local titleBar = Instance.new("Frame")
-titleBar.Size = UDim2.new(1, 0, 0, 36)
-titleBar.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
+titleBar.Size = UDim2.new(1,0,0,36)
+titleBar.BackgroundColor3 = Color3.fromRGB(20,20,24)
 titleBar.Parent = mainFrame
 
 local titleLabel = Instance.new("TextLabel")
-titleLabel.Size = UDim2.new(1, -100, 1, 0)
-titleLabel.Position = UDim2.new(0, 12, 0, 0)
+titleLabel.Size = UDim2.new(1,-100,1,0)
+titleLabel.Position = UDim2.new(0,12,0,0)
 titleLabel.BackgroundTransparency = 1
 titleLabel.Text = "Module Hub"
-titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.TextColor3 = Color3.fromRGB(255,255,255)
 titleLabel.Font = Enum.Font.GothamBold
 titleLabel.TextSize = 16
 titleLabel.Parent = titleBar
 
 local selfDestructBtn = Instance.new("TextButton")
-selfDestructBtn.Size = UDim2.new(0, 85, 0, 24)
-selfDestructBtn.Position = UDim2.new(1, -92, 0.5, -12)
-selfDestructBtn.BackgroundColor3 = Color3.fromRGB(170, 30, 30)
+selfDestructBtn.Size = UDim2.new(0,85,0,24)
+selfDestructBtn.Position = UDim2.new(1,-92,0.5,-12)
+selfDestructBtn.BackgroundColor3 = Color3.fromRGB(170,30,30)
 selfDestructBtn.Text = "Self Destruct"
-selfDestructBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+selfDestructBtn.TextColor3 = Color3.fromRGB(255,255,255)
 selfDestructBtn.Font = Enum.Font.Gotham
 selfDestructBtn.TextSize = 11
 selfDestructBtn.Parent = titleBar
 
 local reloadButton = Instance.new("TextButton")
-reloadButton.Size = UDim2.new(0, 60, 0, 24)
-reloadButton.Position = UDim2.new(1, -155, 0.5, -12)
-reloadButton.BackgroundColor3 = Color3.fromRGB(45, 45, 52)
+reloadButton.Size = UDim2.new(0,60,0,24)
+reloadButton.Position = UDim2.new(1,-155,0.5,-12)
+reloadButton.BackgroundColor3 = Color3.fromRGB(45,45,52)
 reloadButton.Text = "Reload"
-reloadButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+reloadButton.TextColor3 = Color3.fromRGB(255,255,255)
 reloadButton.Font = Enum.Font.Gotham
 reloadButton.TextSize = 12
 reloadButton.Parent = titleBar
 
-local statusLabel = Instance.new("TextLabel")
-statusLabel.Size = UDim2.new(1, -16, 0, 18)
-statusLabel.Position = UDim2.new(0, 8, 0, 40)
-statusLabel.BackgroundTransparency = 1
-statusLabel.Text = "Loading modules..."
-statusLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
-statusLabel.Font = Enum.Font.Gotham
-statusLabel.TextSize = 12
-statusLabel.Parent = mainFrame
+-- Categories
+local categories = {
+    Blatant = {},
+    World = {},
+    Utility = {},
+    Legit = {},
+    Inventory = {},
+    Render = {}
+}
 
-local scrollFrame = Instance.new("ScrollingFrame")
-scrollFrame.Size = UDim2.new(1, -16, 1, -68)
-scrollFrame.Position = UDim2.new(0, 8, 0, 60)
-scrollFrame.BackgroundTransparency = 1
-scrollFrame.ScrollBarThickness = 4
-scrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
-scrollFrame.Parent = mainFrame
+local categoryButtons = {}
+local currentCategory = "Blatant"
+
+local categoryList = Instance.new("ScrollingFrame")
+categoryList.Size = UDim2.new(1,0,1,-36)
+categoryList.Position = UDim2.new(0,0,0,36)
+categoryList.BackgroundTransparency = 1
+categoryList.ScrollBarThickness = 4
+categoryList.Parent = sidebar
 
 local listLayout = Instance.new("UIListLayout")
-listLayout.Padding = UDim.new(0, 6)
-listLayout.Parent = scrollFrame
+listLayout.Padding = UDim.new(0,4)
+listLayout.Parent = categoryList
+
+for catName in pairs(categories) do
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1,0,0,36)
+    btn.BackgroundColor3 = Color3.fromRGB(45,45,52)
+    btn.Text = catName
+    btn.TextColor3 = Color3.fromRGB(255,255,255)
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 14
+    btn.Parent = categoryList
+
+    local corner = Instance.new("UICorner"); corner.CornerRadius = UDim.new(0,6); corner.Parent = btn
+
+    btn.MouseButton1Click:Connect(function()
+        currentCategory = catName
+        refreshModules()
+    end)
+
+    categoryButtons[catName] = btn
+end
+
+local mainContent = Instance.new("ScrollingFrame")
+mainContent.Size = UDim2.new(1, -150, 1, -50)
+mainContent.Position = UDim2.new(0, 150, 0, 45)
+mainContent.BackgroundTransparency = 1
+mainContent.ScrollBarThickness = 4
+mainContent.AutomaticCanvasSize = Enum.AutomaticSize.Y
+mainContent.Parent = mainFrame
+
+local contentLayout = Instance.new("UIListLayout")
+contentLayout.Padding = UDim.new(0,6)
+contentLayout.Parent = mainContent
 
 local modules = {}
 local openConfigWindows = {}
-local keybinds = {}
 
--- FIXED DRAGGING
 local function makeDraggable(frame, dragBar)
     local dragging = false
-    local dragStart = nil
-    local startPos = nil
+    local dragStart, startPos
 
     dragBar.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
             startPos = frame.Position
-        end
-    end)
-
-    dragBar.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = false
         end
     end)
 
@@ -119,20 +150,18 @@ end
 
 makeDraggable(mainFrame, titleBar)
 
-selfDestructBtn.MouseButton1Click:Connect(function()
-    screenGui:Destroy()
-end)
+selfDestructBtn.MouseButton1Click:Connect(function() screenGui:Destroy() end)
 
 -- Keybind System
+local keybinds = {}
+
 UserInputService.InputBegan:Connect(function(input, gp)
     if gp then return end
     for name, mod in pairs(modules) do
         if keybinds[name] and input.KeyCode == keybinds[name] then
-            local success = pcall(mod.moduleData.Run)
-            if success then
-                mod.enabled = not mod.enabled
-                mod.button.BackgroundColor3 = mod.enabled and Color3.fromRGB(40,120,60) or Color3.fromRGB(120,40,40)
-            end
+            pcall(mod.moduleData.Run)
+            mod.enabled = not mod.enabled
+            updateButtonVisual(mod.button, mod.enabled)
         end
     end
 end)
@@ -150,7 +179,7 @@ local function createConfigWindow(moduleData)
     end
 
     local configFrame = Instance.new("Frame")
-    configFrame.Size = UDim2.new(0, 300, 0, 500)  -- Bigger default size
+    configFrame.Size = UDim2.new(0, 300, 0, 500)
     configFrame.Position = UDim2.new(0.5, -150, 0.5, -250)
     configFrame.BackgroundColor3 = Color3.fromRGB(25,25,30)
     configFrame.Parent = screenGui
@@ -177,9 +206,8 @@ local function createConfigWindow(moduleData)
     content.Size = UDim2.new(1,-20,1,-55)
     content.Position = UDim2.new(0,10,0,45)
     content.BackgroundTransparency = 1
-    content.ScrollBarThickness = 8
+    content.ScrollBarThickness = 6
     content.AutomaticCanvasSize = Enum.AutomaticSize.Y
-    content.CanvasSize = UDim2.new(0,0,0,0)
     content.Parent = configFrame
 
     local uiList = Instance.new("UIListLayout")
@@ -187,7 +215,6 @@ local function createConfigWindow(moduleData)
     uiList.SortOrder = Enum.SortOrder.LayoutOrder
     uiList.Parent = content
 
-    -- Config Options
     for _, setting in ipairs(moduleData.Config or {}) do
         if setting.Type == "Toggle" then
             local btn = Instance.new("TextButton")
@@ -299,7 +326,7 @@ local function createConfigWindow(moduleData)
                 end
 
                 dropdownList = Instance.new("ScrollingFrame")
-                dropdownList.Size = UDim2.new(1,0,0,300)  -- Bigger dropdown
+                dropdownList.Size = UDim2.new(1,0,0,300)
                 dropdownList.Position = UDim2.new(0,0,0,40)
                 dropdownList.BackgroundColor3 = Color3.fromRGB(35,35,40)
                 dropdownList.ScrollBarThickness = 6
@@ -346,7 +373,7 @@ local function createButtonForModule(moduleData)
     local buttonFrame = Instance.new("Frame")
     buttonFrame.Size = UDim2.new(1,0,0,42)
     buttonFrame.BackgroundTransparency = 1
-    buttonFrame.Parent = scrollFrame
+    buttonFrame.Parent = mainContent
 
     local button = Instance.new("TextButton")
     button.Size = UDim2.new(1,-48,1,0)
@@ -386,15 +413,9 @@ local function createButtonForModule(moduleData)
 end
 
 local function refreshModules()
-    for _, child in ipairs(scrollFrame:GetChildren()) do
-        if child:IsA("Frame") then child:Destroy() end
-    end
-    modules = {}
-
-    statusLabel.Text = "Loading modules..."
+    for _, v in mainContent:GetChildren() do if v:IsA("Frame") then v:Destroy() end end
 
     local url = string.format("https://api.github.com/repos/%s/%s/contents/%s?ref=%s", REPO_USER, REPO_NAME, GITHUB_FOLDER, REPO_BRANCH)
-
     local ok, response = pcall(function() return request({Url = url, Method = "GET"}) end)
 
     if ok and response.Success then
@@ -405,8 +426,8 @@ local function refreshModules()
                 if ok2 and res.Success then
                     local func = loadstring(res.Body)
                     if func then
-                        local success, mod = pcall(func)
-                        if success and mod and mod.Run then
+                        local s, mod = pcall(func)
+                        if s and mod and mod.Run then
                             createButtonForModule(mod)
                         end
                     end
