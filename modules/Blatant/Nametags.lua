@@ -6,12 +6,57 @@ Nametags.Enabled = false
 local player = game:GetService("Players").LocalPlayer
 local nametagBillboards = {}
 
+local function createNametag(plr)
+    local char = plr.Character
+    if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+
+    if nametagBillboards[plr] then
+        nametagBillboards[plr]:Destroy()
+    end
+
+    local billboard = Instance.new("BillboardGui")
+    billboard.Size = UDim2.new(0, 220, 0, 70)
+    billboard.StudsOffset = Vector3.new(0, 4.5, 0)
+    billboard.AlwaysOnTop = true
+    billboard.Adornee = char.HumanoidRootPart
+    billboard.Parent = char
+
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Size = UDim2.new(1,0,1,0)
+    textLabel.BackgroundTransparency = 1
+    textLabel.TextColor3 = plr.TeamColor.Color
+    textLabel.TextStrokeTransparency = 0.5
+    textLabel.TextStrokeColor3 = Color3.new(0,0,0)
+    textLabel.Font = Enum.Font.GothamBold
+    textLabel.TextSize = 15
+    textLabel.Text = string.format("%s\n%.1f studs\n%d%% HP", plr.Name, 0, 100)
+    textLabel.Parent = billboard
+
+    nametagBillboards[plr] = billboard
+end
+
 Nametags.Run = function()
     Nametags.Enabled = not Nametags.Enabled
 
     if Nametags.Enabled then
         print("✅ Nametags Enabled")
         
+        -- Handle existing players
+        for _, plr in ipairs(game:GetService("Players"):GetPlayers()) do
+            if plr == player then continue end
+            createNametag(plr)
+        end
+
+        -- Handle respawns
+        for _, plr in ipairs(game:GetService("Players"):GetPlayers()) do
+            if plr == player then continue end
+            plr.CharacterAdded:Connect(function()
+                task.wait(0.5)
+                createNametag(plr)
+            end)
+        end
+
+        -- Update loop
         task.spawn(function()
             while Nametags.Enabled do
                 for _, plr in ipairs(game:GetService("Players"):GetPlayers()) do
@@ -29,38 +74,17 @@ Nametags.Run = function()
                     local root = char.HumanoidRootPart
                     local hum = char.Humanoid
 
-                    -- Create/Update Nametag
-                    if not nametagBillboards[plr] then
-                        local billboard = Instance.new("BillboardGui")
-                        billboard.Size = UDim2.new(0, 200, 0, 60)
-                        billboard.StudsOffset = Vector3.new(0, 4, 0)
-                        billboard.AlwaysOnTop = true
-                        billboard.Adornee = root
-                        billboard.Parent = char
+                    if nametagBillboards[plr] then
+                        local distance = (root.Position - (player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character.HumanoidRootPart.Position or Vector3.new())).Magnitude
+                        local healthPercent = math.floor((hum.Health / hum.MaxHealth) * 100)
 
-                        local textLabel = Instance.new("TextLabel")
-                        textLabel.Size = UDim2.new(1,0,1,0)
-                        textLabel.BackgroundTransparency = 1
-                        textLabel.TextColor3 = plr.TeamColor.Color
-                        textLabel.TextStrokeTransparency = 0.7
-                        textLabel.Font = Enum.Font.GothamBold
-                        textLabel.TextSize = 14
-                        textLabel.Parent = billboard
-
-                        nametagBillboards[plr] = billboard
+                        nametagBillboards[plr].TextLabel.Text = string.format(
+                            "%s\n%.1f studs\n%d%% HP", 
+                            plr.Name,
+                            distance,
+                            healthPercent
+                        )
                     end
-
-                    local distance = (root.Position - player.Character.HumanoidRootPart.Position).Magnitude
-                    local healthPercent = math.floor((hum.Health / hum.MaxHealth) * 100)
-                    local name = player.name
-
-                    nametagBillboards[plr].TextLabel.Text = string.format(
-                        "%s\n%.1f studs\n%d%%", 
-                        plr.Team and plr.Team.Name or "No Team",
-                        distance,
-                        healthPercent,
-                        name
-                    )
                 end
 
                 task.wait(0.1)
