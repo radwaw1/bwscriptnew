@@ -1,6 +1,6 @@
 local BedNuker = {}
 
-BedNuker.Name = "BedNuker"
+BedNuker.Name = "Bed Nuker"
 BedNuker.Enabled = false
 
 local DamageBlock = game:GetService("ReplicatedStorage")
@@ -10,7 +10,7 @@ local connection = nil
 
 BedNuker.Config = {
     { Name = "Range", Type = "Slider", Min = 10, Max = 100, Default = 50, Value = 50, Suffix = " studs" },
-    { Name = "Speed", Type = "Slider", Min = 0.05, Max = 1, Default = 0.15, Value = 0.15, Suffix = " seconds" }
+    { Name = "Speed", Type = "Slider", Min = 0.05, Max = 1, Default = 0.1, Value = 0.1, Suffix = " seconds" }
 }
 
 local function getSurroundingBlocks(centerPos)
@@ -46,14 +46,14 @@ BedNuker.Run = function()
 
                             local blockPos = bedPos / 3
 
-                            -- Break bed
+                            -- Keep hitting the bed
                             DamageBlock:InvokeServer({
                                 blockRef = { blockPosition = blockPos },
                                 hitPosition = bedPos + Vector3.new(0.5, 0.5, 0.5),
                                 hitNormal = Vector3.new(0, 1, 0)
                             })
 
-                            -- Break surrounding blocks
+                            -- Break surrounding blocks aggressively
                             local surrounding = getSurroundingBlocks(blockPos)
                             for _, sPos in ipairs(surrounding) do
                                 DamageBlock:InvokeServer({
