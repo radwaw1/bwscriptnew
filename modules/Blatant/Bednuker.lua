@@ -1,6 +1,6 @@
 local BedNuker = {}
 
-BedNuker.Name = "Bed Nuker"
+BedNuker.Name = "BedNuker"
 BedNuker.Enabled = false
 
 local DamageBlock = game:GetService("ReplicatedStorage")
@@ -9,7 +9,7 @@ local DamageBlock = game:GetService("ReplicatedStorage")
 local connection = nil
 
 BedNuker.Config = {
-    { Name = "Range", Type = "Slider", Min = 10, Max = 100, Default = 20, Value = 20, Suffix = " studs" }
+    { Name = "Range", Type = "Slider", Min = 10, Max = 40, Default = 20, Value = 20, Suffix = " studs" }
 }
 
 BedNuker.Run = function()
@@ -29,9 +29,10 @@ BedNuker.Run = function()
                         if obj.Name:lower():find("bed") and obj:IsA("BasePart") then
                             local pos = obj.Position
                             if (pos - rootPos).Magnitude < BedNuker.Config[1].Value then
+                                local blockPos = pos / 3  -- BlockEngine coordinate
                                 DamageBlock:InvokeServer({
                                     blockRef = {
-                                        blockPosition = pos
+                                        blockPosition = blockPos
                                     },
                                     hitPosition = pos + Vector3.new(0.5, 0.5, 0.5),
                                     hitNormal = Vector3.new(0, 1, 0)
