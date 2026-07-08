@@ -1,7 +1,7 @@
 local DeathTP = {}
 
 DeathTP.Name = "DeathTP"
-DeathTP.Enabled = false
+DeathTP.Enabled = true
 
 local player = game:GetService("Players").LocalPlayer
 local lastDeathPos = nil

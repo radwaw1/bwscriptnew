@@ -1,7 +1,7 @@
 local InfiniteJump = {}
 
 InfiniteJump.Name = "InfiniteJump"
-InfiniteJump.Enabled = false
+InfiniteJump.Enabled = true
 
 local player = game:GetService("Players").LocalPlayer
 local UserInputService = game:GetService("UserInputService")

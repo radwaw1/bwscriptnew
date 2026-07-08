@@ -1,7 +1,7 @@
 local Nametags = {}
 
 Nametags.Name = "Nametags"
-Nametags.Enabled = false
+Nametags.Enabled = true
 
 local player = game:GetService("Players").LocalPlayer
 local nametagBillboards = {}

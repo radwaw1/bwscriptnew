@@ -1,7 +1,7 @@
 local BedNuker = {}
 
 BedNuker.Name = "BedNuker"
-BedNuker.Enabled = false
+BedNuker.Enabled = true
 
 local DamageBlock = game:GetService("ReplicatedStorage")
     .rbxts_include.node_modules["@easy-games"]["block-engine"].node_modules["@rbxts"].net.out._NetManaged.DamageBlock
