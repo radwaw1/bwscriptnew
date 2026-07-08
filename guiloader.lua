@@ -17,6 +17,8 @@ screenGui.ResetOnSpawn = false
 screenGui.DisplayOrder = 100
 screenGui.Enabled = true
 screenGui.Parent = playerGui
+screenGui.DisplayOrder = 999999
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 local mainFrame = Instance.new("Frame")
 mainFrame.Size = UDim2.new(0, 650, 0, 480)
