@@ -1,6 +1,6 @@
 local FishingRNG = {}
 
-FishingRNG.Name = "Fishin mangRNG"
+FishingRNG.Name = "FsahmangRNG"
 FishingRNG.Enabled = false
 
 FishingRNG.Run = function()
