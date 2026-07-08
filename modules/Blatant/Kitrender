@@ -1,0 +1,42 @@
+local KitRender = {}
+
+KitRender.Name = "KitRender"
+KitRender.Enabled = false
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+KitRender.Run = function()
+    KitRender.Enabled = not KitRender.Enabled
+
+    if KitRender.Enabled then
+        print("✅ KitRender Enabled")
+
+        -- Print current kits
+        for _, plr in ipairs(Players:GetPlayers()) do
+            if plr == player then continue end
+            local kit = plr:FindFirstChild("PlayingAsKits") or plr:FindFirstChild("Kit")
+            if kit then
+                print(plr.Name .. " is using kit: " .. tostring(kit.Value))
+            else
+                print(plr.Name .. " has no kit info")
+            end
+        end
+
+        -- Monitor kit changes
+        for _, plr in ipairs(Players:GetPlayers()) do
+            if plr == player then continue end
+            plr.ChildAdded:Connect(function(child)
+                if child.Name == "PlayingAsKits" or child.Name == "Kit" then
+                    task.wait(0.5)
+                    print(plr.Name .. " changed kit to: " .. tostring(child.Value))
+                end
+            end)
+        end
+
+    else
+        print("❌ KitRender Disabled")
+    end
+end
+
+return KitRender
