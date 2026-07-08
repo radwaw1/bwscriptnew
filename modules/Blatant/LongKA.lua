@@ -1,6 +1,6 @@
 local LongKA = {}
 
-LongKA.Name = "LongKA"
+LongKA.Name = "LongKA (fix)"
 LongKA.Enabled = false
 
 local SwordHit = game:GetService("ReplicatedStorage")
@@ -20,7 +20,7 @@ LongKA.Run = function()
     LongKA.Enabled = not LongKA.Enabled
 
     if LongKA.Enabled then
-        print("✅ LongKA Enabled (Movement Bypass)")
+        print("✅ LongKA Enabled (TP Hit TP Back)")
         
         connection = task.spawn(function()
             while LongKA.Enabled do
@@ -39,6 +39,7 @@ LongKA.Run = function()
 
                     for _, plr in ipairs(Players:GetPlayers()) do
                         if plr == player then continue end
+                        if plr.Team == player.Team then continue end
 
                         local targetChar = plr.Character
                         local targetRoot = targetChar and targetChar:FindFirstChild("HumanoidRootPart")
@@ -47,7 +48,10 @@ LongKA.Run = function()
                         local distance = (targetRoot.Position - selfPos).Magnitude
                         if distance > LongKA.Config[1].Value then continue end
 
-                        -- TP closer to bypass movement check
+                        -- Save original position
+                        local originalCFrame = root.CFrame
+
+                        -- TP to target
                         local behindPos = targetRoot.Position - targetRoot.CFrame.LookVector * 8
                         root.CFrame = CFrame.lookAt(behindPos, targetRoot.Position)
 
@@ -64,6 +68,9 @@ LongKA.Run = function()
                             },
                             weapon = weapon
                         })
+
+                        -- Instantly TP back
+                        root.CFrame = originalCFrame
                     end
                 end
 
