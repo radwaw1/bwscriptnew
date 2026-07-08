@@ -1,6 +1,6 @@
 local FishingRNG = {}
 
-FishingRNG.Name = "FishingRNG"
+FishingRNG.Name = "Fishingman RNG"
 FishingRNG.Enabled = false
 
 FishingRNG.Run = function()
@@ -11,8 +11,9 @@ FishingRNG.Run = function()
 
         local FishFound = game:GetService("ReplicatedStorage").rbxts_include.node_modules["@rbxts"].net.out._NetManaged.FishFound
         local FishCaught = game:GetService("ReplicatedStorage").rbxts_include.node_modules["@rbxts"].net.out._NetManaged.FishCaught
+        local PullFishingRod = game:GetService("ReplicatedStorage").rbxts_include.node_modules["@rbxts"].net.out._NetManaged.PullFishingRod
 
-        -- Safer hook for FishFound
+        -- Hook FishFound
         for _, conn in getconnections(FishFound.OnClientEvent) do
             if conn.Function then
                 local old = hookfunction(conn.Function, function(...)
@@ -23,7 +24,7 @@ FishingRNG.Run = function()
                             weight = 5,
                             id = "gold_fish",
                             fishSizeMultiplier = 1.5,
-                            -- Drops left for the game to decide
+                            drops = args[1].dropData.drops  -- Keep original drops
                         }
                     end
                     return old(...)
@@ -31,7 +32,7 @@ FishingRNG.Run = function()
             end
         end
 
-        -- Safer hook for FishCaught
+        -- Hook FishCaught
         for _, conn in getconnections(FishCaught.OnClientEvent) do
             if conn.Function then
                 local old = hookfunction(conn.Function, function(...)
@@ -42,8 +43,21 @@ FishingRNG.Run = function()
                             weight = 5,
                             id = "gold_fish",
                             fishSizeMultiplier = 1.5,
-                            -- Drops left for the game to decide
+                            drops = args[1].dropData.drops  -- Keep original drops
                         }
+                    end
+                    return old(...)
+                end)
+            end
+        end
+
+        -- Hook PullFishingRod to always succeed
+        for _, conn in getconnections(PullFishingRod.OnClientEvent) do
+            if conn.Function then
+                local old = hookfunction(conn.Function, function(...)
+                    local args = table.pack(...)
+                    if args[1] then
+                        args[1].success = true
                     end
                     return old(...)
                 end)
