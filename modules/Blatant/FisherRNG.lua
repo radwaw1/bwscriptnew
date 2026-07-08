@@ -1,13 +1,13 @@
 local FishingRNG = {}
 
-FishingRNG.Name = "Fisherman RNG"
+FishingRNG.Name = "FishingRNG"
 FishingRNG.Enabled = false
 
 FishingRNG.Run = function()
     FishingRNG.Enabled = not FishingRNG.Enabled
 
     if FishingRNG.Enabled then
-        print("✅ FishingRNG Enabled (Diamond Fish)")
+        print("✅ FishingRNG Enabled (Gold Fish)")
 
         local FishFound = game:GetService("ReplicatedStorage").rbxts_include.node_modules["@rbxts"].net.out._NetManaged.FishFound
         local FishCaught = game:GetService("ReplicatedStorage").rbxts_include.node_modules["@rbxts"].net.out._NetManaged.FishCaught
@@ -19,13 +19,11 @@ FishingRNG.Run = function()
                     local args = table.pack(...)
                     if args[1] and args[1].dropData then
                         args[1].dropData = {
-                            fishModel = "fish_diamond",
+                            fishModel = "fish_gold",
                             weight = 5,
-                            id = "diamond_fish_2",
+                            id = "gold_fish",
                             fishSizeMultiplier = 1.5,
-                            drops = {
-                                { itemType = "diamond", amount = 3 }
-                            }
+                            -- Drops left for the game to decide
                         }
                     end
                     return old(...)
@@ -40,13 +38,11 @@ FishingRNG.Run = function()
                     local args = table.pack(...)
                     if args[1] and args[1].dropData then
                         args[1].dropData = {
-                            fishModel = "fish_diamond",
+                            fishModel = "fish_gold",
                             weight = 5,
-                            id = "diamond_fish_2",
+                            id = "gold_fish",
                             fishSizeMultiplier = 1.5,
-                            drops = {
-                                { itemType = "diamond", amount = 3 }
-                            }
+                            -- Drops left for the game to decide
                         }
                     end
                     return old(...)
