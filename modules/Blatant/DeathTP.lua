@@ -1,6 +1,6 @@
 local DeathTP = {}
 
-DeathTP.Name = "DeathTP (fix)"
+DeathTP.Name = "DeathTP"
 DeathTP.Enabled = false
 
 local player = game:GetService("Players").LocalPlayer
@@ -31,7 +31,7 @@ DeathTP.Run = function()
                 task.delay(DeathTP.Config[1].Value, function()
                     local root = char:FindFirstChild("HumanoidRootPart")
                     if root then
-                        -- Safe teleport
+                        -- Safer teleport
                         root.CFrame = CFrame.new(lastDeathPosition + Vector3.new(0, 5, 0))
                         print("DeathTP: Teleported back after " .. DeathTP.Config[1].Value .. " seconds")
                     end
