@@ -1,7 +1,7 @@
 local Killaura = {}
 
 Killaura.Name = "Shitaura"
-Killaura.Enabled = true
+Killaura.Enabled = false
 
 local SwordHit = game:GetService("ReplicatedStorage")
     .rbxts_include.node_modules["@rbxts"].net.out._NetManaged.SwordHit

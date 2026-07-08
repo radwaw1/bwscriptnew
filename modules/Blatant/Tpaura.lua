@@ -1,7 +1,7 @@
 local TPAura = {}
 
 TPAura.Name = "TPAura"
-TPAura.Enabled = true
+TPAura.Enabled = false
 
 local SwordHit = game:GetService("ReplicatedStorage")
     .rbxts_include.node_modules["@rbxts"].net.out._NetManaged.SwordHit

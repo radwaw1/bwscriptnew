@@ -1,13 +1,13 @@
 local WalkSpeed = {}
 
 WalkSpeed.Name = "WalkSpeed"
-WalkSpeed.Enabled = true
+WalkSpeed.Enabled = false
 
 local player = game:GetService("Players").LocalPlayer
 local originalSpeed = 16
 
 WalkSpeed.Config = {
-    { Name = "Speed", Type = "Slider", Min = 0, Max = 150, Default = 100, Value = 100 }
+    { Name = "Speed", Type = "Slider", Min = 0, Max = 100, Default = 20, Value = 20 }
 }
 
 WalkSpeed.Run = function()

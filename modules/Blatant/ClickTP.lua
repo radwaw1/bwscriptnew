@@ -1,7 +1,7 @@
 local ClickTP = {}
 
 ClickTP.Name = "ClickTP"
-ClickTP.Enabled = true
+ClickTP.Enabled = false
 
 local player = game:GetService("Players").LocalPlayer
 local mouse = player:GetMouse()
