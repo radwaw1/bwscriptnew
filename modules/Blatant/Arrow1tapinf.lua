@@ -1,55 +1,29 @@
-local ProjectileAura = {}
+local ProjectileAuraOP = {}
 
-ProjectileAura.Name = "ProjectileAura"
-ProjectileAura.Enabled = false
+ProjectileAuraOP.Name = "ProjectileAuraOP"
+ProjectileAuraOP.Enabled = false
 
 local projectileRemote = {InvokeServer = function() end}
 local FireDelays = {}
 
 task.spawn(function()
-    projectileRemote = game:GetService("ReplicatedStorage").rbxts_include.node_modules["@rbxts"].net.out._NetManaged.FireProjectile.instance
+    local remotes = game:GetService("ReplicatedStorage").rbxts_include.node_modules["@rbxts"].net.out._NetManaged
+    projectileRemote = remotes.FireProjectile or remotes.ProjectileFire
 end)
 
-local function getAmmo(check)
-    for _, item in game.Players.LocalPlayer.Backpack:GetChildren() do
-        if check.ammoItemTypes and table.find(check.ammoItemTypes, item.Name) then
-            return item.Name
-        end
-    end
-end
-
-local function getProjectiles()
-    local items = {}
-    for _, item in game.Players.LocalPlayer.Backpack:GetChildren() do
-        if item:IsA("Tool") then
-            local proj = {} -- simplified
-            local ammo = getAmmo(proj) or ProjectileAura.Config[2].Value > 0.5 and item.Name:find('bow') and 'arrow'
-            if ammo then
-                table.insert(items, {
-                    item,
-                    ammo,
-                    "arrow",
-                    {}
-                })
-            end
-        end
-    end
-    return items
-end
-
-ProjectileAura.Config = {
+ProjectileAuraOP.Config = {
     { Name = "Range", Type = "Slider", Min = 1, Max = 50, Default = 50, Value = 50, Suffix = " studs" },
     { Name = "InstaKill", Type = "Slider", Min = 0, Max = 1, Default = 0, Value = 0, Suffix = "" }
 }
 
-ProjectileAura.Run = function()
-    ProjectileAura.Enabled = not ProjectileAura.Enabled
+ProjectileAuraOP.Run = function()
+    ProjectileAuraOP.Enabled = not ProjectileAuraOP.Enabled
 
-    if ProjectileAura.Enabled then
-        print("✅ ProjectileAura Enabled")
+    if ProjectileAuraOP.Enabled then
+        print("✅ ProjectileAuraOP Enabled")
         
         task.spawn(function()
-            while ProjectileAura.Enabled do
+            while ProjectileAuraOP.Enabled do
                 local char = game.Players.LocalPlayer.Character
                 if char and char:FindFirstChild("HumanoidRootPart") then
                     local pos = char.HumanoidRootPart.Position
@@ -61,23 +35,22 @@ ProjectileAura.Run = function()
                         if not targetChar or not targetChar:FindFirstChild("HumanoidRootPart") then continue end
 
                         local distance = (targetChar.HumanoidRootPart.Position - pos).Magnitude
-                        if distance > ProjectileAura.Config[1].Value then continue end
+                        if distance > ProjectileAuraOP.Config[1].Value then continue end
 
-                        for _, data in getProjectiles() do
-                            local item, ammo, projectile, itemMeta = unpack(data)
-                            if (FireDelays[item.Name] or 0) < tick() then
-                                task.spawn(function()
-                                    if ProjectileAura.Config[2].Value > 0.5 and ammo:find('arrow') then
-                                        ammo = 'volley_arrow'
-                                    end
-                                    local dir = CFrame.lookAt(pos, targetChar.HumanoidRootPart.Position).LookVector
-                                    local id = game:GetService("HttpService"):GenerateGUID(true)
-                                    local shootPosition = pos
+                        for _, item in ipairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                            if item:IsA("Tool") then
+                                local projType = "arrow"
+                                local instaKill = ProjectileAuraOP.Config[2].Value > 0.5
+                                if instaKill and item.Name:find("bow") then
+                                    projType = "volley_arrow"
+                                end
 
-                                    projectileRemote:InvokeServer(item, ammo, projectile, shootPosition, pos, dir * 100, id, {drawDurationSeconds = 1, shotId = game:GetService("HttpService"):GenerateGUID(false)}, workspace:GetServerTimeNow() - 0.045)
+                                local dir = (targetChar.HumanoidRootPart.Position - pos).Unit
+                                local id = game:GetService("HttpService"):GenerateGUID(true)
+
+                                pcall(function()
+                                    projectileRemote:InvokeServer(item, projType, "arrow", pos, pos, dir * 100, id, {}, workspace:GetServerTimeNow())
                                 end)
-
-                                FireDelays[item.Name] = tick() + 0.5
                             end
                         end
                     end
@@ -88,8 +61,8 @@ ProjectileAura.Run = function()
         end)
 
     else
-        print("❌ ProjectileAura Disabled")
+        print("❌ ProjectileAuraOP Disabled")
     end
 end
 
-return ProjectileAura
+return ProjectileAuraOP
