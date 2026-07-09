@@ -74,7 +74,7 @@ VolleyBow.Run = function()
                         )
                     end
                 end
-                task.wait(0.001)
+                task.wait(0.0001)
             end
         end)
     else
