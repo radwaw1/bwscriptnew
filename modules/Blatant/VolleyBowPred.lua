@@ -1,6 +1,6 @@
 local VolleyBow = {}
 
-VolleyBow.Name = "VolleyBowOP"
+VolleyBow.Name = "VolleyBowOd  P"
 VolleyBow.Enabled = false
 
 local replicated = game:GetService("ReplicatedStorage")
@@ -53,7 +53,7 @@ VolleyBow.Run = function()
                 if root and bow then
                     local selfroot = lplr.Character and lplr.Character.PrimaryPart
                     if selfroot then
-                        local ammo = 'blackhole_bomb'
+                        local ammo = 'sleep_splash_potion'
                         if VolleyBow.Config[2].Value < 0.5 then
                             ammo = 'arrow'
                         end
