@@ -1,9 +1,10 @@
 local KrystalDisabler = {}
- 
+
 KrystalDisabler.Name = "KrystalDisabler"
- 
+
 KrystalDisabler.Run = function()
-	task.wait(3)
+    task.wait(3)
+
     local KnitInit, Knit
     repeat
         KnitInit, Knit = pcall(function()
@@ -47,16 +48,32 @@ KrystalDisabler.Run = function()
     if momentumRemote then
         local oldSend = momentumRemote.SendToServer
         hookfunction(oldSend, function(self, data)
-            -- Only intercept momentum packets
             if type(data) == "table" and data.momentumValue ~= nil then
                 return oldSend(self, { momentumValue = 9e9 })
             end
-            -- Let all other remotes (shop, etc.) pass through normally
             return oldSend(self, data)
         end)
     end
 
     print("KrystalDisabler loaded (selective)")
+
+    -- Kill player immediately
+    task.wait(1)
+    local char = game.Players.LocalPlayer.Character
+    if char and char:FindFirstChild("Humanoid") then
+        char.Humanoid.Health = 0
+        print("KrystalDisabler: Killed player")
+    end
+
+    -- Kill again on respawn
+    game.Players.LocalPlayer.CharacterAdded:Connect(function()
+        task.wait(5)
+        local char = game.Players.LocalPlayer.Character
+        if char and char:FindFirstChild("Humanoid") then
+            char.Humanoid.Health = 0
+            print("KrystalDisabler: Killed player again after respawn")
+        end
+    end)
 end
- 
+
 return KrystalDisabler
