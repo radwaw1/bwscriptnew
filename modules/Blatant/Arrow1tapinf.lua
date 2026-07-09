@@ -7,7 +7,7 @@ local projectileRemote = {InvokeServer = function() end}
 local FireDelays = {}
 
 task.spawn(function()
-    projectileRemote = game:GetService("ReplicatedStorage").rbxts_include.node_modules["@rbxts"].net.out._NetManaged.FireProjectile.instance
+    projectileRemote = game:GetService("ReplicatedStorage").rbxts_include.node_modules["@rbxts"].net.out._NetManaged.ProjectileFire
 end)
 
 ProjectileAura.Config = {
