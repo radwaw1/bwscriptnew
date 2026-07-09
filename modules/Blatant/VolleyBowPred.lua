@@ -53,7 +53,7 @@ VolleyBow.Run = function()
                 if root and bow then
                     local selfroot = lplr.Character and lplr.Character.PrimaryPart
                     if selfroot then
-                        local ammo = 'meteor_shower'
+                        local ammo = 'blackhole_bomb'
                         if VolleyBow.Config[2].Value < 0.5 then
                             ammo = 'arrow'
                         end
