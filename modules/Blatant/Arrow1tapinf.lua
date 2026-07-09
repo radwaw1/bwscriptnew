@@ -1,29 +1,28 @@
-local ProjectileAuraOP = {}
+local ProjectileAura = {}
 
-ProjectileAuraOP.Name = "ProjectileAuraOP"
-ProjectileAuraOP.Enabled = false
+ProjectileAura.Name = "ProjectileAura"
+ProjectileAura.Enabled = false
 
 local projectileRemote = {InvokeServer = function() end}
 local FireDelays = {}
 
 task.spawn(function()
-    local remotes = game:GetService("ReplicatedStorage").rbxts_include.node_modules["@rbxts"].net.out._NetManaged
-    projectileRemote = remotes.FireProjectile or remotes.ProjectileFire
+    projectileRemote = game:GetService("ReplicatedStorage").rbxts_include.node_modules["@rbxts"].net.out._NetManaged.FireProjectile.instance
 end)
 
-ProjectileAuraOP.Config = {
+ProjectileAura.Config = {
     { Name = "Range", Type = "Slider", Min = 1, Max = 50, Default = 50, Value = 50, Suffix = " studs" },
     { Name = "InstaKill", Type = "Slider", Min = 0, Max = 1, Default = 0, Value = 0, Suffix = "" }
 }
 
-ProjectileAuraOP.Run = function()
-    ProjectileAuraOP.Enabled = not ProjectileAuraOP.Enabled
+ProjectileAura.Run = function()
+    ProjectileAura.Enabled = not ProjectileAura.Enabled
 
-    if ProjectileAuraOP.Enabled then
-        print("✅ ProjectileAuraOP Enabled")
+    if ProjectileAura.Enabled then
+        print("✅ ProjectileAura Enabled")
         
         task.spawn(function()
-            while ProjectileAuraOP.Enabled do
+            while ProjectileAura.Enabled do
                 local char = game.Players.LocalPlayer.Character
                 if char and char:FindFirstChild("HumanoidRootPart") then
                     local pos = char.HumanoidRootPart.Position
@@ -35,12 +34,12 @@ ProjectileAuraOP.Run = function()
                         if not targetChar or not targetChar:FindFirstChild("HumanoidRootPart") then continue end
 
                         local distance = (targetChar.HumanoidRootPart.Position - pos).Magnitude
-                        if distance > ProjectileAuraOP.Config[1].Value then continue end
+                        if distance > ProjectileAura.Config[1].Value then continue end
 
                         for _, item in ipairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
                             if item:IsA("Tool") then
                                 local projType = "arrow"
-                                local instaKill = ProjectileAuraOP.Config[2].Value > 0.5
+                                local instaKill = ProjectileAura.Config[2].Value > 0.5
                                 if instaKill and item.Name:find("bow") then
                                     projType = "volley_arrow"
                                 end
@@ -61,8 +60,8 @@ ProjectileAuraOP.Run = function()
         end)
 
     else
-        print("❌ ProjectileAuraOP Disabled")
+        print("❌ ProjectileAura Disabled")
     end
 end
 
-return ProjectileAuraOP
+return ProjectileAura
