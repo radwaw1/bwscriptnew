@@ -1,70 +1,62 @@
-local VolleyBow = {}
+local ProjectileAura = {}
 
-VolleyBow.Name = "VolleyBow"
-VolleyBow.Enabled = false
+ProjectileAura.Name = "ProjectileAura"
+ProjectileAura.Enabled = false
 
-local replicated = game:GetService("ReplicatedStorage")
-local players = game:GetService("Players")
-local http = game:GetService("HttpService")
-local lplr = players.LocalPlayer
+local projectileRemote = {InvokeServer = function() end}
 
-local connection = nil
+task.spawn(function()
+    projectileRemote = game:GetService("ReplicatedStorage").rbxts_include.node_modules["@rbxts"].net.out._NetManaged.FireProjectile.instance
+end)
 
-VolleyBow.Config = {
-    { Name = "Keybind", Type = "Keybind", Value = Enum.KeyCode.RightControl }
+local FireDelays = {}
+
+ProjectileAura.Config = {
+    { Name = "Range", Type = "Slider", Min = 1, Max = 50, Default = 50, Value = 50, Suffix = " studs" },
+    { Name = "InstaKill", Type = "Slider", Min = 0, Max = 1, Default = 1, Value = 1, Suffix = "" }
 }
 
-local function getClosestRoot()
-    local distance, target = math.huge
-    for _, v in players:GetPlayers() do
-        if v ~= lplr and v.Team ~= lplr.Team then
-            local selfroot = lplr.Character and lplr.Character.PrimaryPart
-            local root = v.Character and v.Character.PrimaryPart
-            local compare = selfroot and root and (selfroot.Position - root.Position).Magnitude
-            if compare and distance > compare then
-                distance = compare
-                target = root
-            end
-        end
-    end
-    return target
-end
+ProjectileAura.Run = function()
+    ProjectileAura.Enabled = not ProjectileAura.Enabled
 
-local function getBow()
-    for _, v in replicated.Inventories[lplr.Name]:GetChildren() do
-        if v.Name:find('_bow') then
-            return v
-        end
-    end
-end
-
-VolleyBow.Run = function()
-    VolleyBow.Enabled = not VolleyBow.Enabled
-
-    if VolleyBow.Enabled then
-        print("✅ VolleyBow Enabled")
+    if ProjectileAura.Enabled then
+        print("✅ ProjectileAura Enabled")
         
-        connection = task.spawn(function()
-            while VolleyBow.Enabled do
-                local root = getClosestRoot()
-                local bow = getBow()
-                if root and bow then
-                    local selfroot = lplr.Character and lplr.Character.PrimaryPart
-                    if selfroot then
-                        replicated.rbxts_include.node_modules['@rbxts'].net.out._NetManaged.ProjectileFire:InvokeServer(
-                            bow,
-                            'volley_arrow',
-                            'arrow',
-                            selfroot.Position,
-                            selfroot.Position,
-                            (root.Position - selfroot.Position).Unit * (200 + (root.Position - selfroot.Position).Magnitude),
-                            http:GenerateGUID(false),
-                            {
-                                shotId = http:GenerateGUID(false),
-                                drawDurationSec = 9e9
-                            },
-                            workspace:GetServerTimeNow()
-                        )
+        task.spawn(function()
+            while ProjectileAura.Enabled do
+                local char = game.Players.LocalPlayer.Character
+                if char and char:FindFirstChild("HumanoidRootPart") then
+                    local root = char.HumanoidRootPart
+                    local pos = root.Position
+
+                    -- Find targets
+                    for _, plr in ipairs(game:GetService("Players"):GetPlayers()) do
+                        if plr == game.Players.LocalPlayer then continue end
+
+                        local targetChar = plr.Character
+                        if not targetChar or not targetChar:FindFirstChild("HumanoidRootPart") then continue end
+
+                        local distance = (targetChar.HumanoidRootPart.Position - pos).Magnitude
+                        if distance > ProjectileAura.Config[1].Value then continue end
+
+                        -- Get projectiles
+                        for _, item in ipairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                            if item:IsA("Tool") then
+                                local projType = "arrow"
+                                local instaKill = ProjectileAura.Config[2].Value > 0.5
+                                if instaKill and item.Name:find("bow") then
+                                    projType = "volley_arrow"
+                                end
+
+                                local meta = {} -- simplified
+                                local dir = (targetChar.HumanoidRootPart.Position - pos).Unit
+                                local id = game:GetService("HttpService"):GenerateGUID(true)
+
+                                pcall(function()
+                                    projectileRemote:InvokeServer(item, projType, "arrow", pos, pos, dir * 100, id, {}, workspace:GetServerTimeNow())
+                                end)
+                            end
+                        end
                     end
                 end
 
@@ -73,12 +65,8 @@ VolleyBow.Run = function()
         end)
 
     else
-        print("❌ VolleyBow Disabled")
-        if connection then
-            connection:Disconnect()
-            connection = nil
-        end
+        print("❌ ProjectileAura Disabled")
     end
 end
 
-return VolleyBow
+return ProjectileAura
