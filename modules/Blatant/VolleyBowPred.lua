@@ -1,7 +1,7 @@
-local VolleyBowPred = {}
+local VolleyBow = {}
 
-VolleyBowPred.Name = "VolleyBowPred"
-VolleyBowPred.Enabled = false
+VolleyBow.Name = "VolleyBowOP"
+VolleyBow.Enabled = false
 
 local replicated = game:GetService("ReplicatedStorage")
 local players = game:GetService("Players")
@@ -9,13 +9,10 @@ local http = game:GetService("HttpService")
 local lplr = players.LocalPlayer
 local connection = nil
 
-VolleyBowPred.Config = {
+VolleyBow.Config = {
     { Name = "Keybind", Type = "Keybind", Value = Enum.KeyCode.RightControl },
     { Name = "InstaKill", Type = "Slider", Min = 0, Max = 1, Default = 1, Value = 1, Suffix = "" }
 }
-
-local rayCheck = RaycastParams.new()
-rayCheck.FilterType = Enum.RaycastFilterType.Include
 
 local function getClosestRoot()
     local distance, target = math.huge
@@ -44,63 +41,44 @@ local function getBow()
     end
 end
 
-VolleyBowPred.Run = function()
-    VolleyBowPred.Enabled = not VolleyBowPred.Enabled
-    if VolleyBowPred.Enabled then
-        print("✅ VolleyBowPred Enabled")
+VolleyBow.Run = function()
+    VolleyBow.Enabled = not VolleyBow.Enabled
+    if VolleyBow.Enabled then
+        print("✅ VolleyBow Enabled")
        
         connection = task.spawn(function()
-            while VolleyBowPred.Enabled do
+            while VolleyBow.Enabled do
                 local root = getClosestRoot()
                 local bow = getBow()
                 if root and bow then
                     local selfroot = lplr.Character and lplr.Character.PrimaryPart
                     if selfroot then
-                        local ammo = 'volley_arrow'
-                        if VolleyBowPred.Config[2].Value < 0.5 then
+                        local ammo = 'meteor_shower'
+                        if VolleyBow.Config[2].Value < 0.5 then
                             ammo = 'arrow'
                         end
 
-                        rayCheck.FilterDescendantsInstances = {workspace.Map}
-                        local meta = {} -- add your meta if needed
-                        local projSpeed = 100
-                        local gravity = 196.2
-
-                        local calc = prediction.SolveTrajectory(
+                        replicated.rbxts_include.node_modules['@rbxts'].net.out._NetManaged.ProjectileFire:InvokeServer(
+                            bow,
+                            ammo,
+                            'arrow',
                             selfroot.Position,
-                            projSpeed,
-                            gravity,
-                            root.Position,
-                            root.Velocity,
-                            workspace.Gravity,
-                            nil,
-                            nil,
-                            rayCheck
+                            selfroot.Position,
+                            (root.Position - selfroot.Position).Unit * (200 + (root.Position - selfroot.Position).Magnitude),
+                            http:GenerateGUID(false),
+                            {
+                                shotId = http:GenerateGUID(false),
+                                drawDurationSec = 9e9
+                            },
+                            workspace:GetServerTimeNow()
                         )
-
-                        if calc then
-                            replicated.rbxts_include.node_modules['@rbxts'].net.out._NetManaged.ProjectileFire:InvokeServer(
-                                bow,
-                                ammo,
-                                'arrow',
-                                selfroot.Position,
-                                selfroot.Position,
-                                (calc - selfroot.Position).Unit * projSpeed,
-                                http:GenerateGUID(false),
-                                {
-                                    shotId = http:GenerateGUID(false),
-                                    drawDurationSec = 9e9
-                                },
-                                workspace:GetServerTimeNow()
-                            )
-                        end
                     end
                 end
                 task.wait(0.01)
             end
         end)
     else
-        print("❌ VolleyBowPred Disabled")
+        print("❌ VolleyBow Disabled")
         if connection then
             connection:Disconnect()
             connection = nil
@@ -108,4 +86,4 @@ VolleyBowPred.Run = function()
     end
 end
 
-return VolleyBowPred
+return VolleyBow
