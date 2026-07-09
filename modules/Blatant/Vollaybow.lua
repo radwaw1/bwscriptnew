@@ -35,7 +35,7 @@ end
 
 local function getBow()
     for _, v in replicated.Inventories[lplr.Name]:GetChildren() do
-        if v.Name:find('_bow') then
+        if v.Name:find('_bow') or v.Name:find('_crossbow') or v.Name:find('_headhunter') then
             return v
         end
     end
