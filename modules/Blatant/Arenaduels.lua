@@ -1,6 +1,6 @@
 local VolleyBow = {}
 
-VolleyBow.Name = "VolleyBow"
+VolleyBow.Name = "Arenaduels"
 VolleyBow.Enabled = false
 
 local replicated = game:GetService("ReplicatedStorage")
