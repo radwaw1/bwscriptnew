@@ -1,2 +1,3 @@
 # bwscriptnew
 bwsscript
+hi
