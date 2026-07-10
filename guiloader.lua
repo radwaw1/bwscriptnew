@@ -1,4 +1,4 @@
--- ModuleHub with Categories + RightShift Toggle
+-- ModuleHub with Categories + RightShift Toggle (Fixed Loading)
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local HttpService = game:GetService("HttpService")
@@ -14,11 +14,10 @@ local GITHUB_FOLDER = "modules"
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "ModuleHub"
 screenGui.ResetOnSpawn = false
-screenGui.DisplayOrder = 100
-screenGui.Enabled = true
-screenGui.Parent = playerGui
 screenGui.DisplayOrder = 999999
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+screenGui.Enabled = true
+screenGui.Parent = playerGui
 
 local mainFrame = Instance.new("Frame")
 mainFrame.Size = UDim2.new(0, 650, 0, 480)
@@ -55,7 +54,7 @@ local selfDestructBtn = Instance.new("TextButton")
 selfDestructBtn.Size = UDim2.new(0,85,0,24)
 selfDestructBtn.Position = UDim2.new(1,-92,0.5,-12)
 selfDestructBtn.BackgroundColor3 = Color3.fromRGB(170,30,30)
-selfDestructBtn.Text = "Uninject"
+selfDestructBtn.Text = "Self Destruct"
 selfDestructBtn.TextColor3 = Color3.fromRGB(255,255,255)
 selfDestructBtn.Font = Enum.Font.Gotham
 selfDestructBtn.TextSize = 11
@@ -451,6 +450,8 @@ local function refreshModules()
                 end
             end
         end
+    else
+        print("Failed to load modules from " .. currentCategory)
     end
 end
 
