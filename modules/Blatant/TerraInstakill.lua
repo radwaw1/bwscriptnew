@@ -60,6 +60,7 @@ TerraInstakill.Run = function()
                         tryBlockKick:FireServer({
                             projectileRefId = "1KSXT97P",
                             direction = dir,
+                            blockType = "grass",
                             originPosition = player.Character.HumanoidRootPart.Position
                         })
                     end)
@@ -74,7 +75,7 @@ TerraInstakill.Run = function()
                     end
                 end
 
-                task.wait(0.1)
+                task.wait(0.3) -- Slower to avoid error
             end
         end)
 
