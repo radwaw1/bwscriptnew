@@ -1,6 +1,6 @@
 local TerraInstakill = {}
 
-TerraInstakill.Name = "Terra Instakill"
+TerraInstakill.Name = "TerraInstakill"
 TerraInstakill.Enabled = false
 
 local useAbility = game:GetService("ReplicatedStorage")
@@ -75,7 +75,7 @@ TerraInstakill.Run = function()
                     end
                 end
 
-                task.wait(0.05)
+                task.wait(0.1)
             end
         end)
 
