@@ -1,6 +1,6 @@
 local TerraInstakill = {}
 
-TerraInstakill.Name = "TerraInstakill"
+TerraInstakill.Name = "Terra Instakill"
 TerraInstakill.Enabled = false
 
 local useAbility = game:GetService("ReplicatedStorage")
@@ -13,10 +13,30 @@ local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
 local connection = nil
+local kickCount = 0
 
 TerraInstakill.Config = {
     { Name = "Keybind", Type = "Keybind", Value = Enum.KeyCode.RightControl }
 }
+
+local function getClosestTarget()
+    local closest, distance = nil, math.huge
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr == player then continue end
+        if plr.Team == player.Team then continue end
+
+        local char = plr.Character
+        if not char or not char:FindFirstChild("HumanoidRootPart") then continue end
+        if char:FindFirstChild("Humanoid") and char.Humanoid.Health <= 0 then continue end
+
+        local dist = (char.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
+        if dist < distance then
+            distance = dist
+            closest = char.HumanoidRootPart
+        end
+    end
+    return closest
+end
 
 TerraInstakill.Run = function()
     TerraInstakill.Enabled = not TerraInstakill.Enabled
@@ -26,10 +46,9 @@ TerraInstakill.Run = function()
         
         connection = task.spawn(function()
             while TerraInstakill.Enabled do
-                local char = player.Character
-                if char and char:FindFirstChild("HumanoidRootPart") then
-                    local root = char.HumanoidRootPart
-                    local dir = root.CFrame.LookVector
+                local target = getClosestTarget()
+                if target then
+                    local dir = (target.Position - player.Character.HumanoidRootPart.Position).Unit
 
                     -- Fire ability
                     pcall(function()
@@ -42,12 +61,21 @@ TerraInstakill.Run = function()
                             projectileRefId = "1KSXT97P",
                             direction = dir,
                             blockType = "grass",
-                            originPosition = root.Position
+                            originPosition = player.Character.HumanoidRootPart.Position
                         })
                     end)
+
+                    kickCount = kickCount + 1
+
+                    -- Every 5 kicks, fire BLOCK_STOMP
+                    if kickCount % 5 == 0 then
+                        pcall(function()
+                            useAbility:FireServer("BLOCK_STOMP")
+                        end)
+                    end
                 end
 
-                task.wait(0.1)
+                task.wait(0.05)
             end
         end)
 
@@ -57,6 +85,7 @@ TerraInstakill.Run = function()
             connection:Disconnect()
             connection = nil
         end
+        kickCount = 0
     end
 end
 
