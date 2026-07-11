@@ -1,4 +1,4 @@
--- ModuleHub with Categories + RightShift Toggle + Save/Load Config
+-- ModuleHub with Categories + RightShift Toggle + Full Config Save/Load
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local HttpService = game:GetService("HttpService")
@@ -134,8 +134,12 @@ local openConfigWindows = {}
 local function saveConfig()
     local config = {}
     for name, mod in pairs(modules) do
-        if mod.enabled then
-            config[name] = true
+        config[name] = {
+            enabled = mod.enabled,
+            config = {}
+        }
+        for _, setting in ipairs(mod.moduleData.Config or {}) do
+            config[name].config[setting.Name] = setting.Value
         end
     end
     pcall(function()
@@ -149,11 +153,21 @@ local function loadConfig()
             return HttpService:JSONDecode(readfile(saveFile))
         end)
         if success then
-            for name, enabled in pairs(config) do
-                if modules[name] and enabled then
-                    pcall(modules[name].moduleData.Run)
-                    modules[name].enabled = true
-                    updateButtonVisual(modules[name].button, true)
+            for name, data in pairs(config) do
+                if modules[name] then
+                    if data.enabled then
+                        pcall(modules[name].moduleData.Run)
+                        modules[name].enabled = true
+                        updateButtonVisual(modules[name].button, true)
+                    end
+                    -- Load settings
+                    for settingName, value in pairs(data.config or {}) do
+                        for _, setting in ipairs(modules[name].moduleData.Config or {}) do
+                            if setting.Name == settingName then
+                                setting.Value = value
+                            end
+                        end
+                    end
                 end
             end
         end
@@ -280,6 +294,7 @@ local function createConfigWindow(moduleData)
             btn.MouseButton1Click:Connect(function()
                 setting.Value = not setting.Value
                 btn.BackgroundColor3 = setting.Value and Color3.fromRGB(40,120,60) or Color3.fromRGB(70,70,80)
+                saveConfig()
             end)
 
         elseif setting.Type == "Slider" then
@@ -334,6 +349,7 @@ local function createConfigWindow(moduleData)
                     local percent = math.clamp((mouseX - bgX) / bgWidth, 0, 1)
                     setting.Value = math.floor(setting.Min + percent * (setting.Max - setting.Min))
                     updateFill()
+                    saveConfig()
                 end
             end)
 
@@ -406,6 +422,7 @@ local function createConfigWindow(moduleData)
                             dropdownList:Destroy()
                             dropdownList = nil
                         end
+                        saveConfig()
                     end)
                 end
             end)
@@ -491,8 +508,12 @@ end
 local function saveConfig()
     local config = {}
     for name, mod in pairs(modules) do
-        if mod.enabled then
-            config[name] = true
+        config[name] = {
+            enabled = mod.enabled,
+            config = {}
+        }
+        for _, setting in ipairs(mod.moduleData.Config or {}) do
+            config[name].config[setting.Name] = setting.Value
         end
     end
     pcall(function()
@@ -506,11 +527,21 @@ local function loadConfig()
             return HttpService:JSONDecode(readfile(saveFile))
         end)
         if success then
-            for name, enabled in pairs(config) do
-                if modules[name] and enabled then
-                    pcall(modules[name].moduleData.Run)
-                    modules[name].enabled = true
-                    updateButtonVisual(modules[name].button, true)
+            for name, data in pairs(config) do
+                if modules[name] then
+                    if data.enabled then
+                        pcall(modules[name].moduleData.Run)
+                        modules[name].enabled = true
+                        updateButtonVisual(modules[name].button, true)
+                    end
+                    -- Load settings
+                    for settingName, value in pairs(data.config or {}) do
+                        for _, setting in ipairs(modules[name].moduleData.Config or {}) do
+                            if setting.Name == settingName then
+                                setting.Value = value
+                            end
+                        end
+                    end
                 end
             end
         end
