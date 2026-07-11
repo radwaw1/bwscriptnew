@@ -60,7 +60,6 @@ TerraInstakill.Run = function()
                         tryBlockKick:FireServer({
                             projectileRefId = "1KSXT97P",
                             direction = dir,
-                            blockType = "grass",
                             originPosition = player.Character.HumanoidRootPart.Position
                         })
                     end)
