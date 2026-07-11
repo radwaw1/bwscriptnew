@@ -136,10 +136,10 @@ local function saveConfig()
     for name, mod in pairs(modules) do
         config[name] = {
             enabled = mod.enabled,
-            config = {}
+            settings = {}
         }
         for _, setting in ipairs(mod.moduleData.Config or {}) do
-            config[name].config[setting.Name] = setting.Value
+            config[name].settings[setting.Name] = setting.Value
         end
     end
     pcall(function()
@@ -160,12 +160,9 @@ local function loadConfig()
                         modules[name].enabled = true
                         updateButtonVisual(modules[name].button, true)
                     end
-                    -- Load settings
-                    for settingName, value in pairs(data.config or {}) do
-                        for _, setting in ipairs(modules[name].moduleData.Config or {}) do
-                            if setting.Name == settingName then
-                                setting.Value = value
-                            end
+                    for _, setting in ipairs(modules[name].moduleData.Config or {}) do
+                        if data.settings and data.settings[setting.Name] ~= nil then
+                            setting.Value = data.settings[setting.Name]
                         end
                     end
                 end
@@ -510,10 +507,10 @@ local function saveConfig()
     for name, mod in pairs(modules) do
         config[name] = {
             enabled = mod.enabled,
-            config = {}
+            settings = {}
         }
         for _, setting in ipairs(mod.moduleData.Config or {}) do
-            config[name].config[setting.Name] = setting.Value
+            config[name].settings[setting.Name] = setting.Value
         end
     end
     pcall(function()
@@ -534,12 +531,9 @@ local function loadConfig()
                         modules[name].enabled = true
                         updateButtonVisual(modules[name].button, true)
                     end
-                    -- Load settings
-                    for settingName, value in pairs(data.config or {}) do
-                        for _, setting in ipairs(modules[name].moduleData.Config or {}) do
-                            if setting.Name == settingName then
-                                setting.Value = value
-                            end
+                    for _, setting in ipairs(modules[name].moduleData.Config or {}) do
+                        if data.settings and data.settings[setting.Name] ~= nil then
+                            setting.Value = data.settings[setting.Name]
                         end
                     end
                 end
