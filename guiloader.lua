@@ -1,4 +1,4 @@
--- ModuleHub with Categories + RightShift Toggle (Fixed Loading)
+-- ModuleHub with Categories + RightShift Toggle + Save/Load Config
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local HttpService = game:GetService("HttpService")
@@ -10,6 +10,8 @@ local REPO_USER = "radwaw1"
 local REPO_NAME = "bwscriptnew"
 local REPO_BRANCH = "main"
 local GITHUB_FOLDER = "modules"
+
+local saveFile = "ModuleHub_Config.json"
 
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "ModuleHub"
@@ -129,6 +131,35 @@ contentLayout.Parent = mainContent
 local modules = {}
 local openConfigWindows = {}
 
+local function saveConfig()
+    local config = {}
+    for name, mod in pairs(modules) do
+        if mod.enabled then
+            config[name] = true
+        end
+    end
+    pcall(function()
+        writefile(saveFile, HttpService:JSONEncode(config))
+    end)
+end
+
+local function loadConfig()
+    if isfile(saveFile) then
+        local success, config = pcall(function()
+            return HttpService:JSONDecode(readfile(saveFile))
+        end)
+        if success then
+            for name, enabled in pairs(config) do
+                if modules[name] and enabled then
+                    pcall(modules[name].moduleData.Run)
+                    modules[name].enabled = true
+                    updateButtonVisual(modules[name].button, true)
+                end
+            end
+        end
+    end
+end
+
 local function makeDraggable(frame, dragBar)
     local dragging = false
     local dragStart = nil
@@ -178,6 +209,7 @@ UserInputService.InputBegan:Connect(function(input, gp)
             pcall(mod.moduleData.Run)
             mod.enabled = not mod.enabled
             updateButtonVisual(mod.button, mod.enabled)
+            saveConfig()
         end
     end
 end)
@@ -419,6 +451,7 @@ local function createButtonForModule(moduleData)
         pcall(mod.moduleData.Run)
         mod.enabled = not mod.enabled
         updateButtonVisual(button, mod.enabled)
+        saveConfig()
     end)
 
     settingsBtn.MouseButton1Click:Connect(function()
@@ -455,5 +488,35 @@ local function refreshModules()
     end
 end
 
+local function saveConfig()
+    local config = {}
+    for name, mod in pairs(modules) do
+        if mod.enabled then
+            config[name] = true
+        end
+    end
+    pcall(function()
+        writefile(saveFile, HttpService:JSONEncode(config))
+    end)
+end
+
+local function loadConfig()
+    if isfile(saveFile) then
+        local success, config = pcall(function()
+            return HttpService:JSONDecode(readfile(saveFile))
+        end)
+        if success then
+            for name, enabled in pairs(config) do
+                if modules[name] and enabled then
+                    pcall(modules[name].moduleData.Run)
+                    modules[name].enabled = true
+                    updateButtonVisual(modules[name].button, true)
+                end
+            end
+        end
+    end
+end
+
 reloadButton.MouseButton1Click:Connect(refreshModules)
 refreshModules()
+loadConfig()  -- Load saved config
