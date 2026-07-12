@@ -1261,7 +1261,7 @@ local function ZJVXXL_fake_script() -- Misc_2.LocalScript
 end
 coroutine.wrap(ZJVXXL_fake_script)()
 
--- GITHUB LOADING CODE (Fixed Duplicates + Toggle Colors + Basic Config)
+-- GITHUB LOADING CODE (Fixed Overlapping + Config Button)
 local REPO_USER = "radwaw1"
 local REPO_NAME = "bwscriptnew"
 local REPO_BRANCH = "main"
@@ -1282,9 +1282,9 @@ local categoryFrames = {
 
 local function updateButtonVisual(button, enabled)
     if enabled then
-        button.BackgroundColor3 = Color3.fromRGB(0, 170, 0)   -- Green when ON
+        button.BackgroundColor3 = Color3.fromRGB(0, 170, 0)   -- Green
     else
-        button.BackgroundColor3 = Color3.fromRGB(170, 0, 0)   -- Red when OFF
+        button.BackgroundColor3 = Color3.fromRGB(170, 0, 0)   -- Red
     end
 end
 
@@ -1328,7 +1328,7 @@ local function refreshModules(category)
     if not scrollingFrame then return end
 
     for _, child in ipairs(scrollingFrame:GetChildren()) do
-        if child:IsA("TextButton") then child:Destroy() end
+        if child:IsA("TextButton") or child:IsA("Frame") then child:Destroy() end
     end
 
     local url = string.format("https://api.github.com/repos/%s/%s/contents/%s/%s?ref=%s", REPO_USER, REPO_NAME, GITHUB_FOLDER, category, REPO_BRANCH)
@@ -1345,31 +1345,40 @@ local function refreshModules(category)
                     if func then
                         local s, mod = pcall(func)
                         if s and mod and mod.Run then
+                            local mainFrame = Instance.new("Frame")
+                            mainFrame.Size = UDim2.new(1, -10, 0, 50)
+                            mainFrame.BackgroundTransparency = 1
+                            mainFrame.Parent = scrollingFrame
+
+                            -- Toggle Button (shorter)
                             local button = Instance.new("TextButton")
-                            button.Size = UDim2.new(1, -10, 0, 40)
+                            button.Size = UDim2.new(0.75, 0, 1, 0)
                             button.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
                             button.Text = mod.Name or file.name
                             button.TextColor3 = Color3.fromRGB(255,255,255)
-                            button.TextSize = 16
-                            button.Parent = scrollingFrame
+                            button.TextSize = 15
+                            button.Parent = mainFrame
 
                             button.MouseButton1Click:Connect(function()
                                 pcall(mod.Run)
                                 mod.enabled = not (mod.enabled or false)
                                 updateButtonVisual(button, mod.enabled)
+                                saveConfig()
                             end)
+
+                            -- Config Button
+                            local configBtn = Instance.new("TextButton")
+                            configBtn.Size = UDim2.new(0.23, 0, 1, 0)
+                            configBtn.Position = UDim2.new(0.77, 0, 0, 0)
+                            configBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+                            configBtn.Text = "Config"
+                            configBtn.TextColor3 = Color3.fromRGB(255,255,255)
+                            configBtn.TextSize = 14
+                            configBtn.Parent = mainFrame
 
                             modules[mod.Name or file.name] = {moduleData = mod, enabled = false, button = button}
 
-                            -- Basic config dropdown (if module has Config)
-                            if mod.Config and #mod.Config > 0 then
-                                local configLabel = Instance.new("TextLabel")
-                                configLabel.Size = UDim2.new(1, -10, 0, 20)
-                                configLabel.BackgroundTransparency = 1
-                                configLabel.Text = "Config:"
-                                configLabel.TextColor3 = Color3.fromRGB(200,200,200)
-                                configLabel.Parent = scrollingFrame
-                            end
+                            updateButtonVisual(button, false)
                         end
                     end
                 end
@@ -1378,7 +1387,7 @@ local function refreshModules(category)
     end
 end
 
--- Refresh every category
+-- Load all categories
 for cat, _ in pairs(categoryFrames) do
     refreshModules(cat)
 end
