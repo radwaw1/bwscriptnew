@@ -1261,7 +1261,7 @@ local function ZJVXXL_fake_script() -- Misc_2.LocalScript
 end
 coroutine.wrap(ZJVXXL_fake_script)()
 
--- GITHUB LOADING CODE (Medium Executor Compatible)
+-- GITHUB LOADING CODE (Fixed Duplicates + Toggle Colors + Basic Config)
 local REPO_USER = "radwaw1"
 local REPO_NAME = "bwscriptnew"
 local REPO_BRANCH = "main"
@@ -1279,6 +1279,14 @@ local categoryFrames = {
     Kits = Modules_7,
     Misc = Modules_8
 }
+
+local function updateButtonVisual(button, enabled)
+    if enabled then
+        button.BackgroundColor3 = Color3.fromRGB(0, 170, 0)   -- Green when ON
+    else
+        button.BackgroundColor3 = Color3.fromRGB(170, 0, 0)   -- Red when OFF
+    end
+end
 
 local function saveConfig()
     local config = {}
@@ -1302,6 +1310,7 @@ local function loadConfig()
                     if cfg.enabled then
                         pcall(modules[name].moduleData.Run)
                         modules[name].enabled = true
+                        updateButtonVisual(modules[name].button, true)
                     end
                     for _, setting in ipairs(modules[name].moduleData.Config or {}) do
                         if cfg.settings and cfg.settings[setting.Name] ~= nil then
@@ -1338,7 +1347,7 @@ local function refreshModules(category)
                         if s and mod and mod.Run then
                             local button = Instance.new("TextButton")
                             button.Size = UDim2.new(1, -10, 0, 40)
-                            button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+                            button.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
                             button.Text = mod.Name or file.name
                             button.TextColor3 = Color3.fromRGB(255,255,255)
                             button.TextSize = 16
@@ -1346,20 +1355,30 @@ local function refreshModules(category)
 
                             button.MouseButton1Click:Connect(function()
                                 pcall(mod.Run)
+                                mod.enabled = not (mod.enabled or false)
+                                updateButtonVisual(button, mod.enabled)
                             end)
 
                             modules[mod.Name or file.name] = {moduleData = mod, enabled = false, button = button}
+
+                            -- Basic config dropdown (if module has Config)
+                            if mod.Config and #mod.Config > 0 then
+                                local configLabel = Instance.new("TextLabel")
+                                configLabel.Size = UDim2.new(1, -10, 0, 20)
+                                configLabel.BackgroundTransparency = 1
+                                configLabel.Text = "Config:"
+                                configLabel.TextColor3 = Color3.fromRGB(200,200,200)
+                                configLabel.Parent = scrollingFrame
+                            end
                         end
                     end
                 end
             end
         end
-    else
-        print("Failed to fetch modules for " .. category)
     end
 end
 
--- Load all categories
+-- Refresh every category
 for cat, _ in pairs(categoryFrames) do
     refreshModules(cat)
 end
