@@ -1261,7 +1261,7 @@ local function ZJVXXL_fake_script() -- Misc_2.LocalScript
 end
 coroutine.wrap(ZJVXXL_fake_script)()
 
--- GITHUB LOADING CODE (Fixed Save + Proper Dropdown Expansion)
+-- GITHUB LOADING CODE (Config Drops Down + Pushes Buttons)
 local REPO_USER = "radwaw1"
 local REPO_NAME = "bwscriptnew"
 local REPO_BRANCH = "main"
@@ -1280,6 +1280,7 @@ local categoryFrames = {
     Misc = Modules_8
 }
 
+-- UIListLayout for proper stacking
 for _, frame in pairs(categoryFrames) do
     local list = Instance.new("UIListLayout")
     list.SortOrder = Enum.SortOrder.LayoutOrder
@@ -1328,9 +1329,12 @@ end
 
 local function createConfigUI(moduleFrame, modData)
     local dropdown = Instance.new("Frame")
+    dropdown.Name = "ConfigDropdown"
     dropdown.Size = UDim2.new(1, 0, 0, 0)
     dropdown.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    dropdown.BorderSizePixel = 0
     dropdown.Visible = false
+    dropdown.LayoutOrder = 1
     dropdown.Parent = moduleFrame
 
     local list = Instance.new("UIListLayout")
@@ -1353,20 +1357,21 @@ local function createConfigUI(moduleFrame, modData)
             label.TextSize = 14
             label.Parent = row
 
-            local btn = Instance.new("TextButton")
-            btn.Size = UDim2.new(0.45, 0, 1, 0)
-            btn.Position = UDim2.new(0.55, 0, 0, 0)
-            btn.BackgroundColor3 = Color3.fromRGB(70,70,70)
-            btn.Text = tostring(setting.Value)
-            btn.TextColor3 = Color3.fromRGB(255,255,255)
-            btn.Parent = row
+            local sliderBtn = Instance.new("TextButton")
+            sliderBtn.Size = UDim2.new(0.45, 0, 1, 0)
+            sliderBtn.Position = UDim2.new(0.55, 0, 0, 0)
+            sliderBtn.BackgroundColor3 = Color3.fromRGB(70,70,70)
+            sliderBtn.Text = tostring(setting.Value)
+            sliderBtn.TextColor3 = Color3.fromRGB(255,255,255)
+            sliderBtn.Parent = row
 
-            btn.MouseButton1Click:Connect(function()
-                local val = tonumber(prompt("Enter value ("..(setting.Min or 0).."-"..(setting.Max or 100)..")", tostring(setting.Value)))
+            sliderBtn.MouseButton1Click:Connect(function()
+                local input = prompt("New value for " .. setting.Name .. " ("..setting.Min.."-"..setting.Max..")", tostring(setting.Value))
+                local val = tonumber(input)
                 if val then
                     setting.Value = math.clamp(val, setting.Min or 0, setting.Max or 100)
                     label.Text = setting.Name .. ": " .. tostring(setting.Value)
-                    btn.Text = tostring(setting.Value)
+                    sliderBtn.Text = tostring(setting.Value)
                     saveConfig()
                 end
             end)
@@ -1401,6 +1406,7 @@ local function refreshModules(category)
                             local moduleFrame = Instance.new("Frame")
                             moduleFrame.Size = UDim2.new(1, -10, 0, 50)
                             moduleFrame.BackgroundTransparency = 1
+                            moduleFrame.LayoutOrder = #scrollingFrame:GetChildren() + 1
                             moduleFrame.Parent = scrollingFrame
 
                             local button = Instance.new("TextButton")
@@ -1430,8 +1436,11 @@ local function refreshModules(category)
 
                             configBtn.MouseButton1Click:Connect(function()
                                 dropdown.Visible = not dropdown.Visible
-                                local extraHeight = dropdown.Visible and dropdown.AbsoluteContentSize.Y + 10 or 0
-                                moduleFrame.Size = UDim2.new(1, -10, 0, 50 + extraHeight)
+                                if dropdown.Visible then
+                                    moduleFrame.Size = UDim2.new(1, -10, 0, 50 + dropdown.AbsoluteContentSize.Y + 10)
+                                else
+                                    moduleFrame.Size = UDim2.new(1, -10, 0, 50)
+                                end
                             end)
 
                             modules[mod.Name or file.name] = {moduleData = mod, enabled = false, button = button}
