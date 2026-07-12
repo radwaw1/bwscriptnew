@@ -1261,7 +1261,7 @@ local function ZJVXXL_fake_script() -- Misc_2.LocalScript
 end
 coroutine.wrap(ZJVXXL_fake_script)()
 
--- GITHUB LOADING CODE (Fixed Save + Working Config Dropdowns)
+-- GITHUB LOADING CODE (Config Drops Down + Pushes Buttons)
 local REPO_USER = "radwaw1"
 local REPO_NAME = "bwscriptnew"
 local REPO_BRANCH = "main"
@@ -1280,7 +1280,7 @@ local categoryFrames = {
     Misc = Modules_8
 }
 
--- Add UIListLayout
+-- UIListLayout for proper stacking
 for _, frame in pairs(categoryFrames) do
     local list = Instance.new("UIListLayout")
     list.SortOrder = Enum.SortOrder.LayoutOrder
@@ -1329,43 +1329,49 @@ end
 
 local function createConfigUI(moduleFrame, modData)
     local dropdown = Instance.new("Frame")
+    dropdown.Name = "ConfigDropdown"
     dropdown.Size = UDim2.new(1, 0, 0, 0)
-    dropdown.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    dropdown.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    dropdown.BorderSizePixel = 0
     dropdown.Visible = false
+    dropdown.LayoutOrder = 1
     dropdown.Parent = moduleFrame
 
     local list = Instance.new("UIListLayout")
+    list.SortOrder = Enum.SortOrder.LayoutOrder
     list.Padding = UDim.new(0, 4)
     list.Parent = dropdown
 
     for _, setting in ipairs(modData.Config or {}) do
         if setting.Type == "Slider" then
-            local sliderFrame = Instance.new("Frame")
-            sliderFrame.Size = UDim2.new(1, 0, 0, 30)
-            sliderFrame.BackgroundTransparency = 1
-            sliderFrame.Parent = dropdown
+            local row = Instance.new("Frame")
+            row.Size = UDim2.new(1, 0, 0, 30)
+            row.BackgroundTransparency = 1
+            row.Parent = dropdown
 
             local label = Instance.new("TextLabel")
-            label.Size = UDim2.new(0.6, 0, 1, 0)
+            label.Size = UDim2.new(0.5, 0, 1, 0)
             label.BackgroundTransparency = 1
-            label.Text = setting.Name .. ": " .. setting.Value
+            label.Text = setting.Name .. ": " .. tostring(setting.Value)
             label.TextColor3 = Color3.fromRGB(255,255,255)
             label.TextSize = 14
-            label.Parent = sliderFrame
+            label.Parent = row
 
-            local slider = Instance.new("TextButton")
-            slider.Size = UDim2.new(0.35, 0, 1, 0)
-            slider.Position = UDim2.new(0.65, 0, 0, 0)
-            slider.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-            slider.Text = tostring(setting.Value)
-            slider.Parent = sliderFrame
+            local sliderBtn = Instance.new("TextButton")
+            sliderBtn.Size = UDim2.new(0.45, 0, 1, 0)
+            sliderBtn.Position = UDim2.new(0.55, 0, 0, 0)
+            sliderBtn.BackgroundColor3 = Color3.fromRGB(70,70,70)
+            sliderBtn.Text = tostring(setting.Value)
+            sliderBtn.TextColor3 = Color3.fromRGB(255,255,255)
+            sliderBtn.Parent = row
 
-            slider.MouseButton1Click:Connect(function()
-                local newVal = tonumber(prompt("Enter value for " .. setting.Name .. " (" .. setting.Min .. "-" .. setting.Max .. ")", setting.Value))
-                if newVal then
-                    setting.Value = math.clamp(newVal, setting.Min, setting.Max)
-                    label.Text = setting.Name .. ": " .. setting.Value
-                    slider.Text = tostring(setting.Value)
+            sliderBtn.MouseButton1Click:Connect(function()
+                local input = prompt("New value for " .. setting.Name .. " ("..setting.Min.."-"..setting.Max..")", tostring(setting.Value))
+                local val = tonumber(input)
+                if val then
+                    setting.Value = math.clamp(val, setting.Min or 0, setting.Max or 100)
+                    label.Text = setting.Name .. ": " .. tostring(setting.Value)
+                    sliderBtn.Text = tostring(setting.Value)
                     saveConfig()
                 end
             end)
@@ -1400,6 +1406,7 @@ local function refreshModules(category)
                             local moduleFrame = Instance.new("Frame")
                             moduleFrame.Size = UDim2.new(1, -10, 0, 50)
                             moduleFrame.BackgroundTransparency = 1
+                            moduleFrame.LayoutOrder = #scrollingFrame:GetChildren() + 1
                             moduleFrame.Parent = scrollingFrame
 
                             local button = Instance.new("TextButton")
@@ -1429,7 +1436,11 @@ local function refreshModules(category)
 
                             configBtn.MouseButton1Click:Connect(function()
                                 dropdown.Visible = not dropdown.Visible
-                                dropdown.Size = dropdown.Visible and UDim2.new(1,0,0, dropdown.UIListLayout.AbsoluteContentSize.Y + 10) or UDim2.new(1,0,0,0)
+                                if dropdown.Visible then
+                                    moduleFrame.Size = UDim2.new(1, -10, 0, 50 + dropdown.AbsoluteContentSize.Y + 10)
+                                else
+                                    moduleFrame.Size = UDim2.new(1, -10, 0, 50)
+                                end
                             end)
 
                             modules[mod.Name or file.name] = {moduleData = mod, enabled = false, button = button}
