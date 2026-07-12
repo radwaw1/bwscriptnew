@@ -1261,9 +1261,7 @@ local function ZJVXXL_fake_script() -- Misc_2.LocalScript
 end
 coroutine.wrap(ZJVXXL_fake_script)()
 
--- GITHUB LOADING CODE (fixed)
-local HttpService = game:GetService("HttpService")
-
+-- GITHUB LOADING CODE (Medium Executor Compatible)
 local REPO_USER = "radwaw1"
 local REPO_NAME = "bwscriptnew"
 local REPO_BRANCH = "main"
@@ -1285,23 +1283,18 @@ local categoryFrames = {
 local function saveConfig()
     local config = {}
     for name, mod in pairs(modules) do
-        config[name] = {
-            enabled = mod.enabled or false,
-            settings = {}
-        }
+        config[name] = { enabled = mod.enabled or false, settings = {} }
         for _, setting in ipairs(mod.moduleData.Config or {}) do
             config[name].settings[setting.Name] = setting.Value
         end
     end
-    pcall(function()
-        writefile(saveFile, HttpService:JSONEncode(config))
-    end)
+    pcall(function() writefile(saveFile, game:GetService("HttpService"):JSONEncode(config)) end)
 end
 
 local function loadConfig()
     if isfile(saveFile) then
         local success, data = pcall(function()
-            return HttpService:JSONDecode(readfile(saveFile))
+            return game:GetService("HttpService"):JSONDecode(readfile(saveFile))
         end)
         if success then
             for name, cfg in pairs(data) do
@@ -1326,60 +1319,50 @@ local function refreshModules(category)
     if not scrollingFrame then return end
 
     for _, child in ipairs(scrollingFrame:GetChildren()) do
-        if child:IsA("TextButton") or child:IsA("Frame") then
-            child:Destroy()
-        end
+        if child:IsA("TextButton") then child:Destroy() end
     end
 
     local url = string.format("https://api.github.com/repos/%s/%s/contents/%s/%s?ref=%s", REPO_USER, REPO_NAME, GITHUB_FOLDER, category, REPO_BRANCH)
     
-    local success, response = pcall(function()
-        return HttpService:GetAsync(url)
-    end)
+    local ok, response = pcall(function() return request({Url = url, Method = "GET"}) end)
 
-    if success then
-        local files = HttpService:JSONDecode(response)
+    if ok and response.Success then
+        local files = game:GetService("HttpService"):JSONDecode(response.Body)
         for _, file in ipairs(files) do
             if file.type == "file" and file.name:match("%.lua$") then
-                local downloadSuccess, scriptContent = pcall(function()
-                    return HttpService:GetAsync(file.download_url)
-                end)
-                if downloadSuccess then
-                    local loadSuccess, mod = pcall(function()
-                        return loadstring(scriptContent)()
-                    end)
-                    if loadSuccess and mod and mod.Run then
-                        local button = Instance.new("TextButton")
-                        button.Name = mod.Name or file.name
-                        button.Size = UDim2.new(1, -10, 0, 40)
-                        button.Position = UDim2.new(0, 5, 0, 0)
-                        button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-                        button.Text = mod.Name or file.name
-                        button.TextColor3 = Color3.fromRGB(255, 255, 255)
-                        button.Font = Enum.Font.Gotham
-                        button.TextSize = 16
-                        button.Parent = scrollingFrame
+                local ok2, res = pcall(function() return request({Url = file.download_url, Method = "GET"}) end)
+                if ok2 and res.Success then
+                    local func = loadstring(res.Body)
+                    if func then
+                        local s, mod = pcall(func)
+                        if s and mod and mod.Run then
+                            local button = Instance.new("TextButton")
+                            button.Size = UDim2.new(1, -10, 0, 40)
+                            button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+                            button.Text = mod.Name or file.name
+                            button.TextColor3 = Color3.fromRGB(255,255,255)
+                            button.TextSize = 16
+                            button.Parent = scrollingFrame
 
-                        button.MouseButton1Click:Connect(function()
-                            pcall(mod.Run)
-                            mod.enabled = not (mod.enabled or false)
-                        end)
+                            button.MouseButton1Click:Connect(function()
+                                pcall(mod.Run)
+                            end)
 
-                        modules[button.Name] = {moduleData = mod, enabled = false, button = button}
+                            modules[mod.Name or file.name] = {moduleData = mod, enabled = false, button = button}
+                        end
                     end
                 end
             end
         end
     else
-        print("Failed to fetch modules for " .. category .. ": " .. tostring(response))
+        print("Failed to fetch modules for " .. category)
     end
 end
 
--- Refresh all categories
-for category, _ in pairs(categoryFrames) do
-    refreshModules(category)
+-- Load all categories
+for cat, _ in pairs(categoryFrames) do
+    refreshModules(cat)
 end
 
 loadConfig()
-
 print("ModuleHub loaded with GitHub integration.")
