@@ -1261,7 +1261,7 @@ local function ZJVXXL_fake_script() -- Misc_2.LocalScript
 end
 coroutine.wrap(ZJVXXL_fake_script)()
 
--- GITHUB LOADING CODE (Fixed Overlapping + Config Button)
+-- GITHUB LOADING CODE (Fixed Overlap + Working Config Dropdown)
 local REPO_USER = "radwaw1"
 local REPO_NAME = "bwscriptnew"
 local REPO_BRANCH = "main"
@@ -1280,12 +1280,16 @@ local categoryFrames = {
     Misc = Modules_8
 }
 
+-- Add UIListLayout to all scrolling frames so buttons stack properly
+for _, frame in pairs(categoryFrames) do
+    local list = Instance.new("UIListLayout")
+    list.SortOrder = Enum.SortOrder.LayoutOrder
+    list.Padding = UDim.new(0, 5)
+    list.Parent = frame
+end
+
 local function updateButtonVisual(button, enabled)
-    if enabled then
-        button.BackgroundColor3 = Color3.fromRGB(0, 170, 0)   -- Green
-    else
-        button.BackgroundColor3 = Color3.fromRGB(170, 0, 0)   -- Red
-    end
+    button.BackgroundColor3 = enabled and Color3.fromRGB(0, 170, 0) or Color3.fromRGB(170, 0, 0)
 end
 
 local function saveConfig()
@@ -1328,7 +1332,7 @@ local function refreshModules(category)
     if not scrollingFrame then return end
 
     for _, child in ipairs(scrollingFrame:GetChildren()) do
-        if child:IsA("TextButton") or child:IsA("Frame") then child:Destroy() end
+        if child:IsA("Frame") then child:Destroy() end
     end
 
     local url = string.format("https://api.github.com/repos/%s/%s/contents/%s/%s?ref=%s", REPO_USER, REPO_NAME, GITHUB_FOLDER, category, REPO_BRANCH)
@@ -1345,19 +1349,20 @@ local function refreshModules(category)
                     if func then
                         local s, mod = pcall(func)
                         if s and mod and mod.Run then
-                            local mainFrame = Instance.new("Frame")
-                            mainFrame.Size = UDim2.new(1, -10, 0, 50)
-                            mainFrame.BackgroundTransparency = 1
-                            mainFrame.Parent = scrollingFrame
+                            local moduleFrame = Instance.new("Frame")
+                            moduleFrame.Size = UDim2.new(1, -10, 0, 50)
+                            moduleFrame.BackgroundTransparency = 1
+                            moduleFrame.LayoutOrder = #scrollingFrame:GetChildren()
+                            moduleFrame.Parent = scrollingFrame
 
-                            -- Toggle Button (shorter)
+                            -- Toggle Button
                             local button = Instance.new("TextButton")
-                            button.Size = UDim2.new(0.75, 0, 1, 0)
+                            button.Size = UDim2.new(0.72, 0, 1, 0)
                             button.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
                             button.Text = mod.Name or file.name
                             button.TextColor3 = Color3.fromRGB(255,255,255)
                             button.TextSize = 15
-                            button.Parent = mainFrame
+                            button.Parent = moduleFrame
 
                             button.MouseButton1Click:Connect(function()
                                 pcall(mod.Run)
@@ -1368,13 +1373,35 @@ local function refreshModules(category)
 
                             -- Config Button
                             local configBtn = Instance.new("TextButton")
-                            configBtn.Size = UDim2.new(0.23, 0, 1, 0)
-                            configBtn.Position = UDim2.new(0.77, 0, 0, 0)
+                            configBtn.Size = UDim2.new(0.25, 0, 1, 0)
+                            configBtn.Position = UDim2.new(0.76, 0, 0, 0)
                             configBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-                            configBtn.Text = "Config"
+                            configBtn.Text = "Config ▼"
                             configBtn.TextColor3 = Color3.fromRGB(255,255,255)
                             configBtn.TextSize = 14
-                            configBtn.Parent = mainFrame
+                            configBtn.Parent = moduleFrame
+
+                            local configDropdown = Instance.new("Frame")
+                            configDropdown.Size = UDim2.new(1, 0, 0, 0)
+                            configDropdown.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+                            configDropdown.Visible = false
+                            configDropdown.Parent = moduleFrame
+
+                            local listLayout = Instance.new("UIListLayout")
+                            listLayout.Parent = configDropdown
+
+                            configBtn.MouseButton1Click:Connect(function()
+                                configDropdown.Visible = not configDropdown.Visible
+                                if configDropdown.Visible then
+                                    local height = 0
+                                    for _, child in ipairs(configDropdown:GetChildren()) do
+                                        if child:IsA("TextButton") then height += 30 end
+                                    end
+                                    configDropdown.Size = UDim2.new(1, 0, 0, height + 10)
+                                else
+                                    configDropdown.Size = UDim2.new(1, 0, 0, 0)
+                                end
+                            end)
 
                             modules[mod.Name or file.name] = {moduleData = mod, enabled = false, button = button}
 
