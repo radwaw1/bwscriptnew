@@ -1,4 +1,4 @@
--- ModuleHub with Categories + RightShift Toggle + Full Config Save/Load
+-- ModuleHub with Categories + RightShift Toggle + Full Save/Load Config
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local HttpService = game:GetService("HttpService")
@@ -13,121 +13,868 @@ local GITHUB_FOLDER = "modules"
 
 local saveFile = "ModuleHub_Config.json"
 
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "ModuleHub"
-screenGui.ResetOnSpawn = false
-screenGui.DisplayOrder = 999999
-screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-screenGui.Enabled = true
-screenGui.Parent = playerGui
+local Script = Instance.new("ScreenGui")
+local Script_2 = Instance.new("Frame")
+local Categories = Instance.new("Frame")
+local Blatant = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
+local UICorner = Instance.new("UICorner")
+local Modules = Instance.new("ScrollingFrame")
+local UIAspectRatioConstraint_2 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_3 = Instance.new("UIAspectRatioConstraint")
+local Inventory = Instance.new("Frame")
+local Title_2 = Instance.new("TextLabel")
+local UIAspectRatioConstraint_4 = Instance.new("UIAspectRatioConstraint")
+local UICorner_2 = Instance.new("UICorner")
+local Modules_2 = Instance.new("ScrollingFrame")
+local UIAspectRatioConstraint_5 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_6 = Instance.new("UIAspectRatioConstraint")
+local Legit = Instance.new("Frame")
+local Title_3 = Instance.new("TextLabel")
+local UIAspectRatioConstraint_7 = Instance.new("UIAspectRatioConstraint")
+local UICorner_3 = Instance.new("UICorner")
+local Modules_3 = Instance.new("ScrollingFrame")
+local UIAspectRatioConstraint_8 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_9 = Instance.new("UIAspectRatioConstraint")
+local Render = Instance.new("Frame")
+local Title_4 = Instance.new("TextLabel")
+local UIAspectRatioConstraint_10 = Instance.new("UIAspectRatioConstraint")
+local UICorner_4 = Instance.new("UICorner")
+local Modules_4 = Instance.new("ScrollingFrame")
+local UIAspectRatioConstraint_11 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_12 = Instance.new("UIAspectRatioConstraint")
+local Utility = Instance.new("Frame")
+local Title_5 = Instance.new("TextLabel")
+local UIAspectRatioConstraint_13 = Instance.new("UIAspectRatioConstraint")
+local UICorner_5 = Instance.new("UICorner")
+local Modules_5 = Instance.new("ScrollingFrame")
+local UIAspectRatioConstraint_14 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_15 = Instance.new("UIAspectRatioConstraint")
+local World = Instance.new("Frame")
+local Title_6 = Instance.new("TextLabel")
+local UIAspectRatioConstraint_16 = Instance.new("UIAspectRatioConstraint")
+local UICorner_6 = Instance.new("UICorner")
+local Modules_6 = Instance.new("ScrollingFrame")
+local UIAspectRatioConstraint_17 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_18 = Instance.new("UIAspectRatioConstraint")
+local Kits = Instance.new("Frame")
+local Title_7 = Instance.new("TextLabel")
+local UIAspectRatioConstraint_19 = Instance.new("UIAspectRatioConstraint")
+local UICorner_7 = Instance.new("UICorner")
+local Modules_7 = Instance.new("ScrollingFrame")
+local UIAspectRatioConstraint_20 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_21 = Instance.new("UIAspectRatioConstraint")
+local Misc = Instance.new("Frame")
+local Title_8 = Instance.new("TextLabel")
+local UIAspectRatioConstraint_22 = Instance.new("UIAspectRatioConstraint")
+local UICorner_8 = Instance.new("UICorner")
+local Modules_8 = Instance.new("ScrollingFrame")
+local UIAspectRatioConstraint_23 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_24 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_25 = Instance.new("UIAspectRatioConstraint")
+local Notification = Instance.new("Frame")
+local UICorner_9 = Instance.new("UICorner")
+local Title_9 = Instance.new("TextLabel")
+local UIAspectRatioConstraint_26 = Instance.new("UIAspectRatioConstraint")
+local Notification_2 = Instance.new("TextLabel")
+local UIAspectRatioConstraint_27 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_28 = Instance.new("UIAspectRatioConstraint")
+local Main = Instance.new("Frame")
+local UICorner_10 = Instance.new("UICorner")
+local Title_10 = Instance.new("TextLabel")
+local UICorner_11 = Instance.new("UICorner")
+local UIAspectRatioConstraint_29 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_30 = Instance.new("UIAspectRatioConstraint")
+local Delete = Instance.new("TextButton")
+local UICorner_12 = Instance.new("UICorner")
+local UIAspectRatioConstraint_31 = Instance.new("UIAspectRatioConstraint")
+local Categories_2 = Instance.new("Frame")
+local Blatant_2 = Instance.new("TextButton")
+local UICorner_13 = Instance.new("UICorner")
+local UIAspectRatioConstraint_32 = Instance.new("UIAspectRatioConstraint")
+local Inventory_2 = Instance.new("TextButton")
+local UICorner_14 = Instance.new("UICorner")
+local UIAspectRatioConstraint_33 = Instance.new("UIAspectRatioConstraint")
+local Legit_2 = Instance.new("TextButton")
+local UICorner_15 = Instance.new("UICorner")
+local UIAspectRatioConstraint_34 = Instance.new("UIAspectRatioConstraint")
+local Render_2 = Instance.new("TextButton")
+local UICorner_16 = Instance.new("UICorner")
+local UIAspectRatioConstraint_35 = Instance.new("UIAspectRatioConstraint")
+local World_2 = Instance.new("TextButton")
+local UICorner_17 = Instance.new("UICorner")
+local UIAspectRatioConstraint_36 = Instance.new("UIAspectRatioConstraint")
+local Utility_2 = Instance.new("TextButton")
+local UICorner_18 = Instance.new("UICorner")
+local UIAspectRatioConstraint_37 = Instance.new("UIAspectRatioConstraint")
+local Kits_2 = Instance.new("TextButton")
+local UICorner_19 = Instance.new("UICorner")
+local UIAspectRatioConstraint_38 = Instance.new("UIAspectRatioConstraint")
+local Misc_2 = Instance.new("TextButton")
+local UICorner_20 = Instance.new("UICorner")
+local UIAspectRatioConstraint_39 = Instance.new("UIAspectRatioConstraint")
+local Reload = Instance.new("TextButton")
+local UICorner_21 = Instance.new("UICorner")
+local UIAspectRatioConstraint_40 = Instance.new("UIAspectRatioConstraint")
+local UICorner_22 = Instance.new("UICorner")
+local UIAspectRatioConstraint_41 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_42 = Instance.new("UIAspectRatioConstraint")
+local UIAspectRatioConstraint_43 = Instance.new("UIAspectRatioConstraint")
 
-local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 650, 0, 480)
-mainFrame.Position = UDim2.new(0, 20, 0.5, -240)
-mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 34)
-mainFrame.Parent = screenGui
+-- Properties
+Script.Name = "Script"
+Script.Parent = playerGui
 
-local uiCorner = Instance.new("UICorner"); uiCorner.CornerRadius = UDim.new(0,8); uiCorner.Parent = mainFrame
+Script_2.Name = "Script"
+Script_2.Parent = Script
+Script_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Script_2.BackgroundTransparency = 1.000
+Script_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Script_2.BorderSizePixel = 0
+Script_2.Size = UDim2.new(1.00036967, 0, 0.895098388, 0)
 
--- Left Sidebar (Categories)
-local sidebar = Instance.new("Frame")
-sidebar.Size = UDim2.new(0, 140, 1, 0)
-sidebar.BackgroundColor3 = Color3.fromRGB(25,25,30)
-sidebar.Parent = mainFrame
+Categories.Name = "Categories"
+Categories.Parent = Script_2
+Categories.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Categories.BackgroundTransparency = 1.000
+Categories.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Categories.BorderSizePixel = 0
+Categories.Position = UDim2.new(0.205005556, 0, 0.035605289, 0)
+Categories.Size = UDim2.new(0.563875675, 0, 0.894201398, 0)
+Categories.ZIndex = 9999
 
-local sidebarCorner = Instance.new("UICorner"); sidebarCorner.CornerRadius = UDim.new(0,8); sidebarCorner.Parent = sidebar
+Blatant.Name = "Blatant"
+Blatant.Parent = Categories
+Blatant.BackgroundColor3 = Color3.fromRGB(165, 165, 165)
+Blatant.BackgroundTransparency = 0.600
+Blatant.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Blatant.BorderSizePixel = 0
+Blatant.Position = UDim2.new(-0.0567656755, 0, 0.0227531288, 0)
+Blatant.Size = UDim2.new(0.12286593, 0, 0.990898728, 0)
+Blatant.Visible = false
+Blatant.ZIndex = 999999
 
-local titleBar = Instance.new("Frame")
-titleBar.Size = UDim2.new(1,0,0,36)
-titleBar.BackgroundColor3 = Color3.fromRGB(20,20,24)
-titleBar.Parent = mainFrame
+Title.Name = "Title"
+Title.Parent = Blatant
+Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Title.BackgroundTransparency = 1.000
+Title.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Title.BorderSizePixel = 0
+Title.Size = UDim2.new(1, 0, 0.0563218333, 0)
+Title.ZIndex = 999999
+Title.Font = Enum.Font.Unknown
+Title.Text = "Blatant"
+Title.TextColor3 = Color3.fromRGB(0, 0, 0)
+Title.TextSize = 25.000
 
-local titleLabel = Instance.new("TextLabel")
-titleLabel.Size = UDim2.new(1,-100,1,0)
-titleLabel.Position = UDim2.new(0,12,0,0)
-titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "shitty script of doom and despair"
-titleLabel.TextColor3 = Color3.fromRGB(255,255,255)
-titleLabel.Font = Enum.Font.GothamBold
-titleLabel.TextSize = 16
-titleLabel.Parent = titleBar
+UIAspectRatioConstraint.Parent = Title
+UIAspectRatioConstraint.AspectRatio = 3.816
 
-local selfDestructBtn = Instance.new("TextButton")
-selfDestructBtn.Size = UDim2.new(0,85,0,24)
-selfDestructBtn.Position = UDim2.new(1,-92,0.5,-12)
-selfDestructBtn.BackgroundColor3 = Color3.fromRGB(170,30,30)
-selfDestructBtn.Text = "Self Destruct"
-selfDestructBtn.TextColor3 = Color3.fromRGB(255,255,255)
-selfDestructBtn.Font = Enum.Font.Gotham
-selfDestructBtn.TextSize = 11
-selfDestructBtn.Parent = titleBar
+UICorner.CornerRadius = UDim.new(0.147198945, 0)
+UICorner.Parent = Blatant
 
-local reloadButton = Instance.new("TextButton")
-reloadButton.Size = UDim2.new(0,60,0,24)
-reloadButton.Position = UDim2.new(1,-155,0.5,-12)
-reloadButton.BackgroundColor3 = Color3.fromRGB(45,45,52)
-reloadButton.Text = "Reload"
-reloadButton.TextColor3 = Color3.fromRGB(255,255,255)
-reloadButton.Font = Enum.Font.Gotham
-reloadButton.TextSize = 12
-reloadButton.Parent = titleBar
+Modules.Name = "Modules"
+Modules.Parent = Blatant
+Modules.Active = true
+Modules.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Modules.BackgroundTransparency = 1.000
+Modules.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Modules.BorderSizePixel = 0
+Modules.Position = UDim2.new(0.0324971639, 0, 0.0574052818, 0)
+Modules.Size = UDim2.new(0.935924411, 0, 0.918484509, 0)
+Modules.ZIndex = 999999
 
--- Categories
-local categories = {
-    Blatant = {},
-    World = {},
-    Utility = {},
-    Legit = {},
-    Inventory = {},
-    Render = {}
-}
+UIAspectRatioConstraint_2.Parent = Modules
+UIAspectRatioConstraint_2.AspectRatio = 0.219
 
-local categoryButtons = {}
-local currentCategory = "Blatant"
+UIAspectRatioConstraint_3.Parent = Blatant
+UIAspectRatioConstraint_3.AspectRatio = 0.215
 
-local categoryList = Instance.new("ScrollingFrame")
-categoryList.Size = UDim2.new(1,0,1,-36)
-categoryList.Position = UDim2.new(0,0,0,36)
-categoryList.BackgroundTransparency = 1
-categoryList.ScrollBarThickness = 4
-categoryList.Parent = sidebar
+Inventory.Name = "Inventory"
+Inventory.Parent = Categories
+Inventory.BackgroundColor3 = Color3.fromRGB(165, 165, 165)
+Inventory.BackgroundTransparency = 0.600
+Inventory.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Inventory.BorderSizePixel = 0
+Inventory.Position = UDim2.new(0.0751598626, 0, 0.0227531288, 0)
+Inventory.Size = UDim2.new(0.12286593, 0, 0.990898728, 0)
+Inventory.Visible = false
+Inventory.ZIndex = 999999
 
-local listLayout = Instance.new("UIListLayout")
-listLayout.Padding = UDim.new(0,4)
-listLayout.Parent = categoryList
+Title_2.Name = "Title"
+Title_2.Parent = Inventory
+Title_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Title_2.BackgroundTransparency = 1.000
+Title_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Title_2.BorderSizePixel = 0
+Title_2.Position = UDim2.new(-0.00134861725, 0, 0, 0)
+Title_2.Size = UDim2.new(1, 0, 0.0563218333, 0)
+Title_2.ZIndex = 999999
+Title_2.Font = Enum.Font.Unknown
+Title_2.Text = "Inventory"
+Title_2.TextColor3 = Color3.fromRGB(0, 0, 0)
+Title_2.TextSize = 25.000
 
-for catName in pairs(categories) do
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1,0,0,36)
-    btn.BackgroundColor3 = Color3.fromRGB(45,45,52)
-    btn.Text = catName
-    btn.TextColor3 = Color3.fromRGB(255,255,255)
-    btn.Font = Enum.Font.Gotham
-    btn.TextSize = 14
-    btn.Parent = categoryList
+UIAspectRatioConstraint_4.Parent = Title_2
+UIAspectRatioConstraint_4.AspectRatio = 3.816
 
-    local corner = Instance.new("UICorner"); corner.CornerRadius = UDim.new(0,6); corner.Parent = btn
+UICorner_2.CornerRadius = UDim.new(0.147198945, 0)
+UICorner_2.Parent = Inventory
 
-    btn.MouseButton1Click:Connect(function()
-        currentCategory = catName
-        refreshModules()
+Modules_2.Name = "Modules"
+Modules_2.Parent = Inventory
+Modules_2.Active = true
+Modules_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Modules_2.BackgroundTransparency = 1.000
+Modules_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Modules_2.BorderSizePixel = 0
+Modules_2.Position = UDim2.new(0.0311487075, 0, 0.0574052818, 0)
+Modules_2.Size = UDim2.new(0.935924411, 0, 0.918484509, 0)
+Modules_2.ZIndex = 999999
+
+UIAspectRatioConstraint_5.Parent = Modules_2
+UIAspectRatioConstraint_5.AspectRatio = 0.219
+
+UIAspectRatioConstraint_6.Parent = Inventory
+UIAspectRatioConstraint_6.AspectRatio = 0.215
+
+Legit.Name = "Legit"
+Legit.Parent = Categories
+Legit.BackgroundColor3 = Color3.fromRGB(165, 165, 165)
+Legit.BackgroundTransparency = 0.600
+Legit.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Legit.BorderSizePixel = 0
+Legit.Position = UDim2.new(0.207661584, 0, 0.0227531288, 0)
+Legit.Size = UDim2.new(0.12286593, 0, 0.990898728, 0)
+Legit.Visible = false
+Legit.ZIndex = 999999
+
+Title_3.Name = "Title"
+Title_3.Parent = Legit
+Title_3.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Title_3.BackgroundTransparency = 1.000
+Title_3.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Title_3.BorderSizePixel = 0
+Title_3.Position = UDim2.new(-0.00270210439, 0, 0, 0)
+Title_3.Size = UDim2.new(1, 0, 0.0563218333, 0)
+Title_3.ZIndex = 999999
+Title_3.Font = Enum.Font.Unknown
+Title_3.Text = "Legit"
+Title_3.TextColor3 = Color3.fromRGB(0, 0, 0)
+Title_3.TextSize = 25.000
+
+UIAspectRatioConstraint_7.Parent = Title_3
+UIAspectRatioConstraint_7.AspectRatio = 3.816
+
+UICorner_3.CornerRadius = UDim.new(0.147198945, 0)
+UICorner_3.Parent = Legit
+
+Modules_3.Name = "Modules"
+Modules_3.Parent = Legit
+Modules_3.Active = true
+Modules_3.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Modules_3.BackgroundTransparency = 1.000
+Modules_3.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Modules_3.BorderSizePixel = 0
+Modules_3.Position = UDim2.new(0.0297955461, 0, 0.0574052818, 0)
+Modules_3.Size = UDim2.new(0.935924411, 0, 0.918484509, 0)
+Modules_3.ZIndex = 999999
+
+UIAspectRatioConstraint_8.Parent = Modules_3
+UIAspectRatioConstraint_8.AspectRatio = 0.219
+
+UIAspectRatioConstraint_9.Parent = Legit
+UIAspectRatioConstraint_9.AspectRatio = 0.215
+
+Render.Name = "Render"
+Render.Parent = Categories
+Render.BackgroundColor3 = Color3.fromRGB(165, 165, 165)
+Render.BackgroundTransparency = 0.600
+Render.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Render.BorderSizePixel = 0
+Render.Position = UDim2.new(0.339587212, 0, 0.0227531288, 0)
+Render.Size = UDim2.new(0.12286593, 0, 0.990898728, 0)
+Render.Visible = false
+Render.ZIndex = 999999
+
+Title_4.Name = "Title"
+Title_4.Parent = Render
+Title_4.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Title_4.BackgroundTransparency = 1.000
+Title_4.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Title_4.BorderSizePixel = 0
+Title_4.Position = UDim2.new(-0.00405039685, 0, 0, 0)
+Title_4.Size = UDim2.new(1, 0, 0.0563218333, 0)
+Title_4.ZIndex = 999999
+Title_4.Font = Enum.Font.Unknown
+Title_4.Text = "Render"
+Title_4.TextColor3 = Color3.fromRGB(0, 0, 0)
+Title_4.TextSize = 25.000
+
+UIAspectRatioConstraint_10.Parent = Title_4
+UIAspectRatioConstraint_10.AspectRatio = 3.816
+
+UICorner_4.CornerRadius = UDim.new(0.147198945, 0)
+UICorner_4.Parent = Render
+
+Modules_4.Name = "Modules"
+Modules_4.Parent = Render
+Modules_4.Active = true
+Modules_4.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Modules_4.BackgroundTransparency = 1.000
+Modules_4.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Modules_4.BorderSizePixel = 0
+Modules_4.Position = UDim2.new(0.0284462795, 0, 0.0574052818, 0)
+Modules_4.Size = UDim2.new(0.935924411, 0, 0.918484509, 0)
+Modules_4.ZIndex = 999999
+
+UIAspectRatioConstraint_11.Parent = Modules_4
+UIAspectRatioConstraint_11.AspectRatio = 0.219
+
+UIAspectRatioConstraint_12.Parent = Render
+UIAspectRatioConstraint_12.AspectRatio = 0.215
+
+Utility.Name = "Utility"
+Utility.Parent = Categories
+Utility.BackgroundColor3 = Color3.fromRGB(165, 165, 165)
+Utility.BackgroundTransparency = 0.600
+Utility.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Utility.BorderSizePixel = 0
+Utility.Position = UDim2.new(0.469307005, 0, 0.0227531288, 0)
+Utility.Size = UDim2.new(0.12286593, 0, 0.990898728, 0)
+Utility.Visible = false
+Utility.ZIndex = 999999
+
+Title_5.Name = "Title"
+Title_5.Parent = Utility
+Title_5.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Title_5.BackgroundTransparency = 1.000
+Title_5.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Title_5.BorderSizePixel = 0
+Title_5.Size = UDim2.new(1, 0, 0.0563218333, 0)
+Title_5.ZIndex = 999999
+Title_5.Font = Enum.Font.Unknown
+Title_5.Text = "Utility"
+Title_5.TextColor3 = Color3.fromRGB(0, 0, 0)
+Title_5.TextSize = 25.000
+
+UIAspectRatioConstraint_13.Parent = Title_5
+UIAspectRatioConstraint_13.AspectRatio = 3.816
+
+UICorner_5.CornerRadius = UDim.new(0.147198945, 0)
+UICorner_5.Parent = Utility
+
+Modules_5.Name = "Modules"
+Modules_5.Parent = Utility
+Modules_5.Active = true
+Modules_5.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Modules_5.BackgroundTransparency = 1.000
+Modules_5.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Modules_5.BorderSizePixel = 0
+Modules_5.Position = UDim2.new(0.0324971639, 0, 0.0574052818, 0)
+Modules_5.Size = UDim2.new(0.935924411, 0, 0.918484509, 0)
+Modules_5.ZIndex = 999999
+
+UIAspectRatioConstraint_14.Parent = Modules_5
+UIAspectRatioConstraint_14.AspectRatio = 0.219
+
+UIAspectRatioConstraint_15.Parent = Utility
+UIAspectRatioConstraint_15.AspectRatio = 0.215
+
+World.Name = "World"
+World.Parent = Categories
+World.BackgroundColor3 = Color3.fromRGB(165, 165, 165)
+World.BackgroundTransparency = 0.600
+World.BorderColor3 = Color3.fromRGB(0, 0, 0)
+World.BorderSizePixel = 0
+World.Position = UDim2.new(0.601232469, 0, 0.0227531288, 0)
+World.Size = UDim2.new(0.12286593, 0, 0.990898728, 0)
+World.Visible = false
+World.ZIndex = 999999
+
+Title_6.Name = "Title"
+Title_6.Parent = World
+Title_6.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Title_6.BackgroundTransparency = 1.000
+Title_6.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Title_6.BorderSizePixel = 0
+Title_6.Position = UDim2.new(-0.00134861725, 0, 0, 0)
+Title_6.Size = UDim2.new(1, 0, 0.0563218333, 0)
+Title_6.ZIndex = 999999
+Title_6.Font = Enum.Font.Unknown
+Title_6.Text = "World"
+Title_6.TextColor3 = Color3.fromRGB(0, 0, 0)
+Title_6.TextSize = 25.000
+
+UIAspectRatioConstraint_16.Parent = Title_6
+UIAspectRatioConstraint_16.AspectRatio = 3.816
+
+UICorner_6.CornerRadius = UDim.new(0.147198945, 0)
+UICorner_6.Parent = World
+
+Modules_6.Name = "Modules"
+Modules_6.Parent = World
+Modules_6.Active = true
+Modules_6.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Modules_6.BackgroundTransparency = 1.000
+Modules_6.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Modules_6.BorderSizePixel = 0
+Modules_6.Position = UDim2.new(0.0311487075, 0, 0.0574052818, 0)
+Modules_6.Size = UDim2.new(0.935924411, 0, 0.918484509, 0)
+Modules_6.ZIndex = 999999
+
+UIAspectRatioConstraint_17.Parent = Modules_6
+UIAspectRatioConstraint_17.AspectRatio = 0.219
+
+UIAspectRatioConstraint_18.Parent = World
+UIAspectRatioConstraint_18.AspectRatio = 0.215
+
+Kits.Name = "Kits"
+Kits.Parent = Categories
+Kits.BackgroundColor3 = Color3.fromRGB(165, 165, 165)
+Kits.BackgroundTransparency = 0.600
+Kits.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Kits.BorderSizePixel = 0
+Kits.Position = UDim2.new(0.73373419, 0, 0.0227531288, 0)
+Kits.Size = UDim2.new(0.12286593, 0, 0.990898728, 0)
+Kits.Visible = false
+Kits.ZIndex = 999999
+
+Title_7.Name = "Title"
+Title_7.Parent = Kits
+Title_7.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Title_7.BackgroundTransparency = 1.000
+Title_7.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Title_7.BorderSizePixel = 0
+Title_7.Position = UDim2.new(-0.00270210439, 0, 0, 0)
+Title_7.Size = UDim2.new(1, 0, 0.0563218333, 0)
+Title_7.ZIndex = 999999
+Title_7.Font = Enum.Font.Unknown
+Title_7.Text = "Kits"
+Title_7.TextColor3 = Color3.fromRGB(0, 0, 0)
+Title_7.TextSize = 25.000
+
+UIAspectRatioConstraint_19.Parent = Title_7
+UIAspectRatioConstraint_19.AspectRatio = 3.816
+
+UICorner_7.CornerRadius = UDim.new(0.147198945, 0)
+UICorner_7.Parent = Kits
+
+Modules_7.Name = "Modules"
+Modules_7.Parent = Kits
+Modules_7.Active = true
+Modules_7.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Modules_7.BackgroundTransparency = 1.000
+Modules_7.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Modules_7.BorderSizePixel = 0
+Modules_7.Position = UDim2.new(0.0297955461, 0, 0.0574052818, 0)
+Modules_7.Size = UDim2.new(0.935924411, 0, 0.918484509, 0)
+Modules_7.ZIndex = 999999
+
+UIAspectRatioConstraint_20.Parent = Modules_7
+UIAspectRatioConstraint_20.AspectRatio = 0.219
+
+UIAspectRatioConstraint_21.Parent = Kits
+UIAspectRatioConstraint_21.AspectRatio = 0.215
+
+Misc.Name = "Misc"
+Misc.Parent = Categories
+Misc.BackgroundColor3 = Color3.fromRGB(165, 165, 165)
+Misc.BackgroundTransparency = 0.600
+Misc.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Misc.BorderSizePixel = 0
+Misc.Position = UDim2.new(0.865659833, 0, 0.0227531288, 0)
+Misc.Size = UDim2.new(0.12286593, 0, 0.990898728, 0)
+Misc.Visible = false
+Misc.ZIndex = 999999
+
+Title_8.Name = "Title"
+Title_8.Parent = Misc
+Title_8.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Title_8.BackgroundTransparency = 1.000
+Title_8.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Title_8.BorderSizePixel = 0
+Title_8.Position = UDim2.new(-0.00405039685, 0, 0, 0)
+Title_8.Size = UDim2.new(1, 0, 0.0563218333, 0)
+Title_8.ZIndex = 999999
+Title_8.Font = Enum.Font.Unknown
+Title_8.Text = "Misc"
+Title_8.TextColor3 = Color3.fromRGB(0, 0, 0)
+Title_8.TextSize = 25.000
+
+UIAspectRatioConstraint_22.Parent = Title_8
+UIAspectRatioConstraint_22.AspectRatio = 3.816
+
+UICorner_8.CornerRadius = UDim.new(0.147198945, 0)
+UICorner_8.Parent = Misc
+
+Modules_8.Name = "Modules"
+Modules_8.Parent = Misc
+Modules_8.Active = true
+Modules_8.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Modules_8.BackgroundTransparency = 1.000
+Modules_8.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Modules_8.BorderSizePixel = 0
+Modules_8.Position = UDim2.new(0.0284462795, 0, 0.0574052818, 0)
+Modules_8.Size = UDim2.new(0.935924411, 0, 0.918484509, 0)
+Modules_8.ZIndex = 999999
+
+UIAspectRatioConstraint_23.Parent = Modules_8
+UIAspectRatioConstraint_23.AspectRatio = 0.219
+
+UIAspectRatioConstraint_24.Parent = Misc
+UIAspectRatioConstraint_24.AspectRatio = 0.215
+
+UIAspectRatioConstraint_25.Parent = Categories
+UIAspectRatioConstraint_25.AspectRatio = 1.733
+
+Notification.Name = "Notification"
+Notification.Parent = Script_2
+Notification.BackgroundColor3 = Color3.fromRGB(77, 77, 77)
+Notification.BackgroundTransparency = 0.200
+Notification.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Notification.BorderSizePixel = 0
+Notification.Position = UDim2.new(0.826682806, 0, 0.720244169, 0)
+Notification.Size = UDim2.new(0.160488963, 0, 0.228720665, 0)
+Notification.Visible = false
+Notification.ZIndex = 99999
+
+UICorner_9.CornerRadius = UDim.new(0.147198945, 0)
+UICorner_9.Parent = Notification
+
+Title_9.Name = "Title"
+Title_9.Parent = Notification
+Title_9.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Title_9.BackgroundTransparency = 1.000
+Title_9.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Title_9.BorderSizePixel = 0
+Title_9.Size = UDim2.new(1, 0, 0.23222746, 0)
+Title_9.ZIndex = 99999
+Title_9.Font = Enum.Font.Unknown
+Title_9.Text = "shitty script of doom and despair"
+Title_9.TextColor3 = Color3.fromRGB(0, 0, 0)
+Title_9.TextScaled = true
+Title_9.TextSize = 28.000
+Title_9.TextWrapped = true
+
+UIAspectRatioConstraint_26.Parent = Title_9
+UIAspectRatioConstraint_26.AspectRatio = 8.306
+
+Notification_2.Name = "Notification"
+Notification_2.Parent = Notification
+Notification_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Notification_2.BackgroundTransparency = 0.700
+Notification_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Notification_2.BorderSizePixel = 0
+Notification_2.Position = UDim2.new(0.0245700236, 0, 0.235849053, 0)
+Notification_2.Size = UDim2.new(0.948067904, 0, 0.679245353, 0)
+Notification_2.ZIndex = 99999
+Notification_2.Font = Enum.Font.Unknown
+Notification_2.Text = "Notification: "
+Notification_2.TextColor3 = Color3.fromRGB(0, 0, 0)
+Notification_2.TextSize = 30.000
+Notification_2.TextWrapped = true
+
+UIAspectRatioConstraint_27.Parent = Notification_2
+UIAspectRatioConstraint_27.AspectRatio = 2.692
+
+UIAspectRatioConstraint_28.Parent = Notification
+UIAspectRatioConstraint_28.AspectRatio = 1.929
+UIAspectRatioConstraint_28.AspectType = Enum.AspectType.ScaleWithParentSize
+
+Main.Name = "Main"
+Main.Parent = Script_2
+Main.BackgroundColor3 = Color3.fromRGB(107, 107, 107)
+Main.BackgroundTransparency = 0.300
+Main.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Main.BorderSizePixel = 0
+Main.Position = UDim2.new(0.0125972014, 0, 0.228292629, 0)
+Main.Size = UDim2.new(0.140727177, 0, 0.841302156, 0)
+Main.ZIndex = 9999999
+
+UICorner_10.CornerRadius = UDim.new(0.103039265, 0)
+UICorner_10.Parent = Main
+
+Title_10.Name = "Title"
+Title_10.Parent = Main
+Title_10.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Title_10.BackgroundTransparency = 1.000
+Title_10.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Title_10.BorderSizePixel = 0
+Title_10.Position = UDim2.new(0.0482758582, 0, 0.00951372646, 0)
+Title_10.Size = UDim2.new(0.546965182, 0, 0.0931076184, 0)
+Title_10.ZIndex = 9999999
+Title_10.Font = Enum.Font.Unknown
+Title_10.Text = "shitty script of doom and despair"
+Title_10.TextColor3 = Color3.fromRGB(0, 0, 255)
+Title_10.TextScaled = true
+Title_10.TextSize = 14.000
+Title_10.TextWrapped = true
+
+UICorner_11.CornerRadius = UDim.new(0.103039265, 0)
+UICorner_11.Parent = Title_10
+
+UIAspectRatioConstraint_29.Parent = Title_10
+UIAspectRatioConstraint_29.AspectRatio = 2.701
+
+UIAspectRatioConstraint_30.Parent = Main
+UIAspectRatioConstraint_30.AspectRatio = 0.460
+
+Delete.Name = "Delete"
+Delete.Parent = Main
+Delete.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
+Delete.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Delete.BorderSizePixel = 0
+Delete.Position = UDim2.new(0.608864665, 0, 0.0167688746, 0)
+Delete.Size = UDim2.new(0.347112507, 0, 0.0779789016, 0)
+Delete.ZIndex = 9999999
+Delete.Font = Enum.Font.Unknown
+Delete.Text = "X"
+Delete.TextColor3 = Color3.fromRGB(255, 255, 255)
+Delete.TextScaled = true
+Delete.TextSize = 14.000
+Delete.TextWrapped = true
+
+UICorner_12.CornerRadius = UDim.new(0.147198945, 0)
+UICorner_12.Parent = Delete
+
+UIAspectRatioConstraint_31.Parent = Delete
+UIAspectRatioConstraint_31.AspectRatio = 2.047
+
+Categories_2.Name = "Categories"
+Categories_2.Parent = Main
+Categories_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Categories_2.BackgroundTransparency = 0.450
+Categories_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Categories_2.BorderSizePixel = 0
+Categories_2.Position = UDim2.new(0.0338930711, 0, 0.104044087, 0)
+Categories_2.Size = UDim2.new(0.907225907, 0, 0.853688061, 0)
+Categories_2.ZIndex = 9999999
+
+Blatant_2.Name = "Blatant"
+Blatant_2.Parent = Categories_2
+Blatant_2.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+Blatant_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Blatant_2.BorderSizePixel = 0
+Blatant_2.Position = UDim2.new(0.0347826071, 0, 0.0254596882, 0)
+Blatant_2.Size = UDim2.new(0.930434704, 0, 0.0909348354, 0)
+Blatant_2.ZIndex = 199999999
+Blatant_2.Font = Enum.Font.Unknown
+Blatant_2.Text = "Blatant"
+Blatant_2.TextColor3 = Color3.fromRGB(0, 0, 0)
+Blatant_2.TextSize = 25.000
+
+UICorner_13.CornerRadius = UDim.new(0.147198945, 0)
+UICorner_13.Parent = Blatant_2
+
+UIAspectRatioConstraint_32.Parent = Blatant_2
+UIAspectRatioConstraint_32.AspectRatio = 5.000
+
+Inventory_2.Name = "Inventory"
+Inventory_2.Parent = Categories_2
+Inventory_2.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+Inventory_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Inventory_2.BorderSizePixel = 0
+Inventory_2.Position = UDim2.new(0.0347826071, 0, 0.131541729, 0)
+Inventory_2.Size = UDim2.new(0.930434704, 0, 0.0909348354, 0)
+Inventory_2.ZIndex = 199999999
+Inventory_2.Font = Enum.Font.Unknown
+Inventory_2.Text = "Inventory"
+Inventory_2.TextColor3 = Color3.fromRGB(0, 0, 0)
+Inventory_2.TextSize = 25.000
+
+UICorner_14.CornerRadius = UDim.new(0.147198945, 0)
+UICorner_14.Parent = Inventory_2
+
+UIAspectRatioConstraint_33.Parent = Inventory_2
+UIAspectRatioConstraint_33.AspectRatio = 5.000
+
+Legit_2.Name = "Legit"
+Legit_2.Parent = Categories_2
+Legit_2.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+Legit_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Legit_2.BorderSizePixel = 0
+Legit_2.Position = UDim2.new(0.0347826071, 0, 0.244695902, 0)
+Legit_2.Size = UDim2.new(0.930434704, 0, 0.0909348354, 0)
+Legit_2.ZIndex = 199999999
+Legit_2.Font = Enum.Font.Unknown
+Legit_2.Text = "Legit"
+Legit_2.TextColor3 = Color3.fromRGB(0, 0, 0)
+Legit_2.TextSize = 25.000
+
+UICorner_15.CornerRadius = UDim.new(0.147198945, 0)
+UICorner_15.Parent = Legit_2
+
+UIAspectRatioConstraint_34.Parent = Legit_2
+UIAspectRatioConstraint_34.AspectRatio = 5.000
+
+Render_2.Name = "Render"
+Render_2.Parent = Categories_2
+Render_2.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+Render_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Render_2.BorderSizePixel = 0
+Render_2.Position = UDim2.new(0.0347826071, 0, 0.355021209, 0)
+Render_2.Size = UDim2.new(0.930434704, 0, 0.0909348354, 0)
+Render_2.ZIndex = 199999999
+Render_2.Font = Enum.Font.Unknown
+Render_2.Text = "Render"
+Render_2.TextColor3 = Color3.fromRGB(0, 0, 0)
+Render_2.TextSize = 25.000
+
+UICorner_16.CornerRadius = UDim.new(0.147198945, 0)
+UICorner_16.Parent = Render_2
+
+UIAspectRatioConstraint_35.Parent = Render_2
+UIAspectRatioConstraint_35.AspectRatio = 5.000
+
+World_2.Name = "World"
+World_2.Parent = Categories_2
+World_2.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+World_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+World_2.BorderSizePixel = 0
+World_2.Position = UDim2.new(0.0347826071, 0, 0.571428597, 0)
+World_2.Size = UDim2.new(0.930434704, 0, 0.0909348354, 0)
+World_2.ZIndex = 199999999
+World_2.Font = Enum.Font.Unknown
+World_2.Text = "World"
+World_2.TextColor3 = Color3.fromRGB(0, 0, 0)
+World_2.TextSize = 25.000
+
+UICorner_17.CornerRadius = UDim.new(0.147198945, 0)
+UICorner_17.Parent = World_2
+
+UIAspectRatioConstraint_36.Parent = World_2
+UIAspectRatioConstraint_36.AspectRatio = 5.000
+
+Utility_2.Name = "Utility"
+Utility_2.Parent = Categories_2
+Utility_2.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+Utility_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Utility_2.BorderSizePixel = 0
+Utility_2.Position = UDim2.new(0.0347826071, 0, 0.463932097, 0)
+Utility_2.Size = UDim2.new(0.930434704, 0, 0.0909348354, 0)
+Utility_2.ZIndex = 199999999
+Utility_2.Font = Enum.Font.Unknown
+Utility_2.Text = "Utility"
+Utility_2.TextColor3 = Color3.fromRGB(0, 0, 0)
+Utility_2.TextSize = 25.000
+
+UICorner_18.CornerRadius = UDim.new(0.147198945, 0)
+UICorner_18.Parent = Utility_2
+
+UIAspectRatioConstraint_37.Parent = Utility_2
+UIAspectRatioConstraint_37.AspectRatio = 5.000
+
+Kits_2.Name = "Kits"
+Kits_2.Parent = Categories_2
+Kits_2.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+Kits_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Kits_2.BorderSizePixel = 0
+Kits_2.Position = UDim2.new(0.0347826071, 0, 0.676096261, 0)
+Kits_2.Size = UDim2.new(0.930434704, 0, 0.0909348354, 0)
+Kits_2.ZIndex = 199999999
+Kits_2.Font = Enum.Font.Unknown
+Kits_2.Text = "Kits"
+Kits_2.TextColor3 = Color3.fromRGB(0, 0, 0)
+Kits_2.TextSize = 25.000
+
+UICorner_19.CornerRadius = UDim.new(0.147198945, 0)
+UICorner_19.Parent = Kits_2
+
+UIAspectRatioConstraint_38.Parent = Kits_2
+UIAspectRatioConstraint_38.AspectRatio = 5.000
+
+Misc_2.Name = "Misc"
+Misc_2.Parent = Categories_2
+Misc_2.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+Misc_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Misc_2.BorderSizePixel = 0
+Misc_2.Position = UDim2.new(0.0347826071, 0, 0.780763865, 0)
+Misc_2.Size = UDim2.new(0.930434704, 0, 0.0909348354, 0)
+Misc_2.ZIndex = 199999999
+Misc_2.Font = Enum.Font.Unknown
+Misc_2.Text = "Misc"
+Misc_2.TextColor3 = Color3.fromRGB(0, 0, 0)
+Misc_2.TextSize = 25.000
+
+UICorner_20.CornerRadius = UDim.new(0.147198945, 0)
+UICorner_20.Parent = Misc_2
+
+UIAspectRatioConstraint_39.Parent = Misc_2
+UIAspectRatioConstraint_39.AspectRatio = 5.000
+
+Reload.Name = "Reload"
+Reload.Parent = Categories_2
+Reload.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Reload.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Reload.BorderSizePixel = 0
+Reload.Position = UDim2.new(0.0347826071, 0, 0.882602632, 0)
+Reload.Size = UDim2.new(0.930434704, 0, 0.105143413, 0)
+Reload.ZIndex = 199999999
+Reload.Font = Enum.Font.Unknown
+Reload.Text = "Reload Modules"
+Reload.TextColor3 = Color3.fromRGB(0, 0, 0)
+Reload.TextSize = 25.000
+
+UICorner_21.CornerRadius = UDim.new(0.147198945, 0)
+UICorner_21.Parent = Reload
+
+UIAspectRatioConstraint_40.Parent = Reload
+UIAspectRatioConstraint_40.AspectRatio = 4.324
+
+UICorner_22.CornerRadius = UDim.new(0.103039265, 0)
+UICorner_22.Parent = Categories_2
+
+UIAspectRatioConstraint_41.Parent = Categories_2
+UIAspectRatioConstraint_41.AspectRatio = 0.489
+
+UIAspectRatioConstraint_42.Parent = Main
+UIAspectRatioConstraint_42.AspectRatio = 0.565
+
+UIAspectRatioConstraint_43.Parent = Script_2
+UIAspectRatioConstraint_43.AspectRatio = 2.749
+
+-- Draggable Scripts
+local function makeDraggable(frame, dragBar)
+    local dragging = false
+    local dragStart = nil
+    local startPos = nil
+
+    dragBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+        end
     end)
 
-    categoryButtons[catName] = btn
+    dragBar.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
 end
 
-local mainContent = Instance.new("ScrollingFrame")
-mainContent.Size = UDim2.new(1, -150, 1, -50)
-mainContent.Position = UDim2.new(0, 150, 0, 45)
-mainContent.BackgroundTransparency = 1
-mainContent.ScrollBarThickness = 4
-mainContent.AutomaticCanvasSize = Enum.AutomaticSize.Y
-mainContent.Parent = mainFrame
+-- Apply draggable to all frames
+makeDraggable(Blatant, Title)
+makeDraggable(Inventory, Title_2)
+makeDraggable(Legit, Title_3)
+makeDraggable(Render, Title_4)
+makeDraggable(Utility, Title_5)
+makeDraggable(World, Title_6)
+makeDraggable(Kits, Title_7)
+makeDraggable(Misc, Title_8)
+makeDraggable(Main, Title_10)
 
-local contentLayout = Instance.new("UIListLayout")
-contentLayout.Padding = UDim.new(0,6)
-contentLayout.Parent = mainContent
-
+-- Save/Load System
 local modules = {}
 local openConfigWindows = {}
 
@@ -171,377 +918,11 @@ local function loadConfig()
     end
 end
 
-local function makeDraggable(frame, dragBar)
-    local dragging = false
-    local dragStart = nil
-    local startPos = nil
-
-    dragBar.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            dragStart = input.Position
-            startPos = frame.Position
-        end
-    end)
-
-    dragBar.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = false
-        end
-    end)
-
-    UserInputService.InputChanged:Connect(function(input)
-        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-            local delta = input.Position - dragStart
-            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        end
-    end)
-end
-
-makeDraggable(mainFrame, titleBar)
-
-selfDestructBtn.MouseButton1Click:Connect(function() screenGui:Destroy() end)
-
--- RightShift Toggle
-UserInputService.InputBegan:Connect(function(input, gp)
-    if gp then return end
-    if input.KeyCode == Enum.KeyCode.RightShift then
-        screenGui.Enabled = not screenGui.Enabled
-    end
+-- Reload
+Reload.MouseButton1Click:Connect(function()
+    refreshModules()
 end)
 
--- Keybind System
-local keybinds = {}
-
-UserInputService.InputBegan:Connect(function(input, gp)
-    if gp then return end
-    for name, mod in pairs(modules) do
-        if keybinds[name] and input.KeyCode == keybinds[name] then
-            pcall(mod.moduleData.Run)
-            mod.enabled = not mod.enabled
-            updateButtonVisual(mod.button, mod.enabled)
-            saveConfig()
-        end
-    end
-end)
-
-local function updateButtonVisual(button, enabled)
-    button.BackgroundColor3 = enabled and Color3.fromRGB(40,120,60) or Color3.fromRGB(120,40,40)
-end
-
-local function createConfigWindow(moduleData)
-    local name = moduleData.Name
-    if openConfigWindows[name] then
-        openConfigWindows[name]:Destroy()
-        openConfigWindows[name] = nil
-        return
-    end
-
-    local configFrame = Instance.new("Frame")
-    configFrame.Size = UDim2.new(0, 300, 0, 500)
-    configFrame.Position = UDim2.new(0.5, -150, 0.5, -250)
-    configFrame.BackgroundColor3 = Color3.fromRGB(25,25,30)
-    configFrame.Parent = screenGui
-
-    local cCorner = Instance.new("UICorner"); cCorner.CornerRadius = UDim.new(0,8); cCorner.Parent = configFrame
-
-    local titleBarConfig = Instance.new("Frame")
-    titleBarConfig.Size = UDim2.new(1,0,0,40)
-    titleBarConfig.BackgroundColor3 = Color3.fromRGB(20,20,24)
-    titleBarConfig.Parent = configFrame
-
-    local titleLabel = Instance.new("TextLabel")
-    titleLabel.Size = UDim2.new(1,0,1,0)
-    titleLabel.BackgroundTransparency = 1
-    titleLabel.Text = name .. " Settings"
-    titleLabel.TextColor3 = Color3.fromRGB(255,255,255)
-    titleLabel.Font = Enum.Font.GothamBold
-    titleLabel.TextSize = 16
-    titleLabel.Parent = titleBarConfig
-
-    makeDraggable(configFrame, titleBarConfig)
-
-    local content = Instance.new("ScrollingFrame")
-    content.Size = UDim2.new(1,-20,1,-55)
-    content.Position = UDim2.new(0,10,0,45)
-    content.BackgroundTransparency = 1
-    content.ScrollBarThickness = 6
-    content.AutomaticCanvasSize = Enum.AutomaticSize.Y
-    content.Parent = configFrame
-
-    local uiList = Instance.new("UIListLayout")
-    uiList.Padding = UDim.new(0,10)
-    uiList.SortOrder = Enum.SortOrder.LayoutOrder
-    uiList.Parent = content
-
-    for _, setting in ipairs(moduleData.Config or {}) do
-        if setting.Type == "Toggle" then
-            local btn = Instance.new("TextButton")
-            btn.Size = UDim2.new(1,0,0,40)
-            btn.BackgroundColor3 = setting.Value and Color3.fromRGB(40,120,60) or Color3.fromRGB(70,70,80)
-            btn.Text = "   " .. setting.Name
-            btn.TextColor3 = Color3.fromRGB(255,255,255)
-            btn.TextXAlignment = Enum.TextXAlignment.Left
-            btn.Font = Enum.Font.Gotham
-            btn.TextSize = 15
-            btn.Parent = content
-
-            local corner = Instance.new("UICorner"); corner.CornerRadius = UDim.new(0,6); corner.Parent = btn
-
-            btn.MouseButton1Click:Connect(function()
-                setting.Value = not setting.Value
-                btn.BackgroundColor3 = setting.Value and Color3.fromRGB(40,120,60) or Color3.fromRGB(70,70,80)
-                saveConfig()
-            end)
-
-        elseif setting.Type == "Slider" then
-            local frame = Instance.new("Frame")
-            frame.Size = UDim2.new(1,0,0,65)
-            frame.BackgroundTransparency = 1
-            frame.Parent = content
-
-            local label = Instance.new("TextLabel")
-            label.Size = UDim2.new(1,0,0,20)
-            label.BackgroundTransparency = 1
-            label.Text = setting.Name .. ": " .. setting.Value .. (setting.Suffix or "")
-            label.TextColor3 = Color3.fromRGB(220,220,220)
-            label.Font = Enum.Font.Gotham
-            label.TextSize = 14
-            label.Parent = frame
-
-            local bg = Instance.new("Frame")
-            bg.Size = UDim2.new(1,0,0,12)
-            bg.Position = UDim2.new(0,0,0,32)
-            bg.BackgroundColor3 = Color3.fromRGB(45,45,50)
-            bg.Parent = frame
-
-            local fill = Instance.new("Frame")
-            fill.BackgroundColor3 = Color3.fromRGB(0, 170, 100)
-            fill.Parent = bg
-
-            local bCorner = Instance.new("UICorner"); bCorner.CornerRadius = UDim.new(0,6); bCorner.Parent = bg
-            bCorner:Clone().Parent = fill
-
-            local function updateFill()
-                local percent = (setting.Value - setting.Min) / (setting.Max - setting.Min)
-                fill.Size = UDim2.new(percent, 0, 1, 0)
-                label.Text = setting.Name .. ": " .. setting.Value .. (setting.Suffix or "")
-            end
-            updateFill()
-
-            local dragging = false
-            bg.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                    dragging = true
-                end
-            end)
-
-            UserInputService.InputChanged:Connect(function(input)
-                if not dragging then return end
-                if input.UserInputType == Enum.UserInputType.MouseMovement then
-                    local mouseX = UserInputService:GetMouseLocation().X
-                    local bgX = bg.AbsolutePosition.X
-                    local bgWidth = bg.AbsoluteSize.X
-
-                    local percent = math.clamp((mouseX - bgX) / bgWidth, 0, 1)
-                    setting.Value = math.floor(setting.Min + percent * (setting.Max - setting.Min))
-                    updateFill()
-                    saveConfig()
-                end
-            end)
-
-            UserInputService.InputEnded:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                    dragging = false
-                end
-            end)
-
-        elseif setting.Type == "Dropdown" then
-            local label = Instance.new("TextLabel")
-            label.Size = UDim2.new(1,0,0,20)
-            label.BackgroundTransparency = 1
-            label.Text = setting.Name
-            label.TextColor3 = Color3.fromRGB(220,220,220)
-            label.Font = Enum.Font.Gotham
-            label.TextSize = 14
-            label.Parent = content
-
-            local dropdownBtn = Instance.new("TextButton")
-            dropdownBtn.Size = UDim2.new(1,0,0,35)
-            dropdownBtn.BackgroundColor3 = Color3.fromRGB(50,50,55)
-            dropdownBtn.Text = setting.Value or setting.Default
-            dropdownBtn.TextColor3 = Color3.fromRGB(255,255,255)
-            dropdownBtn.Font = Enum.Font.Gotham
-            dropdownBtn.TextSize = 14
-            dropdownBtn.Parent = content
-
-            local corner = Instance.new("UICorner"); corner.CornerRadius = UDim.new(0,6); corner.Parent = dropdownBtn
-
-            local dropdownList = nil
-
-            dropdownBtn.MouseButton1Click:Connect(function()
-                if dropdownList then
-                    dropdownList:Destroy()
-                    dropdownList = nil
-                    return
-                end
-
-                dropdownList = Instance.new("ScrollingFrame")
-                dropdownList.Size = UDim2.new(1,0,0,300)
-                dropdownList.Position = UDim2.new(0,0,0,40)
-                dropdownList.BackgroundColor3 = Color3.fromRGB(35,35,40)
-                dropdownList.ScrollBarThickness = 6
-                dropdownList.AutomaticCanvasSize = Enum.AutomaticSize.Y
-                dropdownList.Parent = dropdownBtn.Parent
-
-                local listCorner = Instance.new("UICorner"); listCorner.CornerRadius = UDim.new(0,6); listCorner.Parent = dropdownList
-
-                local listLayout = Instance.new("UIListLayout")
-                listLayout.Padding = UDim.new(0,2)
-                listLayout.Parent = dropdownList
-
-                for _, opt in ipairs(setting.Options) do
-                    local optionBtn = Instance.new("TextButton")
-                    optionBtn.Size = UDim2.new(1,0,0,30)
-                    optionBtn.BackgroundColor3 = Color3.fromRGB(45,45,50)
-                    optionBtn.Text = opt
-                    optionBtn.TextColor3 = Color3.fromRGB(255,255,255)
-                    optionBtn.Font = Enum.Font.Gotham
-                    optionBtn.TextSize = 14
-                    optionBtn.Parent = dropdownList
-
-                    local optCorner = Instance.new("UICorner"); optCorner.CornerRadius = UDim.new(0,4); optCorner.Parent = optionBtn
-
-                    optionBtn.MouseButton1Click:Connect(function()
-                        setting.Value = opt
-                        dropdownBtn.Text = opt
-                        if dropdownList then
-                            dropdownList:Destroy()
-                            dropdownList = nil
-                        end
-                        saveConfig()
-                    end)
-                end
-            end)
-        end
-    end
-
-    openConfigWindows[name] = configFrame
-end
-
-local function createButtonForModule(moduleData)
-    local displayName = moduleData.Name or "Unnamed"
-
-    local buttonFrame = Instance.new("Frame")
-    buttonFrame.Size = UDim2.new(1,0,0,42)
-    buttonFrame.BackgroundTransparency = 1
-    buttonFrame.Parent = mainContent
-
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(1,-48,1,0)
-    button.BackgroundColor3 = Color3.fromRGB(45,45,52)
-    button.Text = displayName
-    button.TextColor3 = Color3.fromRGB(255,255,255)
-    button.Font = Enum.Font.Gotham
-    button.TextSize = 14
-    button.Parent = buttonFrame
-
-    local corner = Instance.new("UICorner"); corner.CornerRadius = UDim.new(0,6); corner.Parent = button
-
-    local settingsBtn = Instance.new("TextButton")
-    settingsBtn.Size = UDim2.new(0,40,1,0)
-    settingsBtn.Position = UDim2.new(1,-44,0,0)
-    settingsBtn.BackgroundColor3 = Color3.fromRGB(55,55,65)
-    settingsBtn.Text = "⚙"
-    settingsBtn.TextColor3 = Color3.fromRGB(220,220,220)
-    settingsBtn.Font = Enum.Font.GothamBold
-    settingsBtn.TextSize = 18
-    settingsBtn.Parent = buttonFrame
-
-    modules[displayName] = {button = button, moduleData = moduleData, enabled = false}
-
-    button.MouseButton1Click:Connect(function()
-        local mod = modules[displayName]
-        pcall(mod.moduleData.Run)
-        mod.enabled = not mod.enabled
-        updateButtonVisual(button, mod.enabled)
-        saveConfig()
-    end)
-
-    settingsBtn.MouseButton1Click:Connect(function()
-        createConfigWindow(moduleData)
-    end)
-
-    updateButtonVisual(button, false)
-end
-
-local function refreshModules()
-    for _, v in mainContent:GetChildren() do if v:IsA("Frame") then v:Destroy() end end
-
-    local url = string.format("https://api.github.com/repos/%s/%s/contents/%s/%s?ref=%s", REPO_USER, REPO_NAME, GITHUB_FOLDER, currentCategory, REPO_BRANCH)
-    local ok, response = pcall(function() return request({Url = url, Method = "GET"}) end)
-
-    if ok and response.Success then
-        local files = HttpService:JSONDecode(response.Body)
-        for _, file in ipairs(files) do
-            if file.type == "file" and file.name:match("%.lua$") then
-                local ok2, res = pcall(function() return request({Url = file.download_url, Method = "GET"}) end)
-                if ok2 and res.Success then
-                    local func = loadstring(res.Body)
-                    if func then
-                        local s, mod = pcall(func)
-                        if s and mod and mod.Run then
-                            createButtonForModule(mod)
-                        end
-                    end
-                end
-            end
-        end
-    else
-        print("Failed to load modules from " .. currentCategory)
-    end
-end
-
-local function saveConfig()
-    local config = {}
-    for name, mod in pairs(modules) do
-        config[name] = {
-            enabled = mod.enabled,
-            settings = {}
-        }
-        for _, setting in ipairs(mod.moduleData.Config or {}) do
-            config[name].settings[setting.Name] = setting.Value
-        end
-    end
-    pcall(function()
-        writefile(saveFile, HttpService:JSONEncode(config))
-    end)
-end
-
-local function loadConfig()
-    if isfile(saveFile) then
-        local success, config = pcall(function()
-            return HttpService:JSONDecode(readfile(saveFile))
-        end)
-        if success then
-            for name, data in pairs(config) do
-                if modules[name] then
-                    if data.enabled then
-                        pcall(modules[name].moduleData.Run)
-                        modules[name].enabled = true
-                        updateButtonVisual(modules[name].button, true)
-                    end
-                    for _, setting in ipairs(modules[name].moduleData.Config or {}) do
-                        if data.settings and data.settings[setting.Name] ~= nil then
-                            setting.Value = data.settings[setting.Name]
-                        end
-                    end
-                end
-            end
-        end
-    end
-end
-
-reloadButton.MouseButton1Click:Connect(refreshModules)
+-- Final Load
 refreshModules()
-loadConfig()  -- Load saved config
+loadConfig()
