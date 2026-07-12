@@ -1261,7 +1261,7 @@ local function ZJVXXL_fake_script() -- Misc_2.LocalScript
 end
 coroutine.wrap(ZJVXXL_fake_script)()
 
--- GITHUB LOADING CODE (added at the end)
+-- GITHUB LOADING CODE (added at the very end)
 local REPO_USER = "radwaw1"
 local REPO_NAME = "bwscriptnew"
 local REPO_BRANCH = "main"
@@ -1270,11 +1270,22 @@ local GITHUB_FOLDER = "modules"
 local modules = {}
 local openConfigWindows = {}
 
+local categoryFrames = {
+    Blatant = Modules,
+    Inventory = Modules_2,
+    Legit = Modules_3,
+    Render = Modules_4,
+    Utility = Modules_5,
+    World = Modules_6,
+    Kits = Modules_7,
+    Misc = Modules_8
+}
+
 local function saveConfig()
     local config = {}
     for name, mod in pairs(modules) do
         config[name] = {
-            enabled = mod.enabled,
+            enabled = mod.enabled or false,
             settings = {}
         }
         for _, setting in ipairs(mod.moduleData.Config or {}) do
@@ -1297,7 +1308,6 @@ local function loadConfig()
                     if data.enabled then
                         pcall(modules[name].moduleData.Run)
                         modules[name].enabled = true
-                        updateButtonVisual(modules[name].button, true)
                     end
                     for _, setting in ipairs(modules[name].moduleData.Config or {}) do
                         if data.settings and data.settings[setting.Name] ~= nil then
@@ -1310,11 +1320,17 @@ local function loadConfig()
     end
 end
 
-local function refreshModules()
-    for _, v in Modules:GetChildren() do if v:IsA("Frame") then v:Destroy() end end
-    -- repeat for other category scrolling frames if needed
+local function refreshModules(category)
+    local scrollingFrame = categoryFrames[category]
+    if not scrollingFrame then return end
 
-    local url = string.format("https://api.github.com/repos/%s/%s/contents/%s/%s?ref=%s", REPO_USER, REPO_NAME, GITHUB_FOLDER, currentCategory, REPO_BRANCH)
+    for _, v in ipairs(scrollingFrame:GetChildren()) do
+        if v:IsA("Frame") or v:IsA("TextButton") then
+            v:Destroy()
+        end
+    end
+
+    local url = string.format("https://api.github.com/repos/%s/%s/contents/%s/%s?ref=%s", REPO_USER, REPO_NAME, GITHUB_FOLDER, category, REPO_BRANCH)
     local ok, response = pcall(function() return request({Url = url, Method = "GET"}) end)
 
     if ok and response.Success then
@@ -1327,7 +1343,15 @@ local function refreshModules()
                     if func then
                         local s, mod = pcall(func)
                         if s and mod and mod.Run then
-                            createButtonForModule(mod)
+                            -- Create button in the correct scrolling frame
+                            local button = Instance.new("TextButton")
+                            button.Size = UDim2.new(1, 0, 0, 30)
+                            button.Text = mod.Name or file.name
+                            button.Parent = scrollingFrame
+                            button.MouseButton1Click:Connect(function()
+                                pcall(mod.Run)
+                            end)
+                            modules[mod.Name or file.name] = {moduleData = mod, enabled = false, button = button}
                         end
                     end
                 end
@@ -1336,6 +1360,9 @@ local function refreshModules()
     end
 end
 
-Reload.MouseButton1Click:Connect(refreshModules)
-refreshModules()
+-- Call refresh for all categories on load
+for category, _ in pairs(categoryFrames) do
+    refreshModules(category)
+end
+
 loadConfig()
