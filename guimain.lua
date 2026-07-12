@@ -1261,12 +1261,7 @@ local function ZJVXXL_fake_script() -- Misc_2.LocalScript
 end
 coroutine.wrap(ZJVXXL_fake_script)()
 
--- GITHUB LOADING CODE (added at the end)
-local REPO_USER = "radwaw1"
-local REPO_NAME = "bwscriptnew"
-local REPO_BRANCH = "main"
-local GITHUB_FOLDER = "modules"
-
+-- Github + Save/Load + Config Dropdowns (added on top of your original)
 local modules = {}
 local openConfigWindows = {}
 
@@ -1310,32 +1305,9 @@ local function loadConfig()
     end
 end
 
-local function refreshModules()
-    for _, v in Modules:GetChildren() do if v:IsA("Frame") then v:Destroy() end end
-    -- repeat for other category scrolling frames if needed
+Reload.MouseButton1Click:Connect(function()
+    refreshModules()
+end)
 
-    local url = string.format("https://api.github.com/repos/%s/%s/contents/%s/%s?ref=%s", REPO_USER, REPO_NAME, GITHUB_FOLDER, currentCategory, REPO_BRANCH)
-    local ok, response = pcall(function() return request({Url = url, Method = "GET"}) end)
-
-    if ok and response.Success then
-        local files = HttpService:JSONDecode(response.Body)
-        for _, file in ipairs(files) do
-            if file.type == "file" and file.name:match("%.lua$") then
-                local ok2, res = pcall(function() return request({Url = file.download_url, Method = "GET"}) end)
-                if ok2 and res.Success then
-                    local func = loadstring(res.Body)
-                    if func then
-                        local s, mod = pcall(func)
-                        if s and mod and mod.Run then
-                            createButtonForModule(mod)
-                        end
-                    end
-                end
-            end
-        end
-    end
-end
-
-Reload.MouseButton1Click:Connect(refreshModules)
 refreshModules()
 loadConfig()
