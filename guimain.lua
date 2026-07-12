@@ -1261,7 +1261,7 @@ local function ZJVXXL_fake_script() -- Misc_2.LocalScript
 end
 coroutine.wrap(ZJVXXL_fake_script)()
 
--- GITHUB LOADING CODE (Fixed Overlap + Working Config Dropdown)
+-- GITHUB LOADING CODE (Fixed Save + Working Config Dropdowns)
 local REPO_USER = "radwaw1"
 local REPO_NAME = "bwscriptnew"
 local REPO_BRANCH = "main"
@@ -1280,7 +1280,7 @@ local categoryFrames = {
     Misc = Modules_8
 }
 
--- Add UIListLayout to all scrolling frames so buttons stack properly
+-- Add UIListLayout
 for _, frame in pairs(categoryFrames) do
     local list = Instance.new("UIListLayout")
     list.SortOrder = Enum.SortOrder.LayoutOrder
@@ -1327,6 +1327,54 @@ local function loadConfig()
     end
 end
 
+local function createConfigUI(moduleFrame, modData)
+    local dropdown = Instance.new("Frame")
+    dropdown.Size = UDim2.new(1, 0, 0, 0)
+    dropdown.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    dropdown.Visible = false
+    dropdown.Parent = moduleFrame
+
+    local list = Instance.new("UIListLayout")
+    list.Padding = UDim.new(0, 4)
+    list.Parent = dropdown
+
+    for _, setting in ipairs(modData.Config or {}) do
+        if setting.Type == "Slider" then
+            local sliderFrame = Instance.new("Frame")
+            sliderFrame.Size = UDim2.new(1, 0, 0, 30)
+            sliderFrame.BackgroundTransparency = 1
+            sliderFrame.Parent = dropdown
+
+            local label = Instance.new("TextLabel")
+            label.Size = UDim2.new(0.6, 0, 1, 0)
+            label.BackgroundTransparency = 1
+            label.Text = setting.Name .. ": " .. setting.Value
+            label.TextColor3 = Color3.fromRGB(255,255,255)
+            label.TextSize = 14
+            label.Parent = sliderFrame
+
+            local slider = Instance.new("TextButton")
+            slider.Size = UDim2.new(0.35, 0, 1, 0)
+            slider.Position = UDim2.new(0.65, 0, 0, 0)
+            slider.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            slider.Text = tostring(setting.Value)
+            slider.Parent = sliderFrame
+
+            slider.MouseButton1Click:Connect(function()
+                local newVal = tonumber(prompt("Enter value for " .. setting.Name .. " (" .. setting.Min .. "-" .. setting.Max .. ")", setting.Value))
+                if newVal then
+                    setting.Value = math.clamp(newVal, setting.Min, setting.Max)
+                    label.Text = setting.Name .. ": " .. setting.Value
+                    slider.Text = tostring(setting.Value)
+                    saveConfig()
+                end
+            end)
+        end
+    end
+
+    return dropdown
+end
+
 local function refreshModules(category)
     local scrollingFrame = categoryFrames[category]
     if not scrollingFrame then return end
@@ -1352,10 +1400,8 @@ local function refreshModules(category)
                             local moduleFrame = Instance.new("Frame")
                             moduleFrame.Size = UDim2.new(1, -10, 0, 50)
                             moduleFrame.BackgroundTransparency = 1
-                            moduleFrame.LayoutOrder = #scrollingFrame:GetChildren()
                             moduleFrame.Parent = scrollingFrame
 
-                            -- Toggle Button
                             local button = Instance.new("TextButton")
                             button.Size = UDim2.new(0.72, 0, 1, 0)
                             button.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
@@ -1371,36 +1417,19 @@ local function refreshModules(category)
                                 saveConfig()
                             end)
 
-                            -- Config Button
                             local configBtn = Instance.new("TextButton")
                             configBtn.Size = UDim2.new(0.25, 0, 1, 0)
                             configBtn.Position = UDim2.new(0.76, 0, 0, 0)
-                            configBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-                            configBtn.Text = "Config ▼"
+                            configBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
+                            configBtn.Text = "Config"
                             configBtn.TextColor3 = Color3.fromRGB(255,255,255)
-                            configBtn.TextSize = 14
                             configBtn.Parent = moduleFrame
 
-                            local configDropdown = Instance.new("Frame")
-                            configDropdown.Size = UDim2.new(1, 0, 0, 0)
-                            configDropdown.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-                            configDropdown.Visible = false
-                            configDropdown.Parent = moduleFrame
-
-                            local listLayout = Instance.new("UIListLayout")
-                            listLayout.Parent = configDropdown
+                            local dropdown = createConfigUI(moduleFrame, mod)
 
                             configBtn.MouseButton1Click:Connect(function()
-                                configDropdown.Visible = not configDropdown.Visible
-                                if configDropdown.Visible then
-                                    local height = 0
-                                    for _, child in ipairs(configDropdown:GetChildren()) do
-                                        if child:IsA("TextButton") then height += 30 end
-                                    end
-                                    configDropdown.Size = UDim2.new(1, 0, 0, height + 10)
-                                else
-                                    configDropdown.Size = UDim2.new(1, 0, 0, 0)
-                                end
+                                dropdown.Visible = not dropdown.Visible
+                                dropdown.Size = dropdown.Visible and UDim2.new(1,0,0, dropdown.UIListLayout.AbsoluteContentSize.Y + 10) or UDim2.new(1,0,0,0)
                             end)
 
                             modules[mod.Name or file.name] = {moduleData = mod, enabled = false, button = button}
@@ -1414,7 +1443,6 @@ local function refreshModules(category)
     end
 end
 
--- Load all categories
 for cat, _ in pairs(categoryFrames) do
     refreshModules(cat)
 end
