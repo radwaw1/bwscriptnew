@@ -1,17 +1,7 @@
--- ModuleHub with Categories + RightShift Toggle + Full Save/Load Config
-local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
-local HttpService = game:GetService("HttpService")
+-- Gui to Lua
+-- Version: 3.2
 
-local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
-
-local REPO_USER = "radwaw1"
-local REPO_NAME = "bwscriptnew"
-local REPO_BRANCH = "main"
-local GITHUB_FOLDER = "modules"
-
-local saveFile = "ModuleHub_Config.json"
+-- Instances:
 
 local Script = Instance.new("ScreenGui")
 local Script_2 = Instance.new("Frame")
@@ -122,9 +112,10 @@ local UIAspectRatioConstraint_41 = Instance.new("UIAspectRatioConstraint")
 local UIAspectRatioConstraint_42 = Instance.new("UIAspectRatioConstraint")
 local UIAspectRatioConstraint_43 = Instance.new("UIAspectRatioConstraint")
 
--- Properties
+--Properties:
+
 Script.Name = "Script"
-Script.Parent = playerGui
+Script.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
 Script_2.Name = "Script"
 Script_2.Parent = Script
@@ -835,46 +826,442 @@ UIAspectRatioConstraint_42.AspectRatio = 0.565
 UIAspectRatioConstraint_43.Parent = Script_2
 UIAspectRatioConstraint_43.AspectRatio = 2.749
 
--- Draggable Scripts
-local function makeDraggable(frame, dragBar)
-    local dragging = false
-    local dragStart = nil
-    local startPos = nil
+-- Scripts:
 
-    dragBar.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            dragStart = input.Position
-            startPos = frame.Position
-        end
-    end)
+local function ZPZWEX_fake_script() -- Blatant.MakeDraggable 
+	local script = Instance.new('LocalScript', Blatant)
 
-    dragBar.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = false
-        end
-    end)
-
-    UserInputService.InputChanged:Connect(function(input)
-        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-            local delta = input.Position - dragStart
-            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        end
-    end)
+	local UserInputService = game:GetService("UserInputService")
+	
+	local gui = script.Parent
+	
+	local dragging
+	local dragInput
+	local dragStart
+	local startPos
+	
+	local function update(input)
+		local delta = input.Position - dragStart
+		gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+	
+	gui.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = gui.Position
+	
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	end)
+	
+	gui.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			dragInput = input
+		end
+	end)
+	
+	UserInputService.InputChanged:Connect(function(input)
+		if input == dragInput and dragging then
+			update(input)
+		end
+	end)
 end
+coroutine.wrap(ZPZWEX_fake_script)()
+local function IYVE_fake_script() -- Inventory.MakeDraggable 
+	local script = Instance.new('LocalScript', Inventory)
 
--- Apply draggable to all frames
-makeDraggable(Blatant, Title)
-makeDraggable(Inventory, Title_2)
-makeDraggable(Legit, Title_3)
-makeDraggable(Render, Title_4)
-makeDraggable(Utility, Title_5)
-makeDraggable(World, Title_6)
-makeDraggable(Kits, Title_7)
-makeDraggable(Misc, Title_8)
-makeDraggable(Main, Title_10)
+	local UserInputService = game:GetService("UserInputService")
+	
+	local gui = script.Parent
+	
+	local dragging
+	local dragInput
+	local dragStart
+	local startPos
+	
+	local function update(input)
+		local delta = input.Position - dragStart
+		gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+	
+	gui.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = gui.Position
+	
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	end)
+	
+	gui.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			dragInput = input
+		end
+	end)
+	
+	UserInputService.InputChanged:Connect(function(input)
+		if input == dragInput and dragging then
+			update(input)
+		end
+	end)
+end
+coroutine.wrap(IYVE_fake_script)()
+local function XBYAA_fake_script() -- Legit.MakeDraggable 
+	local script = Instance.new('LocalScript', Legit)
 
--- Save/Load System
+	local UserInputService = game:GetService("UserInputService")
+	
+	local gui = script.Parent
+	
+	local dragging
+	local dragInput
+	local dragStart
+	local startPos
+	
+	local function update(input)
+		local delta = input.Position - dragStart
+		gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+	
+	gui.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = gui.Position
+	
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	end)
+	
+	gui.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			dragInput = input
+		end
+	end)
+	
+	UserInputService.InputChanged:Connect(function(input)
+		if input == dragInput and dragging then
+			update(input)
+		end
+	end)
+end
+coroutine.wrap(XBYAA_fake_script)()
+local function FVCVWJE_fake_script() -- Render.MakeDraggable 
+	local script = Instance.new('LocalScript', Render)
+
+	local UserInputService = game:GetService("UserInputService")
+	
+	local gui = script.Parent
+	
+	local dragging
+	local dragInput
+	local dragStart
+	local startPos
+	
+	local function update(input)
+		local delta = input.Position - dragStart
+		gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+	
+	gui.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = gui.Position
+	
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	end)
+	
+	gui.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			dragInput = input
+		end
+	end)
+	
+	UserInputService.InputChanged:Connect(function(input)
+		if input == dragInput and dragging then
+			update(input)
+		end
+	end)
+end
+coroutine.wrap(FVCVWJE_fake_script)()
+local function SIIAQM_fake_script() -- Utility.MakeDraggable 
+	local script = Instance.new('LocalScript', Utility)
+
+	local UserInputService = game:GetService("UserInputService")
+	
+	local gui = script.Parent
+	
+	local dragging
+	local dragInput
+	local dragStart
+	local startPos
+	
+	local function update(input)
+		local delta = input.Position - dragStart
+		gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+	
+	gui.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = gui.Position
+	
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	end)
+	
+	gui.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			dragInput = input
+		end
+	end)
+	
+	UserInputService.InputChanged:Connect(function(input)
+		if input == dragInput and dragging then
+			update(input)
+		end
+	end)
+end
+coroutine.wrap(SIIAQM_fake_script)()
+local function MSIT_fake_script() -- World.MakeDraggable 
+	local script = Instance.new('LocalScript', World)
+
+	local UserInputService = game:GetService("UserInputService")
+	
+	local gui = script.Parent
+	
+	local dragging
+	local dragInput
+	local dragStart
+	local startPos
+	
+	local function update(input)
+		local delta = input.Position - dragStart
+		gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+	
+	gui.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = gui.Position
+	
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	end)
+	
+	gui.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			dragInput = input
+		end
+	end)
+	
+	UserInputService.InputChanged:Connect(function(input)
+		if input == dragInput and dragging then
+			update(input)
+		end
+	end)
+end
+coroutine.wrap(MSIT_fake_script)()
+local function IYID_fake_script() -- Kits.MakeDraggable 
+	local script = Instance.new('LocalScript', Kits)
+
+	local UserInputService = game:GetService("UserInputService")
+	
+	local gui = script.Parent
+	
+	local dragging
+	local dragInput
+	local dragStart
+	local startPos
+	
+	local function update(input)
+		local delta = input.Position - dragStart
+		gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+	
+	gui.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = gui.Position
+	
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	end)
+	
+	gui.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			dragInput = input
+		end
+	end)
+	
+	UserInputService.InputChanged:Connect(function(input)
+		if input == dragInput and dragging then
+			update(input)
+		end
+	end)
+end
+coroutine.wrap(IYID_fake_script)()
+local function DRKDHLP_fake_script() -- Misc.MakeDraggable 
+	local script = Instance.new('LocalScript', Misc)
+
+	local UserInputService = game:GetService("UserInputService")
+	
+	local gui = script.Parent
+	
+	local dragging
+	local dragInput
+	local dragStart
+	local startPos
+	
+	local function update(input)
+		local delta = input.Position - dragStart
+		gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+	
+	gui.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = gui.Position
+	
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	end)
+	
+	gui.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			dragInput = input
+		end
+	end)
+	
+	UserInputService.InputChanged:Connect(function(input)
+		if input == dragInput and dragging then
+			update(input)
+		end
+	end)
+end
+coroutine.wrap(DRKDHLP_fake_script)()
+local function GBBFO_fake_script() -- Delete.LocalScript 
+	local script = Instance.new('LocalScript', Delete)
+
+	script.Parent.MouseButton1Click:Connect(function()
+		script.Parent.Parent.Parent:Destroy()
+	end)
+end
+coroutine.wrap(GBBFO_fake_script)()
+local function IZWSGH_fake_script() -- Blatant_2.LocalScript 
+	local script = Instance.new('LocalScript', Blatant_2)
+
+	
+	script.Parent.MouseButton1Click:Connect(function()
+		script.Parent.Parent.Parent.Parent.Categories.Blatant.Visible = not script.Parent.Parent.Parent.Parent.Categories.Blatant.Visible
+	end)
+end
+coroutine.wrap(IZWSGH_fake_script)()
+local function ERDHQ_fake_script() -- Inventory_2.LocalScript 
+	local script = Instance.new('LocalScript', Inventory_2)
+
+	
+	script.Parent.MouseButton1Click:Connect(function()
+		script.Parent.Parent.Parent.Parent.Categories.Inventory.Visible = not script.Parent.Parent.Parent.Parent.Categories.Inventory.Visible
+	end)
+end
+coroutine.wrap(ERDHQ_fake_script)()
+local function MXQMOX_fake_script() -- Legit_2.LocalScript 
+	local script = Instance.new('LocalScript', Legit_2)
+
+	
+	script.Parent.MouseButton1Click:Connect(function()
+		script.Parent.Parent.Parent.Parent.Categories.Legit.Visible = not script.Parent.Parent.Parent.Parent.Categories.Legit.Visible
+	end)
+end
+coroutine.wrap(MXQMOX_fake_script)()
+local function BHEQ_fake_script() -- Render_2.LocalScript 
+	local script = Instance.new('LocalScript', Render_2)
+
+	
+	script.Parent.MouseButton1Click:Connect(function()
+		script.Parent.Parent.Parent.Parent.Categories.Render.Visible = not script.Parent.Parent.Parent.Parent.Categories.Render.Visible
+	end)
+end
+coroutine.wrap(BHEQ_fake_script)()
+local function KIGES_fake_script() -- World_2.LocalScript 
+	local script = Instance.new('LocalScript', World_2)
+
+	
+	script.Parent.MouseButton1Click:Connect(function()
+		script.Parent.Parent.Parent.Parent.Categories.World.Visible = not script.Parent.Parent.Parent.Parent.Categories.World.Visible
+	end)
+end
+coroutine.wrap(KIGES_fake_script)()
+local function USHNWUZ_fake_script() -- Utility_2.LocalScript 
+	local script = Instance.new('LocalScript', Utility_2)
+
+	
+	script.Parent.MouseButton1Click:Connect(function()
+		script.Parent.Parent.Parent.Parent.Categories.Utility.Visible = not script.Parent.Parent.Parent.Parent.Categories.Utility.Visible
+	end)
+end
+coroutine.wrap(USHNWUZ_fake_script)()
+local function GHXTLGJ_fake_script() -- Kits_2.LocalScript 
+	local script = Instance.new('LocalScript', Kits_2)
+
+	
+	script.Parent.MouseButton1Click:Connect(function()
+		script.Parent.Parent.Parent.Parent.Categories.Kits.Visible = not script.Parent.Parent.Parent.Parent.Categories.Kits.Visible
+	end)
+end
+coroutine.wrap(GHXTLGJ_fake_script)()
+local function ZJVXXL_fake_script() -- Misc_2.LocalScript 
+	local script = Instance.new('LocalScript', Misc_2)
+
+	
+	script.Parent.MouseButton1Click:Connect(function()
+		script.Parent.Parent.Parent.Parent.Categories.Misc.Visible = not script.Parent.Parent.Parent.Parent.Categories.Misc.Visible
+	end)
+end
+coroutine.wrap(ZJVXXL_fake_script)()
+
+-- Github + Save/Load + Config Dropdowns (added on top of your original)
 local modules = {}
 local openConfigWindows = {}
 
@@ -918,11 +1305,9 @@ local function loadConfig()
     end
 end
 
--- Reload
 Reload.MouseButton1Click:Connect(function()
     refreshModules()
 end)
 
--- Final Load
 refreshModules()
 loadConfig()
