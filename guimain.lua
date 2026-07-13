@@ -4,6 +4,8 @@
 -- Instances:
 
 local Script = Instance.new("ScreenGui")
+Script.ResetOnSpawn = false
+
 local Script_2 = Instance.new("Frame")
 local Categories = Instance.new("Frame")
 local Blatant = Instance.new("Frame")
@@ -1261,7 +1263,7 @@ local function ZJVXXL_fake_script() -- Misc_2.LocalScript
 end
 coroutine.wrap(ZJVXXL_fake_script)()
 
--- GITHUB LOADING CODE (Config Drops Down + Pushes Buttons)
+-- GITHUB LOADING CODE (Load All at Once + Fixed Save + Dropdown)
 local REPO_USER = "radwaw1"
 local REPO_NAME = "bwscriptnew"
 local REPO_BRANCH = "main"
@@ -1280,7 +1282,7 @@ local categoryFrames = {
     Misc = Modules_8
 }
 
--- UIListLayout for proper stacking
+-- UIListLayout
 for _, frame in pairs(categoryFrames) do
     local list = Instance.new("UIListLayout")
     list.SortOrder = Enum.SortOrder.LayoutOrder
@@ -1329,12 +1331,9 @@ end
 
 local function createConfigUI(moduleFrame, modData)
     local dropdown = Instance.new("Frame")
-    dropdown.Name = "ConfigDropdown"
     dropdown.Size = UDim2.new(1, 0, 0, 0)
     dropdown.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    dropdown.BorderSizePixel = 0
     dropdown.Visible = false
-    dropdown.LayoutOrder = 1
     dropdown.Parent = moduleFrame
 
     local list = Instance.new("UIListLayout")
@@ -1357,21 +1356,20 @@ local function createConfigUI(moduleFrame, modData)
             label.TextSize = 14
             label.Parent = row
 
-            local sliderBtn = Instance.new("TextButton")
-            sliderBtn.Size = UDim2.new(0.45, 0, 1, 0)
-            sliderBtn.Position = UDim2.new(0.55, 0, 0, 0)
-            sliderBtn.BackgroundColor3 = Color3.fromRGB(70,70,70)
-            sliderBtn.Text = tostring(setting.Value)
-            sliderBtn.TextColor3 = Color3.fromRGB(255,255,255)
-            sliderBtn.Parent = row
+            local btn = Instance.new("TextButton")
+            btn.Size = UDim2.new(0.45, 0, 1, 0)
+            btn.Position = UDim2.new(0.55, 0, 0, 0)
+            btn.BackgroundColor3 = Color3.fromRGB(70,70,70)
+            btn.Text = tostring(setting.Value)
+            btn.TextColor3 = Color3.fromRGB(255,255,255)
+            btn.Parent = row
 
-            sliderBtn.MouseButton1Click:Connect(function()
-                local input = prompt("New value for " .. setting.Name .. " ("..setting.Min.."-"..setting.Max..")", tostring(setting.Value))
-                local val = tonumber(input)
+            btn.MouseButton1Click:Connect(function()
+                local val = tonumber(prompt("Enter value for " .. setting.Name, tostring(setting.Value)))
                 if val then
                     setting.Value = math.clamp(val, setting.Min or 0, setting.Max or 100)
                     label.Text = setting.Name .. ": " .. tostring(setting.Value)
-                    sliderBtn.Text = tostring(setting.Value)
+                    btn.Text = tostring(setting.Value)
                     saveConfig()
                 end
             end)
@@ -1381,71 +1379,82 @@ local function createConfigUI(moduleFrame, modData)
     return dropdown
 end
 
-local function refreshModules(category)
-    local scrollingFrame = categoryFrames[category]
-    if not scrollingFrame then return end
-
-    for _, child in ipairs(scrollingFrame:GetChildren()) do
-        if child:IsA("Frame") then child:Destroy() end
-    end
-
-    local url = string.format("https://api.github.com/repos/%s/%s/contents/%s/%s?ref=%s", REPO_USER, REPO_NAME, GITHUB_FOLDER, category, REPO_BRANCH)
-    
+local function refreshModules()
+    -- Single call to get all categories
+    local url = string.format("https://api.github.com/repos/%s/%s/contents/%s?ref=%s", REPO_USER, REPO_NAME, GITHUB_FOLDER, REPO_BRANCH)
     local ok, response = pcall(function() return request({Url = url, Method = "GET"}) end)
 
-    if ok and response.Success then
-        local files = game:GetService("HttpService"):JSONDecode(response.Body)
-        for _, file in ipairs(files) do
-            if file.type == "file" and file.name:match("%.lua$") then
-                local ok2, res = pcall(function() return request({Url = file.download_url, Method = "GET"}) end)
-                if ok2 and res.Success then
-                    local func = loadstring(res.Body)
-                    if func then
-                        local s, mod = pcall(func)
-                        if s and mod and mod.Run then
-                            local moduleFrame = Instance.new("Frame")
-                            moduleFrame.Size = UDim2.new(1, -10, 0, 50)
-                            moduleFrame.BackgroundTransparency = 1
-                            moduleFrame.LayoutOrder = #scrollingFrame:GetChildren() + 1
-                            moduleFrame.Parent = scrollingFrame
+    if not (ok and response.Success) then
+        print("Failed to fetch modules list")
+        return
+    end
 
-                            local button = Instance.new("TextButton")
-                            button.Size = UDim2.new(0.72, 0, 1, 0)
-                            button.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
-                            button.Text = mod.Name or file.name
-                            button.TextColor3 = Color3.fromRGB(255,255,255)
-                            button.TextSize = 15
-                            button.Parent = moduleFrame
+    local folders = game:GetService("HttpService"):JSONDecode(response.Body)
 
-                            button.MouseButton1Click:Connect(function()
-                                pcall(mod.Run)
-                                mod.enabled = not (mod.enabled or false)
-                                updateButtonVisual(button, mod.enabled)
-                                saveConfig()
-                            end)
+    for _, folder in ipairs(folders) do
+        if folder.type == "dir" then
+            local category = folder.name
+            local scrollingFrame = categoryFrames[category]
+            if not scrollingFrame then continue end
 
-                            local configBtn = Instance.new("TextButton")
-                            configBtn.Size = UDim2.new(0.25, 0, 1, 0)
-                            configBtn.Position = UDim2.new(0.76, 0, 0, 0)
-                            configBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
-                            configBtn.Text = "Config"
-                            configBtn.TextColor3 = Color3.fromRGB(255,255,255)
-                            configBtn.Parent = moduleFrame
+            -- Clear previous
+            for _, child in ipairs(scrollingFrame:GetChildren()) do
+                if child:IsA("Frame") then child:Destroy() end
+            end
 
-                            local dropdown = createConfigUI(moduleFrame, mod)
+            local catUrl = string.format("https://api.github.com/repos/%s/%s/contents/%s/%s?ref=%s", REPO_USER, REPO_NAME, GITHUB_FOLDER, category, REPO_BRANCH)
+            local catOk, catResponse = pcall(function() return request({Url = catUrl, Method = "GET"}) end)
 
-                            configBtn.MouseButton1Click:Connect(function()
-                                dropdown.Visible = not dropdown.Visible
-                                if dropdown.Visible then
-                                    moduleFrame.Size = UDim2.new(1, -10, 0, 50 + dropdown.AbsoluteContentSize.Y + 10)
-                                else
+            if catOk and catResponse.Success then
+                local files = game:GetService("HttpService"):JSONDecode(catResponse.Body)
+                for _, file in ipairs(files) do
+                    if file.type == "file" and file.name:match("%.lua$") then
+                        local ok2, res = pcall(function() return request({Url = file.download_url, Method = "GET"}) end)
+                        if ok2 and res.Success then
+                            local func = loadstring(res.Body)
+                            if func then
+                                local s, mod = pcall(func)
+                                if s and mod and mod.Run then
+                                    local moduleFrame = Instance.new("Frame")
                                     moduleFrame.Size = UDim2.new(1, -10, 0, 50)
+                                    moduleFrame.BackgroundTransparency = 1
+                                    moduleFrame.Parent = scrollingFrame
+
+                                    local button = Instance.new("TextButton")
+                                    button.Size = UDim2.new(0.72, 0, 1, 0)
+                                    button.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
+                                    button.Text = mod.Name or file.name
+                                    button.TextColor3 = Color3.fromRGB(255,255,255)
+                                    button.TextSize = 15
+                                    button.Parent = moduleFrame
+
+                                    button.MouseButton1Click:Connect(function()
+                                        pcall(mod.Run)
+                                        mod.enabled = not (mod.enabled or false)
+                                        updateButtonVisual(button, mod.enabled)
+                                        saveConfig()
+                                    end)
+
+                                    local configBtn = Instance.new("TextButton")
+                                    configBtn.Size = UDim2.new(0.25, 0, 1, 0)
+                                    configBtn.Position = UDim2.new(0.76, 0, 0, 0)
+                                    configBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
+                                    configBtn.Text = "Config"
+                                    configBtn.TextColor3 = Color3.fromRGB(255,255,255)
+                                    configBtn.Parent = moduleFrame
+
+                                    local dropdown = createConfigUI(moduleFrame, mod)
+
+                                    configBtn.MouseButton1Click:Connect(function()
+                                        dropdown.Visible = not dropdown.Visible
+                                        local extra = dropdown.Visible and dropdown.AbsoluteContentSize.Y + 10 or 0
+                                        moduleFrame.Size = UDim2.new(1, -10, 0, 50 + extra)
+                                    end)
+
+                                    modules[mod.Name or file.name] = {moduleData = mod, enabled = false, button = button}
+                                    updateButtonVisual(button, false)
                                 end
-                            end)
-
-                            modules[mod.Name or file.name] = {moduleData = mod, enabled = false, button = button}
-
-                            updateButtonVisual(button, false)
+                            end
                         end
                     end
                 end
@@ -1454,9 +1463,17 @@ local function refreshModules(category)
     end
 end
 
-for cat, _ in pairs(categoryFrames) do
-    refreshModules(cat)
-end
-
+-- Load everything at once
+refreshModules()
 loadConfig()
 print("ModuleHub loaded with GitHub integration.")
+
+-- RightShift Toggle
+local UserInputService = game:GetService("UserInputService")
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.RightShift then
+        Script_2.Visible = not Script_2.Visible
+    end
+end)
