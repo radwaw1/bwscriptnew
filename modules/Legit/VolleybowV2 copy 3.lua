@@ -1,6 +1,6 @@
 local InstantKillV2 = {}
 
-InstantKillV2.Name = "Volleybow V2"
+InstantKillV2.Name = "Volleybow V2, 4"
 InstantKillV2.Enabled = false
 
 local Players = game:GetService("Players")
