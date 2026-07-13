@@ -1294,38 +1294,59 @@ local function updateButtonVisual(button, enabled)
     button.BackgroundColor3 = enabled and Color3.fromRGB(0, 170, 0) or Color3.fromRGB(170, 0, 0)
 end
 
+local saveFile = "ModuleHub_Config.json"  -- saved in executor workspace folder
+
 local function saveConfig()
     local config = {}
     for name, mod in pairs(modules) do
-        config[name] = { enabled = mod.enabled or false, settings = {} }
+        config[name] = {
+            enabled = mod.enabled or false,
+            settings = {}
+        }
         for _, setting in ipairs(mod.moduleData.Config or {}) do
             config[name].settings[setting.Name] = setting.Value
         end
     end
-    pcall(function() writefile(saveFile, game:GetService("HttpService"):JSONEncode(config)) end)
+    
+    local success, err = pcall(function()
+        writefile(saveFile, game:GetService("HttpService"):JSONEncode(config))
+    end)
+    
+    if success then
+        print("✅ Config saved to workspace (" .. saveFile .. ")")
+    else
+        print("❌ Save failed: " .. tostring(err))
+    end
 end
 
 local function loadConfig()
-    if isfile(saveFile) then
-        local success, data = pcall(function()
-            return game:GetService("HttpService"):JSONDecode(readfile(saveFile))
-        end)
-        if success then
-            for name, cfg in pairs(data) do
-                if modules[name] then
-                    if cfg.enabled then
-                        pcall(modules[name].moduleData.Run)
-                        modules[name].enabled = true
-                        updateButtonVisual(modules[name].button, true)
-                    end
-                    for _, setting in ipairs(modules[name].moduleData.Config or {}) do
-                        if cfg.settings and cfg.settings[setting.Name] ~= nil then
-                            setting.Value = cfg.settings[setting.Name]
-                        end
+    if not isfile(saveFile) then
+        print("No save file found yet")
+        return
+    end
+    
+    local success, data = pcall(function()
+        return game:GetService("HttpService"):JSONDecode(readfile(saveFile))
+    end)
+    
+    if success then
+        for name, cfg in pairs(data) do
+            if modules[name] then
+                if cfg.enabled then
+                    pcall(modules[name].moduleData.Run)
+                    modules[name].enabled = true
+                    updateButtonVisual(modules[name].button, true)
+                end
+                for _, setting in ipairs(modules[name].moduleData.Config or {}) do
+                    if cfg.settings and cfg.settings[setting.Name] ~= nil then
+                        setting.Value = cfg.settings[setting.Name]
                     end
                 end
             end
         end
+        print("✅ Config loaded from workspace")
+    else
+        print("❌ Load failed (corrupted file)")
     end
 end
 
