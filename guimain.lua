@@ -5,6 +5,7 @@
 
 local Script = Instance.new("ScreenGui")
 Script.ResetOnSpawn = false
+Script.DisplayOrder = 999999
 
 local Script_2 = Instance.new("Frame")
 local Categories = Instance.new("Frame")
