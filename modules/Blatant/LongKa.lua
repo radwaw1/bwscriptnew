@@ -8,25 +8,28 @@ local SwordHit = game:GetService("ReplicatedStorage")
 
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
+local camera = workspace.CurrentCamera
 
 local connection = nil
 
 LongKillaura.Config = {
     { Name = "Range", Type = "Slider", Min = 10, Max = 300, Default = 120, Value = 120, Suffix = " studs" },
-    { Name = "Speed", Type = "Slider", Min = 0.01, Max = 0.4, Default = 0.12, Value = 0.12, Suffix = " seconds" }
+    { Name = "Speed", Type = "Slider", Min = 0.01, Max = 0.5, Default = 0.15, Value = 0.15, Suffix = " seconds" }
 }
 
 LongKillaura.Run = function()
     LongKillaura.Enabled = not LongKillaura.Enabled
 
     if LongKillaura.Enabled then
-        print("✅ LongKillaura Enabled (Range Bypass)")
+        print("✅ LongKillaura Enabled (Range Bypass + Camera Fix)")
         
         connection = task.spawn(function()
             while LongKillaura.Enabled do
                 local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
                 if root then
                     local selfPos = root.Position
+                    local originalCFrame = root.CFrame
+                    local originalCamCFrame = camera.CFrame
 
                     -- Find weapon
                     local weapon = nil
@@ -60,14 +63,14 @@ LongKillaura.Run = function()
                         local distance = (targetRoot.Position - selfPos).Magnitude
                         if distance > LongKillaura.Config[1].Value then continue end
 
-                        -- Save original position
-                        local originalCFrame = root.CFrame
-
-                        -- TP to target (behind them)
+                        -- TP to target
                         local behindPos = targetRoot.Position - targetRoot.CFrame.LookVector * 8
                         root.CFrame = CFrame.lookAt(behindPos, targetRoot.Position)
 
-                        task.wait(0.1)  -- More time for attack to register
+                        -- Keep camera in place
+                        camera.CFrame = originalCamCFrame
+
+                        task.wait(0.15)  -- Increased time for attack
 
                         -- Attack
                         local dir = CFrame.lookAt(selfPos, targetRoot.Position).LookVector
@@ -83,8 +86,9 @@ LongKillaura.Run = function()
                             weapon = weapon
                         })
 
-                        -- TP back immediately
+                        -- TP back + restore camera
                         root.CFrame = originalCFrame
+                        camera.CFrame = originalCamCFrame
                     end
                 end
 
