@@ -14,7 +14,7 @@ local connection = nil
 
 LongKillaura.Config = {
     { Name = "Range", Type = "Slider", Min = 10, Max = 300, Default = 120, Value = 120, Suffix = " studs" },
-    { Name = "Speed", Type = "Slider", Min = 0.01, Max = 0.5, Default = 0.08, Value = 0.08, Suffix = " seconds" }
+    { Name = "Speed", Type = "Slider", Min = 0.01, Max = 0.5, Default = 0.15, Value = 0.15, Suffix = " seconds" }
 }
 
 LongKillaura.Run = function()
@@ -70,7 +70,7 @@ LongKillaura.Run = function()
                         -- Keep camera in place
                         camera.CFrame = originalCamCFrame
 
-                        task.wait(0.15)  -- Increased time for attack
+                        task.wait(0.25)  -- Increased time for attack
 
                         -- Attack
                         local dir = CFrame.lookAt(selfPos, targetRoot.Position).LookVector
