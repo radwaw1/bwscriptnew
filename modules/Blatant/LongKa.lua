@@ -13,7 +13,7 @@ local connection = nil
 
 LongKillaura.Config = {
     { Name = "Range", Type = "Slider", Min = 10, Max = 300, Default = 120, Value = 120, Suffix = " studs" },
-    { Name = "Speed", Type = "Slider", Min = 0.01, Max = 0.3, Default = 0.08, Value = 0.08, Suffix = " seconds" }
+    { Name = "Speed", Type = "Slider", Min = 0.01, Max = 0.4, Default = 0.12, Value = 0.12, Suffix = " seconds" }
 }
 
 LongKillaura.Run = function()
@@ -67,7 +67,7 @@ LongKillaura.Run = function()
                         local behindPos = targetRoot.Position - targetRoot.CFrame.LookVector * 8
                         root.CFrame = CFrame.lookAt(behindPos, targetRoot.Position)
 
-                        task.wait(0.06)  -- Longer delay for attack to register
+                        task.wait(0.1)  -- More time for attack to register
 
                         -- Attack
                         local dir = CFrame.lookAt(selfPos, targetRoot.Position).LookVector
