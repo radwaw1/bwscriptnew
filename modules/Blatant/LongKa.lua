@@ -13,7 +13,7 @@ local connection = nil
 
 LongKillaura.Config = {
     { Name = "Range", Type = "Slider", Min = 10, Max = 300, Default = 120, Value = 120, Suffix = " studs" },
-    { Name = "Speed", Type = "Slider", Min = 0.01, Max = 0.2, Default = 0.05, Value = 0.05, Suffix = " seconds" }
+    { Name = "Speed", Type = "Slider", Min = 0.01, Max = 0.3, Default = 0.08, Value = 0.08, Suffix = " seconds" }
 }
 
 LongKillaura.Run = function()
@@ -49,7 +49,7 @@ LongKillaura.Run = function()
                     end
 
                     for _, plr in ipairs(Players:GetPlayers()) do
-                        if plr == player then continue end
+                        if plr == player or plr.Team == player.Team then continue end
 
                         local targetChar = plr.Character
                         if not targetChar or not targetChar:FindFirstChild("Humanoid") or targetChar.Humanoid.Health <= 0 then continue end
@@ -67,7 +67,7 @@ LongKillaura.Run = function()
                         local behindPos = targetRoot.Position - targetRoot.CFrame.LookVector * 8
                         root.CFrame = CFrame.lookAt(behindPos, targetRoot.Position)
 
-                        task.wait(0.03)  -- Small delay for server to register
+                        task.wait(0.06)  -- Longer delay for attack to register
 
                         -- Attack
                         local dir = CFrame.lookAt(selfPos, targetRoot.Position).LookVector
@@ -84,7 +84,6 @@ LongKillaura.Run = function()
                         })
 
                         -- TP back immediately
-                        task.wait(0.05)
                         root.CFrame = originalCFrame
                     end
                 end
