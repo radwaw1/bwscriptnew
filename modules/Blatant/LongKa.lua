@@ -13,7 +13,7 @@ local camera = workspace.CurrentCamera
 local connection = nil
 
 LongKillaura.Config = {
-    { Name = "Range", Type = "Slider", Min = 10, Max = 300, Default = 120, Value = 120, Suffix = " studs" },
+    { Name = "Range", Type = "Slider", Min = 10, Max = 120, Default = 50, Value = 50, Suffix = " studs" },
     { Name = "Speed", Type = "Slider", Min = 0.01, Max = 0.5, Default = 0.15, Value = 0.15, Suffix = " seconds" }
 }
 
