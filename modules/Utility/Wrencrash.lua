@@ -9,8 +9,8 @@ local RunService = game:GetService("RunService")
 local events = ReplicatedStorage:WaitForChild("events-@easy-games/game-core:shared/game-core-networking@getEvents.Events")
 local useAbility = events:WaitForChild("useAbility")
 
-local THREAD_COUNT = 80   -- Slightly reduced for stability
-local BATCH_SIZE = 80
+local THREAD_COUNT = 70   -- Slightly reduced for stability
+local BATCH_SIZE = 70
 local DURATION = 35
 
 local threads = {}
